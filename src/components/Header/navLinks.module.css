@@ -1,0 +1,19 @@
+.mainLink {
+  display: block;
+  padding: 6px 2px;
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 500;
+  color: var(--mantine-color-gray-6);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 100ms ease, border-color 100ms ease;
+
+  &:hover {
+    color: var(--mantine-color-dark-8);
+  }
+
+  &[data-active] {
+    color: var(--mantine-color-blue-6);
+    border-bottom-color: var(--mantine-color-blue-6);
+  }
+}
