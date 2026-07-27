@@ -1,14 +1,33 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useSession } from '#/lib/auth-client'
+import { useEffect } from 'react'
 
-export const Route = createFileRoute('/')({ component: Home })
+export const Route = createFileRoute('/')({ 
+  component: Home 
+})
 
 function Home() {
+  const navigate = useNavigate()
+  const { data: session, isPending } = useSession()
+
+  useEffect(() => {
+    // Redirect to dashboard if authenticated, otherwise to login
+    if (!isPending) {
+      if (session?.user) {
+        navigate({ to: '/dashboard' })
+      } else {
+        navigate({ to: '/login' })
+      }
+    }
+  }, [session, isPending, navigate])
+
+  // Show loading while checking auth
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold">Welcome to TanStack Start</h1>
-      <p className="mt-4 text-lg">
-        Edit <code>src/routes/index.tsx</code> to get started.
-      </p>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <p className="mt-4 text-gray-600">Loading...</p>
+      </div>
     </div>
   )
 }

@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Stack, Text, Button, Group, Card, Grid, Badge, ActionIcon, Menu, TextInput, Select, Tabs, Progress, Divider } from '@mantine/core'
 import { IconPlus, IconSearch, IconDots, IconEdit, IconCopy, IconTrash, IconStar, IconStarFilled, IconMail, IconClock, IconTrendingUp, IconMessageCircle2 } from '@tabler/icons-react'
+import { TemplatesSkeleton } from '#/components/Templates/TemplatesSkeleton'
 
 export const Route = createFileRoute('/dashboard/templates/')({
   component: TemplatesPage,
+  pendingComponent: TemplatesSkeleton,
 })
 
 interface Template {

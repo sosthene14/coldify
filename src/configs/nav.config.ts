@@ -10,6 +10,7 @@ export const navItems: NavItem[] = [
   
   { label: 'Templates', href: '/dashboard/templates' },
   { label: 'Reports', href: '/dashboard/reports' },
-  { label: 'Inbox', href: '/inbox' },
-  { label: 'Settings', href: '/settings' },
+  { label: 'Inbox', href: '/dashboard/inbox' },
+   { label: 'Calendar', href: '/dashboard/calendar' },
+  { label: 'Settings', href: '/dashboard/settings' },
 ]

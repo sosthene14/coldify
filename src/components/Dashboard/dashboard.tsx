@@ -1,3 +1,4 @@
+import { useSession } from "#/lib/auth-client.ts";
 import { PageHeader } from "../PageHeader";
 import { ActivitySidebar } from "./activity-feed";
 import { EmailActivityOverview } from "./email-activity-overview";
@@ -7,11 +8,12 @@ import { Sidebar } from "./Sidebar";
 import { TopPerformingCampaigns } from "./top-performing-campaigns";
 
 export const Dashboard = () => {
+  const {data: session} = useSession()
     return (
         <div className="p-4 bg-slate-50/10">
 
-        <PageHeader
-  title="Welcome back, Alex"
+ <PageHeader
+  title={`Welcome back, ${session?.user?.firstName || session?.user?.name?.split(' ')[0] || 'there'}`}
   subtitle="Here's what's happening with your campaigns today."
 />
 <div className="flex gap-4 mt-4">

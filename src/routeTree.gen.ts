@@ -10,13 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardCalendarIndexRouteImport } from './routes/dashboard/calendar/index'
 import { Route as DashboardCampaignsIndexRouteImport } from './routes/dashboard/campaigns/index'
 import { Route as DashboardCampaignsCampaignIdRouteImport } from './routes/dashboard/campaigns/$campaignId'
 import { Route as DashboardCampaignsNewRouteImport } from './routes/dashboard/campaigns/new'
+import { Route as DashboardInboxIndexRouteImport } from './routes/dashboard/inbox/index'
 import { Route as DashboardLeadsIndexRouteImport } from './routes/dashboard/leads/index'
 import { Route as DashboardLeadsLeadIdRouteImport } from './routes/dashboard/leads/$leadId'
 import { Route as DashboardLeadsImportRouteImport } from './routes/dashboard/leads/import'
+import { Route as DashboardReportsIndexRouteImport } from './routes/dashboard/reports/index'
+import { Route as DashboardSettingsIndexRouteImport } from './routes/dashboard/settings/index'
 import { Route as DashboardTemplatesIndexRouteImport } from './routes/dashboard/templates/index'
 import { Route as DashboardTemplatesNewRouteImport } from './routes/dashboard/templates/new'
 
@@ -25,140 +36,257 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: '/dashboard/',
-  path: '/dashboard/',
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardCampaignsIndexRoute = DashboardCampaignsIndexRouteImport.update({
-  id: '/dashboard/campaigns/',
-  path: '/dashboard/campaigns/',
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCalendarIndexRoute = DashboardCalendarIndexRouteImport.update({
+  id: '/calendar/',
+  path: '/calendar/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCampaignsIndexRoute = DashboardCampaignsIndexRouteImport.update({
+  id: '/campaigns/',
+  path: '/campaigns/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardCampaignsCampaignIdRoute =
   DashboardCampaignsCampaignIdRouteImport.update({
-    id: '/dashboard/campaigns/$campaignId',
-    path: '/dashboard/campaigns/$campaignId',
-    getParentRoute: () => rootRouteImport,
+    id: '/campaigns/$campaignId',
+    path: '/campaigns/$campaignId',
+    getParentRoute: () => DashboardRoute,
   } as any)
 const DashboardCampaignsNewRoute = DashboardCampaignsNewRouteImport.update({
-  id: '/dashboard/campaigns/new',
-  path: '/dashboard/campaigns/new',
-  getParentRoute: () => rootRouteImport,
+  id: '/campaigns/new',
+  path: '/campaigns/new',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardInboxIndexRoute = DashboardInboxIndexRouteImport.update({
+  id: '/inbox/',
+  path: '/inbox/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardLeadsIndexRoute = DashboardLeadsIndexRouteImport.update({
-  id: '/dashboard/leads/',
-  path: '/dashboard/leads/',
-  getParentRoute: () => rootRouteImport,
+  id: '/leads/',
+  path: '/leads/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardLeadsLeadIdRoute = DashboardLeadsLeadIdRouteImport.update({
-  id: '/dashboard/leads/$leadId',
-  path: '/dashboard/leads/$leadId',
-  getParentRoute: () => rootRouteImport,
+  id: '/leads/$leadId',
+  path: '/leads/$leadId',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardLeadsImportRoute = DashboardLeadsImportRouteImport.update({
-  id: '/dashboard/leads/import',
-  path: '/dashboard/leads/import',
-  getParentRoute: () => rootRouteImport,
+  id: '/leads/import',
+  path: '/leads/import',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardReportsIndexRoute = DashboardReportsIndexRouteImport.update({
+  id: '/reports/',
+  path: '/reports/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardTemplatesIndexRoute = DashboardTemplatesIndexRouteImport.update({
-  id: '/dashboard/templates/',
-  path: '/dashboard/templates/',
-  getParentRoute: () => rootRouteImport,
+  id: '/templates/',
+  path: '/templates/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardTemplatesNewRoute = DashboardTemplatesNewRouteImport.update({
-  id: '/dashboard/templates/new',
-  path: '/dashboard/templates/new',
-  getParentRoute: () => rootRouteImport,
+  id: '/templates/new',
+  path: '/templates/new',
+  getParentRoute: () => DashboardRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/campaigns/$campaignId': typeof DashboardCampaignsCampaignIdRoute
   '/dashboard/campaigns/new': typeof DashboardCampaignsNewRoute
   '/dashboard/leads/$leadId': typeof DashboardLeadsLeadIdRoute
   '/dashboard/leads/import': typeof DashboardLeadsImportRoute
   '/dashboard/templates/new': typeof DashboardTemplatesNewRoute
+  '/dashboard/calendar/': typeof DashboardCalendarIndexRoute
   '/dashboard/campaigns/': typeof DashboardCampaignsIndexRoute
+  '/dashboard/inbox/': typeof DashboardInboxIndexRoute
   '/dashboard/leads/': typeof DashboardLeadsIndexRoute
+  '/dashboard/reports/': typeof DashboardReportsIndexRoute
+  '/dashboard/settings/': typeof DashboardSettingsIndexRoute
   '/dashboard/templates/': typeof DashboardTemplatesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/campaigns/$campaignId': typeof DashboardCampaignsCampaignIdRoute
   '/dashboard/campaigns/new': typeof DashboardCampaignsNewRoute
   '/dashboard/leads/$leadId': typeof DashboardLeadsLeadIdRoute
   '/dashboard/leads/import': typeof DashboardLeadsImportRoute
   '/dashboard/templates/new': typeof DashboardTemplatesNewRoute
+  '/dashboard/calendar': typeof DashboardCalendarIndexRoute
   '/dashboard/campaigns': typeof DashboardCampaignsIndexRoute
+  '/dashboard/inbox': typeof DashboardInboxIndexRoute
   '/dashboard/leads': typeof DashboardLeadsIndexRoute
+  '/dashboard/reports': typeof DashboardReportsIndexRoute
+  '/dashboard/settings': typeof DashboardSettingsIndexRoute
   '/dashboard/templates': typeof DashboardTemplatesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/campaigns/$campaignId': typeof DashboardCampaignsCampaignIdRoute
   '/dashboard/campaigns/new': typeof DashboardCampaignsNewRoute
   '/dashboard/leads/$leadId': typeof DashboardLeadsLeadIdRoute
   '/dashboard/leads/import': typeof DashboardLeadsImportRoute
   '/dashboard/templates/new': typeof DashboardTemplatesNewRoute
+  '/dashboard/calendar/': typeof DashboardCalendarIndexRoute
   '/dashboard/campaigns/': typeof DashboardCampaignsIndexRoute
+  '/dashboard/inbox/': typeof DashboardInboxIndexRoute
   '/dashboard/leads/': typeof DashboardLeadsIndexRoute
+  '/dashboard/reports/': typeof DashboardReportsIndexRoute
+  '/dashboard/settings/': typeof DashboardSettingsIndexRoute
   '/dashboard/templates/': typeof DashboardTemplatesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/onboarding'
+    | '/register'
+    | '/reset-password'
+    | '/verify-email'
     | '/dashboard/'
     | '/dashboard/campaigns/$campaignId'
     | '/dashboard/campaigns/new'
     | '/dashboard/leads/$leadId'
     | '/dashboard/leads/import'
     | '/dashboard/templates/new'
+    | '/dashboard/calendar/'
     | '/dashboard/campaigns/'
+    | '/dashboard/inbox/'
     | '/dashboard/leads/'
+    | '/dashboard/reports/'
+    | '/dashboard/settings/'
     | '/dashboard/templates/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/onboarding'
+    | '/register'
+    | '/reset-password'
+    | '/verify-email'
     | '/dashboard'
     | '/dashboard/campaigns/$campaignId'
     | '/dashboard/campaigns/new'
     | '/dashboard/leads/$leadId'
     | '/dashboard/leads/import'
     | '/dashboard/templates/new'
+    | '/dashboard/calendar'
     | '/dashboard/campaigns'
+    | '/dashboard/inbox'
     | '/dashboard/leads'
+    | '/dashboard/reports'
+    | '/dashboard/settings'
     | '/dashboard/templates'
   id:
     | '__root__'
     | '/'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/onboarding'
+    | '/register'
+    | '/reset-password'
+    | '/verify-email'
     | '/dashboard/'
     | '/dashboard/campaigns/$campaignId'
     | '/dashboard/campaigns/new'
     | '/dashboard/leads/$leadId'
     | '/dashboard/leads/import'
     | '/dashboard/templates/new'
+    | '/dashboard/calendar/'
     | '/dashboard/campaigns/'
+    | '/dashboard/inbox/'
     | '/dashboard/leads/'
+    | '/dashboard/reports/'
+    | '/dashboard/settings/'
     | '/dashboard/templates/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardCampaignsCampaignIdRoute: typeof DashboardCampaignsCampaignIdRoute
-  DashboardCampaignsNewRoute: typeof DashboardCampaignsNewRoute
-  DashboardLeadsLeadIdRoute: typeof DashboardLeadsLeadIdRoute
-  DashboardLeadsImportRoute: typeof DashboardLeadsImportRoute
-  DashboardTemplatesNewRoute: typeof DashboardTemplatesNewRoute
-  DashboardCampaignsIndexRoute: typeof DashboardCampaignsIndexRoute
-  DashboardLeadsIndexRoute: typeof DashboardLeadsIndexRoute
-  DashboardTemplatesIndexRoute: typeof DashboardTemplatesIndexRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
+  RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -170,83 +298,194 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/': {
       id: '/dashboard/'
-      path: '/dashboard'
+      path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/calendar/': {
+      id: '/dashboard/calendar/'
+      path: '/calendar'
+      fullPath: '/dashboard/calendar/'
+      preLoaderRoute: typeof DashboardCalendarIndexRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/campaigns/': {
       id: '/dashboard/campaigns/'
-      path: '/dashboard/campaigns'
+      path: '/campaigns'
       fullPath: '/dashboard/campaigns/'
       preLoaderRoute: typeof DashboardCampaignsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/campaigns/$campaignId': {
       id: '/dashboard/campaigns/$campaignId'
-      path: '/dashboard/campaigns/$campaignId'
+      path: '/campaigns/$campaignId'
       fullPath: '/dashboard/campaigns/$campaignId'
       preLoaderRoute: typeof DashboardCampaignsCampaignIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/campaigns/new': {
       id: '/dashboard/campaigns/new'
-      path: '/dashboard/campaigns/new'
+      path: '/campaigns/new'
       fullPath: '/dashboard/campaigns/new'
       preLoaderRoute: typeof DashboardCampaignsNewRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/inbox/': {
+      id: '/dashboard/inbox/'
+      path: '/inbox'
+      fullPath: '/dashboard/inbox/'
+      preLoaderRoute: typeof DashboardInboxIndexRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/leads/': {
       id: '/dashboard/leads/'
-      path: '/dashboard/leads'
+      path: '/leads'
       fullPath: '/dashboard/leads/'
       preLoaderRoute: typeof DashboardLeadsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/leads/$leadId': {
       id: '/dashboard/leads/$leadId'
-      path: '/dashboard/leads/$leadId'
+      path: '/leads/$leadId'
       fullPath: '/dashboard/leads/$leadId'
       preLoaderRoute: typeof DashboardLeadsLeadIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/leads/import': {
       id: '/dashboard/leads/import'
-      path: '/dashboard/leads/import'
+      path: '/leads/import'
       fullPath: '/dashboard/leads/import'
       preLoaderRoute: typeof DashboardLeadsImportRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/reports/': {
+      id: '/dashboard/reports/'
+      path: '/reports'
+      fullPath: '/dashboard/reports/'
+      preLoaderRoute: typeof DashboardReportsIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/settings/': {
+      id: '/dashboard/settings/'
+      path: '/settings'
+      fullPath: '/dashboard/settings/'
+      preLoaderRoute: typeof DashboardSettingsIndexRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/templates/': {
       id: '/dashboard/templates/'
-      path: '/dashboard/templates'
+      path: '/templates'
       fullPath: '/dashboard/templates/'
       preLoaderRoute: typeof DashboardTemplatesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/templates/new': {
       id: '/dashboard/templates/new'
-      path: '/dashboard/templates/new'
+      path: '/templates/new'
       fullPath: '/dashboard/templates/new'
       preLoaderRoute: typeof DashboardTemplatesNewRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+interface DashboardRouteChildren {
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardCampaignsCampaignIdRoute: typeof DashboardCampaignsCampaignIdRoute
+  DashboardCampaignsNewRoute: typeof DashboardCampaignsNewRoute
+  DashboardLeadsLeadIdRoute: typeof DashboardLeadsLeadIdRoute
+  DashboardLeadsImportRoute: typeof DashboardLeadsImportRoute
+  DashboardTemplatesNewRoute: typeof DashboardTemplatesNewRoute
+  DashboardCalendarIndexRoute: typeof DashboardCalendarIndexRoute
+  DashboardCampaignsIndexRoute: typeof DashboardCampaignsIndexRoute
+  DashboardInboxIndexRoute: typeof DashboardInboxIndexRoute
+  DashboardLeadsIndexRoute: typeof DashboardLeadsIndexRoute
+  DashboardReportsIndexRoute: typeof DashboardReportsIndexRoute
+  DashboardSettingsIndexRoute: typeof DashboardSettingsIndexRoute
+  DashboardTemplatesIndexRoute: typeof DashboardTemplatesIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardCampaignsCampaignIdRoute: DashboardCampaignsCampaignIdRoute,
   DashboardCampaignsNewRoute: DashboardCampaignsNewRoute,
   DashboardLeadsLeadIdRoute: DashboardLeadsLeadIdRoute,
   DashboardLeadsImportRoute: DashboardLeadsImportRoute,
   DashboardTemplatesNewRoute: DashboardTemplatesNewRoute,
+  DashboardCalendarIndexRoute: DashboardCalendarIndexRoute,
   DashboardCampaignsIndexRoute: DashboardCampaignsIndexRoute,
+  DashboardInboxIndexRoute: DashboardInboxIndexRoute,
   DashboardLeadsIndexRoute: DashboardLeadsIndexRoute,
+  DashboardReportsIndexRoute: DashboardReportsIndexRoute,
+  DashboardSettingsIndexRoute: DashboardSettingsIndexRoute,
   DashboardTemplatesIndexRoute: DashboardTemplatesIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
+  RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

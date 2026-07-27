@@ -22,6 +22,7 @@
     "@tanstack/react-devtools": "latest",
     "@tanstack/react-router": "latest",
     "@tanstack/react-router-devtools": "latest",
+    "better-auth": "^1.6.25",
     "dayjs": "^1.11.21",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

@@ -17,8 +17,8 @@ export interface Campaign {
   lastActivity: string
   starred: boolean
   icon: any
-  iconColor: string
-  iconBg: string
+  iconColor?: string
+  iconBg?: string
 }
 
 const statusColor: Record<Status, string> = {

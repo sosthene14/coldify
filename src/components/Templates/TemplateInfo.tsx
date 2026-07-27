@@ -1,0 +1,64 @@
+import { categories, languages } from '#/types/template.ts';
+import { Card, Stack, TextInput, Textarea, Group, Select } from '@mantine/core'
+ 
+
+interface TemplateInfoProps {
+  templateName: string
+  setTemplateName: (value: string) => void
+  description: string
+  setDescription: (value: string) => void
+  category: string | null
+  setCategory: (value: string | null) => void
+  language: string | null
+  setLanguage: (value: string | null) => void
+}
+
+export function TemplateInfo({
+  templateName,
+  setTemplateName,
+  description,
+  setDescription,
+  category,
+  setCategory,
+  language,
+  setLanguage,
+}: TemplateInfoProps) {
+  return (
+    <Card withBorder radius="md" p="lg" bg="white">
+      <Stack gap="sm">
+        <TextInput
+          label="Template name"
+          placeholder="e.g. Q3 SaaS Outreach - Email 1"
+          size="md"
+          value={templateName}
+          onChange={(e) => setTemplateName(e.currentTarget.value)}
+        />
+        <Textarea
+          label="Description"
+          placeholder="What's this template for? Who is it aimed at?"
+          autosize
+          minRows={2}
+          value={description}
+          onChange={(e) => setDescription(e.currentTarget.value)}
+        />
+        <Group grow>
+          <Select
+            label="Category"
+            placeholder="Select category"
+            data={categories}
+            value={category}
+            onChange={setCategory}
+          />
+          <Select
+            label="Language"
+            placeholder="Select language"
+            data={languages}
+            value={language}
+            onChange={setLanguage}
+            defaultValue="French"
+          />
+        </Group>
+      </Stack>
+    </Card>
+  )
+}

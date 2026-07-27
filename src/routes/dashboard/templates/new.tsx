@@ -1,6 +1,7 @@
+import { TemplateCreatePage } from '#/components/Templates/index.tsx';
+import type { TemplateFormData } from '#/components/Templates/types.ts';
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { CreateTemplate } from '#/components/Templates'
-import type { TemplateFormData } from '#/components/Templates'
+ 
 
 export const Route = createFileRoute('/dashboard/templates/new')({
   component: NewTemplatePage,
@@ -21,9 +22,8 @@ function NewTemplatePage() {
   }
 
   return (
-    <CreateTemplate 
-      onSubmit={handleSubmit}
-      onCancel={handleCancel}
+    <TemplateCreatePage 
+      
     />
   )
 }
