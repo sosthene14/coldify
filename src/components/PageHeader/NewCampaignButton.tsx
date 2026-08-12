@@ -13,7 +13,7 @@ export function NewCampaignButton({ onCreate }: NewCampaignButtonProps) {
     if (onCreate) {
       onCreate()
     } else {
-      navigate({ to: '/dashboard/campaigns/new' })
+      navigate({ to: '/dashboard/mails/new' })
     }
   }
 
@@ -25,7 +25,7 @@ export function NewCampaignButton({ onCreate }: NewCampaignButtonProps) {
         radius="sm"
         onClick={handleClick}
       >
-        New Campaign
+        New Mail
       </Button>
     </Button.Group>
   )

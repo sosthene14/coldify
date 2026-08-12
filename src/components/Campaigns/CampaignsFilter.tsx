@@ -1,5 +1,5 @@
 import { Stack, UnstyledButton, Group, Text } from '@mantine/core'
-import { campaignFilters } from '#/configs/campaignFilters.config'
+import { emailFilters } from '#/configs/emailFilters.config'
 
 type FilterValue = 'All Campaigns' | 'Starred' | 'Drafts' | 'Running' | 'Paused' | 'Completed'
 
@@ -11,7 +11,7 @@ interface CampaignsFilterProps {
 export function CampaignsFilter({ activeFilter, onFilterChange }: CampaignsFilterProps) {
   return (
     <Stack gap="xs">
-      {campaignFilters?.map((filter) => {
+      {emailFilters?.map((filter) => {
         const Icon = filter.icon
         const isActive = activeFilter === filter.label
 

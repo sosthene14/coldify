@@ -1,16 +1,16 @@
 import { useNavigate } from '@tanstack/react-router'
 import { Card, Stack, Text, Group, Badge, Button, Tabs, Grid } from '@mantine/core'
 import { IconArrowLeft, IconEdit, IconPlayerPause, IconTrash } from '@tabler/icons-react'
-import { Route } from '#/routes/dashboard/campaigns/$campaignId'
+import { Route } from '#/routes/dashboard/mails/$mailId'
 
 
 export function CampaignDetailPage() {
   const navigate = useNavigate()
-  const { campaignId } = Route.useParams()
+  const { mailId } = Route.useParams()
 
   // Mock data - in real app, fetch from API
   const campaign = {
-    id: campaignId,
+    id: mailId,
     name: 'Q3 SaaS Outreach',
     status: 'Running',
     leads: 2450,
@@ -28,7 +28,7 @@ export function CampaignDetailPage() {
         <Button
           variant="subtle"
           leftSection={<IconArrowLeft size={16} />}
-          onClick={() => navigate({ to: '/dashboard/campaigns' })}
+          onClick={() => navigate({ to: '/dashboard/mails' })}
           w="fit-content"
         >
           Back to Campaigns
@@ -53,7 +53,7 @@ export function CampaignDetailPage() {
             <Button
               variant="default"
               leftSection={<IconEdit size={16} />}
-              onClick={() => navigate({ to: `/dashboard/campaigns/${campaignId}/edit` })}
+              onClick={() => navigate({ to: `/dashboard/mails/${mailId}/edit` })}
             >
               Edit
             </Button>
@@ -105,7 +105,7 @@ export function CampaignDetailPage() {
               </Text>
             </Card>
           </Grid.Col>
-          <Grid.Col span={3}>
+          {/* <Grid.Col span={3}>
             <Card withBorder radius="md" p="lg" bg="white">
               <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
                 Reply Rate
@@ -114,7 +114,7 @@ export function CampaignDetailPage() {
                 {campaign.replyRate}%
               </Text>
             </Card>
-          </Grid.Col>
+          </Grid.Col> */}
         </Grid>
 
         {/* Tabs for different views */}

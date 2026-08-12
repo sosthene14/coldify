@@ -30,9 +30,40 @@ export const mergeTagGroups: MergeTagGroup[] = [
   },
 ]
 
-export const categories = ['Cold Outreach', 'Follow-up', 'Breakup Email', 'Meeting Request', 'Re-engagement']
+export const categories = [
+  'Professional',
+  'Sales',
+  'Marketing',
+  'Follow-up',
+  'Personal',
+  'Transactional',
+  'Newsletter',
+  'Support',
+  'Recruitment',
+  'Networking',
+]
 export const languages = ['French', 'English', 'Spanish', 'German']
 export const tones = ['Direct', 'Casual', 'Formal', 'Friendly', 'Bold']
 export const lengths = ['Short (~50 words)', 'Medium (~100 words)', 'Long (~150 words)']
 export const goals = ['Book a call', 'Get a reply', 'Drive a click', 'Build awareness']
 export const previewLeads = ['John Doe - Acme Inc', 'Jane Smith - TechCo', 'Alice Williams - Agency Co']
+
+export interface Template {
+  id: string
+  name: string
+  subject: string
+  body?: string // Optional for list view
+  category: string
+  language: string
+  preview: string
+  usageCount: number
+  openRate: number | null
+  replyRate: number | null
+  starred?: boolean // Computed on frontend based on user's starred list
+  createdAt: string
+  updatedAt: string
+  lastUsedAt?: string | null
+  organizationId?: string
+  ownerId?: string
+  isPrivate?: boolean
+}

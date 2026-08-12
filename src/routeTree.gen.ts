@@ -13,23 +13,19 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
-import { Route as DashboardCalendarIndexRouteImport } from './routes/dashboard/calendar/index'
-import { Route as DashboardCampaignsIndexRouteImport } from './routes/dashboard/campaigns/index'
-import { Route as DashboardCampaignsCampaignIdRouteImport } from './routes/dashboard/campaigns/$campaignId'
-import { Route as DashboardCampaignsNewRouteImport } from './routes/dashboard/campaigns/new'
-import { Route as DashboardInboxIndexRouteImport } from './routes/dashboard/inbox/index'
-import { Route as DashboardLeadsIndexRouteImport } from './routes/dashboard/leads/index'
-import { Route as DashboardLeadsLeadIdRouteImport } from './routes/dashboard/leads/$leadId'
-import { Route as DashboardLeadsImportRouteImport } from './routes/dashboard/leads/import'
-import { Route as DashboardReportsIndexRouteImport } from './routes/dashboard/reports/index'
+import { Route as DashboardMailsIndexRouteImport } from './routes/dashboard/mails/index'
+import { Route as DashboardMailsMailIdRouteImport } from './routes/dashboard/mails/$mailId'
+import { Route as DashboardMailsNewRouteImport } from './routes/dashboard/mails/new'
 import { Route as DashboardSettingsIndexRouteImport } from './routes/dashboard/settings/index'
 import { Route as DashboardTemplatesIndexRouteImport } from './routes/dashboard/templates/index'
 import { Route as DashboardTemplatesNewRouteImport } from './routes/dashboard/templates/new'
+import { Route as DashboardEmailHistoryEmailIdStatsRouteImport } from './routes/dashboard/email-history/$emailId.stats'
+import { Route as DashboardTemplatesTemplateIdEditRouteImport } from './routes/dashboard/templates/$templateId.edit'
+import { Route as DashboardTemplatesTemplateIdStatsRouteImport } from './routes/dashboard/templates/$templateId.stats'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -49,11 +45,6 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -76,50 +67,19 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardCalendarIndexRoute = DashboardCalendarIndexRouteImport.update({
-  id: '/calendar/',
-  path: '/calendar/',
+const DashboardMailsIndexRoute = DashboardMailsIndexRouteImport.update({
+  id: '/mails/',
+  path: '/mails/',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardCampaignsIndexRoute = DashboardCampaignsIndexRouteImport.update({
-  id: '/campaigns/',
-  path: '/campaigns/',
+const DashboardMailsMailIdRoute = DashboardMailsMailIdRouteImport.update({
+  id: '/mails/$mailId',
+  path: '/mails/$mailId',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardCampaignsCampaignIdRoute =
-  DashboardCampaignsCampaignIdRouteImport.update({
-    id: '/campaigns/$campaignId',
-    path: '/campaigns/$campaignId',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardCampaignsNewRoute = DashboardCampaignsNewRouteImport.update({
-  id: '/campaigns/new',
-  path: '/campaigns/new',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardInboxIndexRoute = DashboardInboxIndexRouteImport.update({
-  id: '/inbox/',
-  path: '/inbox/',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardLeadsIndexRoute = DashboardLeadsIndexRouteImport.update({
-  id: '/leads/',
-  path: '/leads/',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardLeadsLeadIdRoute = DashboardLeadsLeadIdRouteImport.update({
-  id: '/leads/$leadId',
-  path: '/leads/$leadId',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardLeadsImportRoute = DashboardLeadsImportRouteImport.update({
-  id: '/leads/import',
-  path: '/leads/import',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardReportsIndexRoute = DashboardReportsIndexRouteImport.update({
-  id: '/reports/',
-  path: '/reports/',
+const DashboardMailsNewRoute = DashboardMailsNewRouteImport.update({
+  id: '/mails/new',
+  path: '/mails/new',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
@@ -137,51 +97,61 @@ const DashboardTemplatesNewRoute = DashboardTemplatesNewRouteImport.update({
   path: '/templates/new',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardEmailHistoryEmailIdStatsRoute =
+  DashboardEmailHistoryEmailIdStatsRouteImport.update({
+    id: '/email-history/$emailId/stats',
+    path: '/email-history/$emailId/stats',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardTemplatesTemplateIdEditRoute =
+  DashboardTemplatesTemplateIdEditRouteImport.update({
+    id: '/templates/$templateId/edit',
+    path: '/templates/$templateId/edit',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardTemplatesTemplateIdStatsRoute =
+  DashboardTemplatesTemplateIdStatsRouteImport.update({
+    id: '/templates/$templateId/stats',
+    path: '/templates/$templateId/stats',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
-  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/dashboard/campaigns/$campaignId': typeof DashboardCampaignsCampaignIdRoute
-  '/dashboard/campaigns/new': typeof DashboardCampaignsNewRoute
-  '/dashboard/leads/$leadId': typeof DashboardLeadsLeadIdRoute
-  '/dashboard/leads/import': typeof DashboardLeadsImportRoute
+  '/dashboard/mails/$mailId': typeof DashboardMailsMailIdRoute
+  '/dashboard/mails/new': typeof DashboardMailsNewRoute
   '/dashboard/templates/new': typeof DashboardTemplatesNewRoute
-  '/dashboard/calendar/': typeof DashboardCalendarIndexRoute
-  '/dashboard/campaigns/': typeof DashboardCampaignsIndexRoute
-  '/dashboard/inbox/': typeof DashboardInboxIndexRoute
-  '/dashboard/leads/': typeof DashboardLeadsIndexRoute
-  '/dashboard/reports/': typeof DashboardReportsIndexRoute
+  '/dashboard/mails/': typeof DashboardMailsIndexRoute
   '/dashboard/settings/': typeof DashboardSettingsIndexRoute
   '/dashboard/templates/': typeof DashboardTemplatesIndexRoute
+  '/dashboard/email-history/$emailId/stats': typeof DashboardEmailHistoryEmailIdStatsRoute
+  '/dashboard/templates/$templateId/edit': typeof DashboardTemplatesTemplateIdEditRoute
+  '/dashboard/templates/$templateId/stats': typeof DashboardTemplatesTemplateIdStatsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
-  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
   '/dashboard': typeof DashboardIndexRoute
-  '/dashboard/campaigns/$campaignId': typeof DashboardCampaignsCampaignIdRoute
-  '/dashboard/campaigns/new': typeof DashboardCampaignsNewRoute
-  '/dashboard/leads/$leadId': typeof DashboardLeadsLeadIdRoute
-  '/dashboard/leads/import': typeof DashboardLeadsImportRoute
+  '/dashboard/mails/$mailId': typeof DashboardMailsMailIdRoute
+  '/dashboard/mails/new': typeof DashboardMailsNewRoute
   '/dashboard/templates/new': typeof DashboardTemplatesNewRoute
-  '/dashboard/calendar': typeof DashboardCalendarIndexRoute
-  '/dashboard/campaigns': typeof DashboardCampaignsIndexRoute
-  '/dashboard/inbox': typeof DashboardInboxIndexRoute
-  '/dashboard/leads': typeof DashboardLeadsIndexRoute
-  '/dashboard/reports': typeof DashboardReportsIndexRoute
+  '/dashboard/mails': typeof DashboardMailsIndexRoute
   '/dashboard/settings': typeof DashboardSettingsIndexRoute
   '/dashboard/templates': typeof DashboardTemplatesIndexRoute
+  '/dashboard/email-history/$emailId/stats': typeof DashboardEmailHistoryEmailIdStatsRoute
+  '/dashboard/templates/$templateId/edit': typeof DashboardTemplatesTemplateIdEditRoute
+  '/dashboard/templates/$templateId/stats': typeof DashboardTemplatesTemplateIdStatsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -189,23 +159,19 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
-  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/dashboard/campaigns/$campaignId': typeof DashboardCampaignsCampaignIdRoute
-  '/dashboard/campaigns/new': typeof DashboardCampaignsNewRoute
-  '/dashboard/leads/$leadId': typeof DashboardLeadsLeadIdRoute
-  '/dashboard/leads/import': typeof DashboardLeadsImportRoute
+  '/dashboard/mails/$mailId': typeof DashboardMailsMailIdRoute
+  '/dashboard/mails/new': typeof DashboardMailsNewRoute
   '/dashboard/templates/new': typeof DashboardTemplatesNewRoute
-  '/dashboard/calendar/': typeof DashboardCalendarIndexRoute
-  '/dashboard/campaigns/': typeof DashboardCampaignsIndexRoute
-  '/dashboard/inbox/': typeof DashboardInboxIndexRoute
-  '/dashboard/leads/': typeof DashboardLeadsIndexRoute
-  '/dashboard/reports/': typeof DashboardReportsIndexRoute
+  '/dashboard/mails/': typeof DashboardMailsIndexRoute
   '/dashboard/settings/': typeof DashboardSettingsIndexRoute
   '/dashboard/templates/': typeof DashboardTemplatesIndexRoute
+  '/dashboard/email-history/$emailId/stats': typeof DashboardEmailHistoryEmailIdStatsRoute
+  '/dashboard/templates/$templateId/edit': typeof DashboardTemplatesTemplateIdEditRoute
+  '/dashboard/templates/$templateId/stats': typeof DashboardTemplatesTemplateIdStatsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -214,68 +180,56 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/forgot-password'
     | '/login'
-    | '/onboarding'
     | '/register'
     | '/reset-password'
     | '/verify-email'
     | '/dashboard/'
-    | '/dashboard/campaigns/$campaignId'
-    | '/dashboard/campaigns/new'
-    | '/dashboard/leads/$leadId'
-    | '/dashboard/leads/import'
+    | '/dashboard/mails/$mailId'
+    | '/dashboard/mails/new'
     | '/dashboard/templates/new'
-    | '/dashboard/calendar/'
-    | '/dashboard/campaigns/'
-    | '/dashboard/inbox/'
-    | '/dashboard/leads/'
-    | '/dashboard/reports/'
+    | '/dashboard/mails/'
     | '/dashboard/settings/'
     | '/dashboard/templates/'
+    | '/dashboard/email-history/$emailId/stats'
+    | '/dashboard/templates/$templateId/edit'
+    | '/dashboard/templates/$templateId/stats'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/forgot-password'
     | '/login'
-    | '/onboarding'
     | '/register'
     | '/reset-password'
     | '/verify-email'
     | '/dashboard'
-    | '/dashboard/campaigns/$campaignId'
-    | '/dashboard/campaigns/new'
-    | '/dashboard/leads/$leadId'
-    | '/dashboard/leads/import'
+    | '/dashboard/mails/$mailId'
+    | '/dashboard/mails/new'
     | '/dashboard/templates/new'
-    | '/dashboard/calendar'
-    | '/dashboard/campaigns'
-    | '/dashboard/inbox'
-    | '/dashboard/leads'
-    | '/dashboard/reports'
+    | '/dashboard/mails'
     | '/dashboard/settings'
     | '/dashboard/templates'
+    | '/dashboard/email-history/$emailId/stats'
+    | '/dashboard/templates/$templateId/edit'
+    | '/dashboard/templates/$templateId/stats'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
     | '/forgot-password'
     | '/login'
-    | '/onboarding'
     | '/register'
     | '/reset-password'
     | '/verify-email'
     | '/dashboard/'
-    | '/dashboard/campaigns/$campaignId'
-    | '/dashboard/campaigns/new'
-    | '/dashboard/leads/$leadId'
-    | '/dashboard/leads/import'
+    | '/dashboard/mails/$mailId'
+    | '/dashboard/mails/new'
     | '/dashboard/templates/new'
-    | '/dashboard/calendar/'
-    | '/dashboard/campaigns/'
-    | '/dashboard/inbox/'
-    | '/dashboard/leads/'
-    | '/dashboard/reports/'
+    | '/dashboard/mails/'
     | '/dashboard/settings/'
     | '/dashboard/templates/'
+    | '/dashboard/email-history/$emailId/stats'
+    | '/dashboard/templates/$templateId/edit'
+    | '/dashboard/templates/$templateId/stats'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -283,7 +237,6 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
-  OnboardingRoute: typeof OnboardingRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
@@ -319,13 +272,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -354,67 +300,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/calendar/': {
-      id: '/dashboard/calendar/'
-      path: '/calendar'
-      fullPath: '/dashboard/calendar/'
-      preLoaderRoute: typeof DashboardCalendarIndexRouteImport
+    '/dashboard/mails/': {
+      id: '/dashboard/mails/'
+      path: '/mails'
+      fullPath: '/dashboard/mails/'
+      preLoaderRoute: typeof DashboardMailsIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/campaigns/': {
-      id: '/dashboard/campaigns/'
-      path: '/campaigns'
-      fullPath: '/dashboard/campaigns/'
-      preLoaderRoute: typeof DashboardCampaignsIndexRouteImport
+    '/dashboard/mails/$mailId': {
+      id: '/dashboard/mails/$mailId'
+      path: '/mails/$mailId'
+      fullPath: '/dashboard/mails/$mailId'
+      preLoaderRoute: typeof DashboardMailsMailIdRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/campaigns/$campaignId': {
-      id: '/dashboard/campaigns/$campaignId'
-      path: '/campaigns/$campaignId'
-      fullPath: '/dashboard/campaigns/$campaignId'
-      preLoaderRoute: typeof DashboardCampaignsCampaignIdRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/campaigns/new': {
-      id: '/dashboard/campaigns/new'
-      path: '/campaigns/new'
-      fullPath: '/dashboard/campaigns/new'
-      preLoaderRoute: typeof DashboardCampaignsNewRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/inbox/': {
-      id: '/dashboard/inbox/'
-      path: '/inbox'
-      fullPath: '/dashboard/inbox/'
-      preLoaderRoute: typeof DashboardInboxIndexRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/leads/': {
-      id: '/dashboard/leads/'
-      path: '/leads'
-      fullPath: '/dashboard/leads/'
-      preLoaderRoute: typeof DashboardLeadsIndexRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/leads/$leadId': {
-      id: '/dashboard/leads/$leadId'
-      path: '/leads/$leadId'
-      fullPath: '/dashboard/leads/$leadId'
-      preLoaderRoute: typeof DashboardLeadsLeadIdRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/leads/import': {
-      id: '/dashboard/leads/import'
-      path: '/leads/import'
-      fullPath: '/dashboard/leads/import'
-      preLoaderRoute: typeof DashboardLeadsImportRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/reports/': {
-      id: '/dashboard/reports/'
-      path: '/reports'
-      fullPath: '/dashboard/reports/'
-      preLoaderRoute: typeof DashboardReportsIndexRouteImport
+    '/dashboard/mails/new': {
+      id: '/dashboard/mails/new'
+      path: '/mails/new'
+      fullPath: '/dashboard/mails/new'
+      preLoaderRoute: typeof DashboardMailsNewRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/settings/': {
@@ -438,39 +342,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTemplatesNewRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/email-history/$emailId/stats': {
+      id: '/dashboard/email-history/$emailId/stats'
+      path: '/email-history/$emailId/stats'
+      fullPath: '/dashboard/email-history/$emailId/stats'
+      preLoaderRoute: typeof DashboardEmailHistoryEmailIdStatsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/templates/$templateId/edit': {
+      id: '/dashboard/templates/$templateId/edit'
+      path: '/templates/$templateId/edit'
+      fullPath: '/dashboard/templates/$templateId/edit'
+      preLoaderRoute: typeof DashboardTemplatesTemplateIdEditRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/templates/$templateId/stats': {
+      id: '/dashboard/templates/$templateId/stats'
+      path: '/templates/$templateId/stats'
+      fullPath: '/dashboard/templates/$templateId/stats'
+      preLoaderRoute: typeof DashboardTemplatesTemplateIdStatsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
 interface DashboardRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardCampaignsCampaignIdRoute: typeof DashboardCampaignsCampaignIdRoute
-  DashboardCampaignsNewRoute: typeof DashboardCampaignsNewRoute
-  DashboardLeadsLeadIdRoute: typeof DashboardLeadsLeadIdRoute
-  DashboardLeadsImportRoute: typeof DashboardLeadsImportRoute
+  DashboardMailsMailIdRoute: typeof DashboardMailsMailIdRoute
+  DashboardMailsNewRoute: typeof DashboardMailsNewRoute
   DashboardTemplatesNewRoute: typeof DashboardTemplatesNewRoute
-  DashboardCalendarIndexRoute: typeof DashboardCalendarIndexRoute
-  DashboardCampaignsIndexRoute: typeof DashboardCampaignsIndexRoute
-  DashboardInboxIndexRoute: typeof DashboardInboxIndexRoute
-  DashboardLeadsIndexRoute: typeof DashboardLeadsIndexRoute
-  DashboardReportsIndexRoute: typeof DashboardReportsIndexRoute
+  DashboardMailsIndexRoute: typeof DashboardMailsIndexRoute
   DashboardSettingsIndexRoute: typeof DashboardSettingsIndexRoute
   DashboardTemplatesIndexRoute: typeof DashboardTemplatesIndexRoute
+  DashboardEmailHistoryEmailIdStatsRoute: typeof DashboardEmailHistoryEmailIdStatsRoute
+  DashboardTemplatesTemplateIdEditRoute: typeof DashboardTemplatesTemplateIdEditRoute
+  DashboardTemplatesTemplateIdStatsRoute: typeof DashboardTemplatesTemplateIdStatsRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
-  DashboardCampaignsCampaignIdRoute: DashboardCampaignsCampaignIdRoute,
-  DashboardCampaignsNewRoute: DashboardCampaignsNewRoute,
-  DashboardLeadsLeadIdRoute: DashboardLeadsLeadIdRoute,
-  DashboardLeadsImportRoute: DashboardLeadsImportRoute,
+  DashboardMailsMailIdRoute: DashboardMailsMailIdRoute,
+  DashboardMailsNewRoute: DashboardMailsNewRoute,
   DashboardTemplatesNewRoute: DashboardTemplatesNewRoute,
-  DashboardCalendarIndexRoute: DashboardCalendarIndexRoute,
-  DashboardCampaignsIndexRoute: DashboardCampaignsIndexRoute,
-  DashboardInboxIndexRoute: DashboardInboxIndexRoute,
-  DashboardLeadsIndexRoute: DashboardLeadsIndexRoute,
-  DashboardReportsIndexRoute: DashboardReportsIndexRoute,
+  DashboardMailsIndexRoute: DashboardMailsIndexRoute,
   DashboardSettingsIndexRoute: DashboardSettingsIndexRoute,
   DashboardTemplatesIndexRoute: DashboardTemplatesIndexRoute,
+  DashboardEmailHistoryEmailIdStatsRoute:
+    DashboardEmailHistoryEmailIdStatsRoute,
+  DashboardTemplatesTemplateIdEditRoute: DashboardTemplatesTemplateIdEditRoute,
+  DashboardTemplatesTemplateIdStatsRoute:
+    DashboardTemplatesTemplateIdStatsRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
@@ -482,7 +403,6 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
-  OnboardingRoute: OnboardingRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   VerifyEmailRoute: VerifyEmailRoute,

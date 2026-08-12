@@ -51,7 +51,7 @@ export function CampaignsPage() {
             color="blue"
             fullWidth
             mb="lg"
-            onClick={() => navigate({ to: '/dashboard/campaigns/new' })}
+            onClick={() => navigate({ to: '/dashboard/mails/new' })}
           >
             New Campaign
           </Button>

@@ -1,6 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,100..900;1,100..900&display=swap');
 @import "@mantine/core/styles.css";
 @import "@mantine/dates/styles.css";
+@import "@mantine/notifications/styles.css";
+@import '@mantine/core/styles.css';
+@import '@mantine/tiptap/styles.css';
 @import "tailwindcss";
 
 * {

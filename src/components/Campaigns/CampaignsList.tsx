@@ -231,11 +231,11 @@ export function CampaignsList({ filterStatus = 'All', searchQuery = '' }: Campai
                 Contacted
               </Text>
             </Table.Th>
-            <Table.Th>
+            {/* <Table.Th>
               <Text size="xs" fw={600} c="dimmed" tt="uppercase">
                 Reply Rate
               </Text>
-            </Table.Th>
+            </Table.Th> */}
             <Table.Th>
               <Text size="xs" fw={600} c="dimmed" tt="uppercase">
                 Last Activity
@@ -372,7 +372,7 @@ export function CampaignsList({ filterStatus = 'All', searchQuery = '' }: Campai
                       variant="default"
                       onClick={(e) => {
                         e.stopPropagation()
-                        navigate({ to: `/dashboard/campaigns/${campaign.id}` })
+                        navigate({ to: `/dashboard/mails/${campaign.id}` })
                       }}
                     >
                       View

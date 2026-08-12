@@ -32,7 +32,7 @@ export function AiGenerator({
     <Stack gap="sm">
       <Textarea
         label="What should this email do?"
-        placeholder="e.g. Write a cold email to a SaaS CTO, direct tone, under 80 words, goal is booking a 15-min call"
+        placeholder="e.g. Demande d'emplois pour google"
         autosize
         minRows={3}
         value={aiPrompt}
@@ -42,7 +42,7 @@ export function AiGenerator({
       <Group grow>
         <Select label="Tone" data={tones} value={tone} onChange={setTone} defaultValue="Direct" />
         <Select label="Length" data={lengths} value={length} onChange={setLength} defaultValue="Short (~50 words)" />
-        <Select label="Goal" data={goals} value={goal} onChange={setGoal} defaultValue="Book a call" />
+        {/* <Select label="Goal" data={goals} value={goal} onChange={setGoal} defaultValue="Book a call" /> */}
       </Group>
 
       <Textarea
@@ -54,16 +54,16 @@ export function AiGenerator({
         onChange={(e) => setExtraContext(e.currentTarget.value)}
       />
 
-      <Button leftSection={<IconSparkles size={16} />} color="grape">
+      <Button leftSection={<IconSparkles size={16} />} color="blue">
         Generate template
       </Button>
 
-      <Divider label="Generated variants" labelPosition="center" />
+      <Divider label="Generated variants" labelPosition="center" className='font-semibold' />
 
       {[1, 2].map((v) => (
         <Paper key={v} withBorder p="md" radius="md">
           <Group justify="space-between" mb="xs">
-            <Badge size="sm" variant="light" color="grape">Variant {v}</Badge>
+            <Badge size="sm" variant="light" color="blue">Variant {v}</Badge>
             <Group gap={4}>
               <Tooltip label="Use this variant">
                 <ActionIcon variant="subtle" color="green"><IconCheck size={16} /></ActionIcon>

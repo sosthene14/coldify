@@ -25,7 +25,7 @@ export interface CustomField {
 }
 
 export interface CampaignStatus {
-  campaignId: string
+  mailId: string
   campaignName: string
   status: LeadStatus
   sequenceStep: number

@@ -24,11 +24,11 @@ export function TemplateInfo({
   setLanguage,
 }: TemplateInfoProps) {
   return (
-    <Card withBorder radius="md" p="lg" bg="white">
+    <Card withBorder radius="md" p={{ base: 'sm', sm: 'md', md: 'lg' }} bg="white">
       <Stack gap="sm">
         <TextInput
           label="Template name"
-          placeholder="e.g. Q3 SaaS Outreach - Email 1"
+          placeholder="Demande d'emplois"
           size="md"
           value={templateName}
           onChange={(e) => setTemplateName(e.currentTarget.value)}
@@ -41,10 +41,11 @@ export function TemplateInfo({
           value={description}
           onChange={(e) => setDescription(e.currentTarget.value)}
         />
-        <Group grow>
+        <Group grow wrap="nowrap" style={{ flexDirection: 'row' }}>
           <Select
             label="Category"
             placeholder="Select category"
+            searchable
             data={categories}
             value={category}
             onChange={setCategory}

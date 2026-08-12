@@ -34,15 +34,7 @@ export function HtmlImport({
           </Button>
           <Text size="xs" c="dimmed">or paste code below</Text>
         </Group>
-        <SegmentedControl
-          size="xs"
-          value={htmlCodeView ? 'code' : 'preview'}
-          onChange={() => toggleHtmlCodeView()}
-          data={[
-            { label: 'Code', value: 'code' },
-            { label: 'Preview', value: 'preview' },
-          ]}
-        />
+    
       </Group>
 
       {htmlCodeView ? (

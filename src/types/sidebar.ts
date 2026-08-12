@@ -24,8 +24,6 @@ export interface MailboxHealthCardProps {
 
 
 export interface SidebarProps {
-  emailSent: number
-  emailLimit: number
   mailboxes: MailboxHealthItem[]
   onQuickAction?: (key: string) => void
 }

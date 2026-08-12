@@ -18,8 +18,8 @@ function LoginPageRoute() {
     }
   }, [session, isPending, navigate])
 
-  // Show nothing while checking or if already logged in
-  if (isPending || session?.user) {
+  // Show nothing only if already logged in to prevent content flash during redirect
+  if (session?.user) {
     return null
   }
 

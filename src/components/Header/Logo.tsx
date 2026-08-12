@@ -1,19 +1,16 @@
-import { Group, ThemeIcon } from '@mantine/core'
-import { IconShieldCheck } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 
 export function Logo() {
   return (
-    <Group
-      component={Link}
-      gap="xs"
-      wrap="nowrap"
-      style={{ textDecoration: 'none' }}
+    <Link
+      to="/dashboard"
+      style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}
     >
-      <ThemeIcon size={30} radius="md" variant="filled" color="blue">
-        <IconShieldCheck size={18} />
-      </ThemeIcon>
- 
-    </Group>
+      <img 
+        src="/logo-transparent.png" 
+        alt="So-mails" 
+        style={{ height: '25px', width: 'auto' }}
+      />
+    </Link>
   )
 }

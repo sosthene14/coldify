@@ -1,7 +1,20 @@
-import { mergeTagGroups } from '#/types/template.ts';
-import { Stack, TextInput, Group, ActionIcon, Divider, Menu, Button, Textarea, Text } from '@mantine/core'
-import { IconBold, IconItalic, IconLink, IconList, IconPhoto, IconVideo, IconMoodSmile, IconPlus } from '@tabler/icons-react'
- 
+import { mergeTagGroups } from '#/types/template.ts'
+import { Stack, TextInput, Text } from '@mantine/core'
+import { RichTextEditor, Link } from '@mantine/tiptap'
+import { useEditor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Placeholder from '@tiptap/extension-placeholder'
+import Underline from '@tiptap/extension-underline'
+import TextAlign from '@tiptap/extension-text-align'
+import Highlight from '@tiptap/extension-highlight'
+import Color from '@tiptap/extension-color'
+import {TextStyle} from '@tiptap/extension-text-style'
+import Superscript from '@tiptap/extension-superscript'
+import SubScript from '@tiptap/extension-subscript'
+import ResizableImage  from 'tiptap-extension-resize-image'
+import {  IconPhoto } from '@tabler/icons-react'
+import { useState, useEffect } from 'react'
+import { ImageInsertModal } from './InsertModal'
 
 interface ManualEditorProps {
   subjectLine: string
@@ -11,56 +24,157 @@ interface ManualEditorProps {
 }
 
 export function ManualEditor({ subjectLine, setSubjectLine, emailBody, setEmailBody }: ManualEditorProps) {
+  const [tagMenuOpen, setTagMenuOpen] = useState(false)
+  const [imageModalOpen, setImageModalOpen] = useState(false)
+
+
+ const editor = useEditor({
+  extensions: [
+    StarterKit,
+    Underline,
+    Link,
+    Superscript,
+    SubScript,
+    Highlight,
+    TextStyle,
+    Color,
+    TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    ResizableImage, // remplace Image
+    Placeholder.configure({ placeholder: 'Hi {{firstName}}, I noticed {{companyName}} is...' }),
+  ],
+  content: emailBody,
+  onUpdate: ({ editor }) => setEmailBody(editor.getHTML()),
+})
+
+  // Mettre à jour le contenu de l'éditeur quand emailBody change (ex: chargement d'un template)
+  useEffect(() => {
+    if (editor && emailBody && emailBody !== editor.getHTML()) {
+      editor.commands.setContent(emailBody)
+    }
+  }, [editor, emailBody])
+
+  const insertImage = (src: string) => {
+  editor?.chain().focus().setImage({ src }).run()
+}
+
+  const insertTag = (tag: string) => {
+    editor?.chain().focus().insertContent(`{{${tag}}} `).run()
+    setTagMenuOpen(false)
+  }
+
+  const wordCount = editor?.getText().trim().split(/\s+/).filter(Boolean).length ?? 0
+
   return (
     <Stack gap="sm">
       <TextInput
         label="Subject line"
-        placeholder="e.g. Quick question about {{companyName}}'s outreach"
+        placeholder="Il me faut un taff"
         value={subjectLine}
         onChange={(e) => setSubjectLine(e.currentTarget.value)}
       />
 
-      <Group gap={4} p={4} style={{ border: '1px solid #E9ECEF', borderRadius: 6 }}>
-        <ActionIcon variant="subtle" color="gray"><IconBold size={16} /></ActionIcon>
-        <ActionIcon variant="subtle" color="gray"><IconItalic size={16} /></ActionIcon>
-        <ActionIcon variant="subtle" color="gray"><IconLink size={16} /></ActionIcon>
-        <ActionIcon variant="subtle" color="gray"><IconList size={16} /></ActionIcon>
-        <Divider orientation="vertical" />
-        <ActionIcon variant="subtle" color="gray"><IconPhoto size={16} /></ActionIcon>
-        <ActionIcon variant="subtle" color="gray"><IconVideo size={16} /></ActionIcon>
-        <ActionIcon variant="subtle" color="gray"><IconMoodSmile size={16} /></ActionIcon>
-        <Divider orientation="vertical" />
-        <Menu shadow="md" width={200}>
-          <Menu.Target>
-            <Button variant="subtle" size="xs" leftSection={<IconPlus size={12} />}>
-              Insert variable
-            </Button>
-          </Menu.Target>
-          <Menu.Dropdown>
-            {mergeTagGroups.map(group => (
+      <RichTextEditor
+        editor={editor}
+        styles={{
+          root: { border: '1px solid #E9ECEF', borderRadius: 6, fontWeight:15 },
+          toolbar: { borderBottom: '1px solid #E9ECEF', backgroundColor: '#fff' },
+          content: { minHeight: 220 },
+        }}
+      >
+        <RichTextEditor.Toolbar sticky>
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.Bold />
+            <RichTextEditor.Italic />
+            <RichTextEditor.Underline />
+            <RichTextEditor.Strikethrough />
+            <RichTextEditor.ClearFormatting />
+            <RichTextEditor.Highlight />
+            <RichTextEditor.Code />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.H1 />
+            <RichTextEditor.H2 />
+            <RichTextEditor.H3 />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.BulletList />
+            <RichTextEditor.OrderedList />
+            <RichTextEditor.Subscript />
+            <RichTextEditor.Superscript />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.Link />
+            <RichTextEditor.Unlink />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.AlignLeft />
+            <RichTextEditor.AlignCenter />
+            <RichTextEditor.AlignRight />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.ColorPicker
+              colors={['#000000', '#495057', '#1971C2', '#2F9E44', '#F08C00', '#E03131']}
+            />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+           <RichTextEditor.Control
+  onClick={() => setImageModalOpen(true)}
+  aria-label="Insert image"
+  title="Insert image"
+>
+  <IconPhoto size={16} />
+</RichTextEditor.Control>
+      
+          </RichTextEditor.ControlsGroup>
+        </RichTextEditor.Toolbar>
+
+        {tagMenuOpen && (
+          <div
+            style={{
+              padding: '8px',
+              borderBottom: '1px solid #E9ECEF',
+              display: 'flex',
+              gap: 16,
+              flexWrap: 'wrap',
+            }}
+          >
+            {mergeTagGroups.map((group) => (
               <div key={group.label}>
-                <Menu.Label>{group.label}</Menu.Label>
-                {group.tags.map(tag => (
-                  <Menu.Item key={tag}>{`{{${tag}}}`}</Menu.Item>
-                ))}
+                <Text size="xs" c="dimmed" fw={600}>{group.label}</Text>
+                <Stack gap={2}>
+                  {group.tags.map((tag) => (
+                    <Text
+                      key={tag}
+                      size="sm"
+                      c="blue"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => insertTag(tag)}
+                    >
+                      {`{{${tag}}}`}
+                    </Text>
+                  ))}
+                </Stack>
               </div>
             ))}
-          </Menu.Dropdown>
-        </Menu>
-      </Group>
+          </div>
+        )}
 
-      <Textarea
-        placeholder="Hi {{firstName}}, I noticed {{companyName}} is..."
-        autosize
-        minRows={10}
-        value={emailBody}
-        onChange={(e) => setEmailBody(e.currentTarget.value)}
-      />
+        <RichTextEditor.Content />
+      </RichTextEditor>
 
-      <Group justify="space-between">
-        <Text size="xs" c="dimmed">142 words • Spam score: Low</Text>
-        <Text size="xs" c="dimmed">Personalization: 3 variables used</Text>
-      </Group>
+      <Text size="xs" c="dimmed">{wordCount} words • Spam score: Low</Text>
+
+      <ImageInsertModal
+  opened={imageModalOpen}
+  onClose={() => setImageModalOpen(false)}
+  onInsert={insertImage}
+/>
     </Stack>
   )
 }

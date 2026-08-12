@@ -29,7 +29,7 @@ export function useRegister() {
         name: `${firstName} ${lastName}`,
         firstName,
         lastName,
-        callbackURL: `${import.meta.env.VITE_FRONTEND_URL}/onboarding`,
+        callbackURL: `${import.meta.env.VITE_FRONTEND_URL}/dashboard`,
       })
 
       if (signUpError) {
@@ -50,7 +50,7 @@ navigate({
 
   const registerWithGoogle = async () => {
     setError(null)
-    await authClient.signIn.social({ provider: 'google', callbackURL: `${import.meta.env.VITE_FRONTEND_URL}/onboarding` })
+    await authClient.signIn.social({ provider: 'google', callbackURL: `${import.meta.env.VITE_FRONTEND_URL}/dashboard` })
   }
 
   return { register, registerWithGoogle, loading, error }

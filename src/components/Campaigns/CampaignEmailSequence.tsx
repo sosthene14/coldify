@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, TextInput, Textarea, Stack, Text, Button, Group, NumberInput, ActionIcon, Badge, Accordion } from '@mantine/core'
+import { Card, TextInput, Textarea, Stack, Text, Button, Group, NumberInput, Badge, Accordion } from '@mantine/core'
 import { IconPlus, IconTrash, IconMail, IconClock } from '@tabler/icons-react'
 import type { CampaignFormData } from './CreateCampaign'
 
@@ -9,7 +9,7 @@ interface CampaignEmailSequenceProps {
 }
 
 export function CampaignEmailSequence({ data, onChange }: CampaignEmailSequenceProps) {
-  const [activeEmail, setActiveEmail] = useState<string>('1')
+  const [activeEmail, setActiveEmail] = useState<string | null>('1')
 
   const addEmail = () => {
     const newEmail = {

@@ -1,45 +1,202 @@
-import { Card, Group, Text, Select, Box } from '@mantine/core';
-import { LineChart } from '@mantine/charts';
+import { useState, useEffect } from 'react'
+import { Card, Group, Text, Select, Box, Loader, Stack } from '@mantine/core'
+import { LineChart } from '@mantine/charts'
+import { IconMail, IconEye, IconTrendingUp } from '@tabler/icons-react'
+import axios from 'axios'
+import { format, subDays, startOfDay, endOfDay } from 'date-fns'
 
-const data = [
-  { date: 'May 7', sent: 4200, replies: 700 },
-  { date: 'May 8', sent: 6100, replies: 900 },
-  { date: 'May 9', sent: 7600, replies: 1000 },
-  { date: 'May 10', sent: 6300, replies: 1000 },
-  { date: 'May 11', sent: 6500, replies: 1300 },
-  { date: 'May 12', sent: 5300, replies: 1200 },
-  { date: 'May 13', sent: 3900, replies: 900 },
-];
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
+interface EmailActivityData {
+  date: string
+  sent: number
+  opened: number
+}
+
+interface EmailStats {
+  totalSent: number
+  totalOpened: number
+  openRate: number
+  chartData: EmailActivityData[]
+}
 
 const series = [
-  { name: 'sent', label: 'Emails sent', color: 'indigo.6' },
-  { name: 'replies', label: 'Replies', color: 'gray.5' },
-];
+  { name: 'sent', label: 'Emails sent', color: 'blue.6' },
+  { name: 'opened', label: 'Emails opened', color: 'green.6' },
+]
 
-export function EmailActivityOverview() {
+interface DateRange {
+  startDate: Date
+  endDate: Date
+}
+
+interface EmailActivityOverviewProps {
+  dateRange?: DateRange
+}
+
+// Hook pour récupérer les données d'activité email
+function useEmailActivity(days: number, dateRange?: DateRange): EmailStats & { loading: boolean } {
+  const [data, setData] = useState<EmailStats>({
+    totalSent: 0,
+    totalOpened: 0,
+    openRate: 0,
+    chartData: []
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchEmailActivity = async () => {
+      setLoading(true)
+      try {
+        // Récupérer les emails envoyés
+        const response = await axios.get(`${API_URL}/email-history`, { 
+          withCredentials: true 
+        })
+
+        const sentEmails = Array.isArray(response.data?.data) 
+          ? response.data.data 
+          : (Array.isArray(response.data) ? response.data : [])
+
+        // Utiliser la date range fournie ou les derniers X jours par défaut
+        const endDate = dateRange?.endDate || new Date()
+        const startDate = dateRange?.startDate || subDays(endDate, days - 1)
+        const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+        
+        // Filtrer les emails dans la plage de dates
+        const filteredEmails = sentEmails.filter((email: any) => {
+          const emailDate = email.sentAt ? new Date(email.sentAt) : null
+          return emailDate && emailDate >= startDate && emailDate <= endDate
+        })
+
+        // Créer les données pour le graphique
+        const chartData: EmailActivityData[] = []
+        
+        for (let i = daysDiff - 1; i >= 0; i--) {
+          const currentDate = subDays(endDate, i)
+          const dateKey = format(currentDate, 'MMM d')
+          const dayStart = startOfDay(currentDate)
+          const dayEnd = endOfDay(currentDate)
+
+          // Compter les emails envoyés ce jour
+          const sentThisDay = filteredEmails.filter((email: any) => {
+            const emailDate = email.sentAt ? new Date(email.sentAt) : null
+            return emailDate && emailDate >= dayStart && emailDate <= dayEnd && email.status === 'sent'
+          }).length
+
+          // Compter les emails ouverts ce jour (basé sur firstOpenedAt ou lastOpenedAt)
+          const openedThisDay = filteredEmails.filter((email: any) => {
+            const openDate = email.firstOpenedAt ? new Date(email.firstOpenedAt) : null
+            return openDate && openDate >= dayStart && openDate <= dayEnd && (email.totalOpens || 0) > 0
+          }).length
+
+          chartData.push({
+            date: dateKey,
+            sent: sentThisDay,
+            opened: openedThisDay
+          })
+        }
+
+        // Calculer les totaux pour la période sélectionnée
+        const totalSent = filteredEmails.filter((e: any) => e.status === 'sent').length
+        const totalOpened = filteredEmails.filter((e: any) => (e.totalOpens || 0) > 0).length
+        const openRate = totalSent > 0 ? Math.round((totalOpened / totalSent) * 100) : 0
+
+        setData({
+          totalSent,
+          totalOpened,
+          openRate,
+          chartData
+        })
+      } catch (error) {
+        console.error('Failed to fetch email activity:', error)
+        // Données par défaut en cas d'erreur
+        setData({
+          totalSent: 0,
+          totalOpened: 0,
+          openRate: 0,
+          chartData: []
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchEmailActivity()
+  }, [
+    days, 
+    dateRange?.startDate ? dateRange.startDate.getTime() : null, 
+    dateRange?.endDate ? dateRange.endDate.getTime() : null
+  ])
+
+  return { ...data, loading }
+}
+
+export function EmailActivityOverview({ dateRange }: EmailActivityOverviewProps) {
+  const [selectedPeriod, setSelectedPeriod] = useState('7')
+  const days = parseInt(selectedPeriod)
+  const { totalSent, totalOpened, openRate, chartData, loading } = useEmailActivity(days, dateRange)
+
+  const periodOptions = [
+    { value: '7', label: 'Last 7 days' },
+    { value: '14', label: 'Last 14 days' },
+    { value: '30', label: 'Last 30 days' }
+  ]
+
+  if (loading) {
+    return (
+      <Card withBorder radius="md" p="lg" bg="white" className="w-full">
+        <Group justify="center" py="xl">
+          <Loader size="sm" />
+          <Text size="sm" c="dimmed">Loading email activity...</Text>
+        </Group>
+      </Card>
+    )
+  }
+
   return (
-    <Card withBorder radius="md" p="lg" bg="white"  className="w-full">
-      <Group justify="space-between" align="center" mb="md">
+    <Card withBorder radius="md" p={{ base: 'sm', sm: 'md', md: 'lg' }} bg="white" className="w-full">
+      <Group justify="space-between" align="center" mb={{ base: 'sm', sm: 'md' }}>
         <Text fw={600} size="sm" c="dark.7">
           Email activity overview
         </Text>
 
         <Select
           size="xs"
-          data={['Last 7 days', 'Last 14 days', 'Last 30 days']}
-          defaultValue="Last 7 days"
-          w={140}
+          data={periodOptions}
+          value={selectedPeriod}
+          onChange={(value) => setSelectedPeriod(value || '7')}
+          w={{ base: 120, sm: 140 }}
           radius="sm"
         />
       </Group>
 
-      <Group gap="lg" mb="sm">
+      {/* Stats rapides */}
+      <Group gap={{ base: 'sm', sm: 'lg' }} mb={{ base: 'sm', sm: 'md' }} wrap="wrap">
+        <Group gap={6}>
+          <IconMail size={14} color="var(--mantine-color-blue-6)" />
+          <Text size="xs" c="dimmed">
+            {totalSent} sent
+          </Text>
+        </Group>
+        <Group gap={6}>
+          <IconEye size={14} color="var(--mantine-color-green-6)" />
+          <Text size="xs" c="dimmed">
+            {totalOpened} opened ({openRate}%)
+          </Text>
+        </Group>
+      </Group>
+
+      {/* Légende du graphique */}
+      <Group gap={{ base: 'sm', sm: 'lg' }} mb="sm">
         {series.map((s) => (
           <Group key={s.name} gap={6}>
             <Box
               w={8}
               h={8}
-              style={{ borderRadius: 2, backgroundColor: `var(--mantine-color-${s.color.replace('.', '-')})` }}
+              style={{ 
+                borderRadius: 2, 
+                backgroundColor: `var(--mantine-color-${s.color.replace('.', '-')})` 
+              }}
             />
             <Text size="xs" c="dimmed">
               {s.label}
@@ -48,24 +205,65 @@ export function EmailActivityOverview() {
         ))}
       </Group>
 
-      <LineChart
-        h={220}
-        data={data}
-        dataKey="date"
-        series={series}
-        curveType="monotone"
-        withDots
-        dotProps={{ r: 3, strokeWidth: 0 }}
-        activeDotProps={{ r: 4 }}
-        strokeWidth={2}
-        gridAxis="y"
-        withYAxis
-        withXAxis
-        yAxisProps={{ tickFormatter: (v: number) => (v >= 1000 ? `${v / 1000}K` : `${v}`) }}
-        tickLine="none"
-        withLegend={false}
-        withTooltip
-      />
+      {/* Graphique */}
+      {chartData.length > 0 ? (
+        <LineChart
+          h={{ base: 180, sm: 220 }}
+          data={chartData}
+          dataKey="date"
+          series={series}
+          curveType="monotone"
+          withDots
+          dotProps={{ r: 3, strokeWidth: 0 }}
+          activeDotProps={{ r: 4 }}
+          strokeWidth={2}
+          gridAxis="y"
+          withYAxis
+          withXAxis
+          yAxisProps={{ 
+            tickFormatter: (v: number) => v >= 1000 ? `${Math.round(v / 1000)}K` : `${v}` 
+          }}
+          tickLine="none"
+          withLegend={false}
+          withTooltip
+          tooltipProps={{
+            content: ({ payload, label }) => {
+              if (!payload || payload.length === 0) return null
+              
+              return (
+                <Card withBorder p="xs" shadow="md">
+                  <Text size="sm" fw={500} mb="xs">{label}</Text>
+                  <Stack gap="xs">
+                    {payload.map((item: any) => (
+                      <Group key={item.dataKey} gap="xs">
+                        <Box
+                          w={8}
+                          h={8}
+                          style={{ 
+                            borderRadius: 2, 
+                            backgroundColor: item.color 
+                          }}
+                        />
+                        <Text size="xs" c="dimmed">
+                          {series.find(s => s.name === item.dataKey)?.label}: {item.value}
+                        </Text>
+                      </Group>
+                    ))}
+                  </Stack>
+                </Card>
+              )
+            }
+          }}
+        />
+      ) : (
+        <Group justify="center" py={{ base: 'md', sm: 'xl' }}>
+          <Stack align="center" gap="xs">
+            <IconTrendingUp size={32} color="var(--mantine-color-gray-5)" />
+            <Text size="sm" c="dimmed">No email activity data available</Text>
+            <Text size="xs" c="dimmed">Start sending emails to see your activity</Text>
+          </Stack>
+        </Group>
+      )}
     </Card>
-  );
+  )
 }
