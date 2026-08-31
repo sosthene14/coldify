@@ -1,4 +1,4 @@
-# Script Vidéo Marketing Complet - Coldy
+# Script Vidéo Marketing Complet - somails
 ## Durée totale : 60 secondes | Format : 1920x1080px (16:9)
 
 ---
@@ -8,13 +8,13 @@
 
 ### Visuel
 - **Fond** : Gradient sombre (noir → bleu foncé #0a0e27)
-- **Animation d'ouverture** : Logo Coldy apparaît avec effet de zoom élégant (0-2s)
+- **Animation d'ouverture** : Logo somails apparaît avec effet de zoom élégant (0-2s)
 - **Interface simulée** : Client email générique (Gmail/Outlook) en arrière-plan flouté
 
 ### Éléments à l'écran
 ```
 ┌─────────────────────────────────────────────┐
-│  [Logo Coldy - centré]                       │
+│  [Logo somails - centré]                       │
 │                                              │
 │  Email envoyé... puis rien. 📧              │
 │                                              │
@@ -46,17 +46,17 @@
 
 ### Visuel
 - **Transition** : Fond qui s'éclaircit (bleu foncé → bleu clair #228be6)
-- **Logo Coldy** en haut à gauche (petit, permanent)
+- **Logo somails** en haut à gauche (petit, permanent)
 
 ### Éléments à l'écran
 ```
 ┌─────────────────────────────────────────────┐
-│  [Logo Coldy]                   Coldy       │
+│  [Logo somails]                   somails       │
 │                                              │
 │     ✨ La solution existe ! ✨             │
 │                                              │
 │  ┌──────────────────────────────────────┐   │
-│  │  Coldy - Email Tracking Platform     │   │
+│  │  somails - Email Tracking Platform     │   │
 │  │                                      │   │
 │  │  ✅ Notifications en temps réel     │   │
 │  │  📊 Statistiques détaillées         │   │
@@ -66,12 +66,12 @@
 ```
 
 ### Texte à l'écran
-- **8-11s** : "Avec Coldy, soyez informé en temps réel ⚡"
+- **8-11s** : "Avec somails, soyez informé en temps réel ⚡"
 - **11-14s** : "Notification instantanée à chaque ouverture 🔔"
 - **14-18s** : "Statistiques complètes + Historique détaillé 📊"
 
 ### Voix off
-> "Coldy transforme vos emails en outils de tracking puissants. Recevez une notification instantanée dès qu'un email est ouvert, avec des statistiques complètes sur vos campagnes."
+> "somails transforme vos emails en outils de tracking puissants. Recevez une notification instantanée dès qu'un email est ouvert, avec des statistiques complètes sur vos campagnes."
 
 ### Animations
 - Bulles de notifications qui apparaissent (effet pop)
@@ -83,12 +83,12 @@
 ## 🎬 SCÈNE 3 : DÉMO - INSCRIPTION (18-28s)
 **Durée : 10 secondes**
 
-### Visuel : Page d'inscription Coldy
+### Visuel : Page d'inscription somails
 Interface réelle de votre application
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  [Logo Coldy]          Sign up to Coldy             │
+│  [Logo somails]          Sign up to somails             │
 │                                                      │
 │  ┌────────────────────────────────────────────────┐ │
 │  │  Full Name    [John Doe____________]           │ │
@@ -225,7 +225,7 @@ Interface réelle de ComposeEmailPage.tsx
 - **44-48s** : "Envoyé ! Tracking activé 🚀"
 
 ### Voix off
-> "Composez votre email directement dans Coldy. Interface propre, éditeur riche, pièces jointes supportées. Cliquez sur envoyer et le tracking s'active automatiquement."
+> "Composez votre email directement dans somails. Interface propre, éditeur riche, pièces jointes supportées. Cliquez sur envoyer et le tracking s'active automatiquement."
 
 ---
 
@@ -242,7 +242,7 @@ Animation clé de la vidéo
 │  GAUCHE (40%)            │    DROITE (60%)            │
 │  ─────────────────────   │   ──────────────────────   │
 │                          │                            │
-│  📧 Email reçu           │   💻 Dashboard Coldy       │
+│  📧 Email reçu           │   💻 Dashboard somails       │
 │                          │                            │
 │  [Inbox - Client]        │   ┌──────────────────┐    │
 │  De: john@company.com    │   │ 🔔 Notification  │    │
@@ -272,7 +272,7 @@ Animation clé de la vidéo
    - Particules brillantes suivent l'onde
 
 3. **Côté droit** :
-   - Dashboard Coldy en arrière-plan
+   - Dashboard somails en arrière-plan
    - **Notification push apparaît** (slide down + bounce)
    - Son de "ding" (indication visuelle 🔔)
    - Badge rouge "1" apparaît
@@ -303,7 +303,7 @@ Animation clé de la vidéo
 **Durée : 5 secondes**
 
 ### Visuel : Dashboard + Email History
-Vue d'ensemble de la puissance de Coldy
+Vue d'ensemble de la puissance de somails
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -356,28 +356,28 @@ Design épuré et impactant
 ```
 ┌────────────────────────────────────────────────────┐
 │                                                     │
-│              [Logo Coldy - Large]                   │
+│              [Logo somails - Large]                   │
 │                                                     │
-│         Coldy - Email Tracking Platform            │
+│         somails - Email Tracking Platform            │
 │                                                     │
 │    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━         │
 │                                                     │
 │         🚀 Commencez gratuitement dès maintenant   │
 │                                                     │
-│         [ Essayer Coldy gratuitement ]             │
+│         [ Essayer somails gratuitement ]             │
 │              ↑ Animation pulse                     │
 │                                                     │
 │         ✅ Sans carte bancaire                     │
 │         ✅ Setup en 2 minutes                      │
 │         ✅ 100 emails gratuits                     │
 │                                                     │
-│              coldy.com                             │
+│              somails.com                             │
 │                                                     │
 └────────────────────────────────────────────────────┘
 ```
 
 ### Animations
-1. **Logo Coldy** apparaît avec zoom élégant
+1. **Logo somails** apparaît avec zoom élégant
 2. **Ligne de séparation** se dessine (gauche → droite)
 3. **Bouton CTA** pulse en continu (scale 1.0 → 1.05)
 4. **Checkmarks** apparaissent un par un (0.5s d'intervalle)
@@ -385,10 +385,10 @@ Design épuré et impactant
 
 ### Texte overlay
 - **60-62s** : "🚀 Prêt à transformer vos emails ?"
-- **62-65s** : "coldy.com - Inscription gratuite"
+- **62-65s** : "somails.com - Inscription gratuite"
 
 ### Voix off
-> "Rejoignez des centaines de professionnels qui ne travaillent plus à l'aveugle. Inscrivez-vous gratuitement sur Coldy point com. Sans carte bancaire, setup en 2 minutes."
+> "Rejoignez des centaines de professionnels qui ne travaillent plus à l'aveugle. Inscrivez-vous gratuitement sur somails point com. Sans carte bancaire, setup en 2 minutes."
 
 ---
 
@@ -438,7 +438,7 @@ Design épuré et impactant
 7. ✅ Notification toast (Mantine notification)
 
 ### Éléments graphiques à créer
-1. 🎨 Logo Coldy (haute résolution)
+1. 🎨 Logo somails (haute résolution)
 2. 🎨 Icônes animées (email, notification, stats)
 3. 🎨 Graphiques de données (charts)
 4. 🎨 Curseur personnalisé (pour démo)
