@@ -1,12 +1,14 @@
 import { Button } from '@mantine/core'
 import { IconPlus } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 interface NewCampaignButtonProps {
   onCreate?: () => void
 }
 
 export function NewCampaignButton({ onCreate }: NewCampaignButtonProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const handleClick = () => {
@@ -25,7 +27,7 @@ export function NewCampaignButton({ onCreate }: NewCampaignButtonProps) {
         radius="sm"
         onClick={handleClick}
       >
-        New Mail
+        {t('new_mail')}
       </Button>
     </Button.Group>
   )

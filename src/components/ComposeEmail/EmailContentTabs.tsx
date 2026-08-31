@@ -1,6 +1,7 @@
 // components/EmailContentTabs.tsx
 import { Tabs } from '@mantine/core'
 import { IconTemplate, IconCode } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 import { EmailEditor } from './EmailEditor'
 import { TemplateSelector } from './TemplateSelector'
 
@@ -21,14 +22,16 @@ export function EmailContentTabs({
   onContentChange,
   onTemplateSelect,
 }: EmailContentTabsProps) {
+  const { t } = useTranslation()
+
   return (
     <Tabs value={mode} onChange={(value) => onModeChange(value as any)}>
       <Tabs.List>
         <Tabs.Tab value="compose" leftSection={<IconCode size={14} />}>
-          Compose
+          {t('compose')}
         </Tabs.Tab>
         <Tabs.Tab value="template" leftSection={<IconTemplate size={14} />}>
-          Use Template
+          {t('use_template')}
         </Tabs.Tab>
       </Tabs.List>
 

@@ -1,6 +1,7 @@
 import { Avatar, Group, Menu, Text, UnstyledButton } from '@mantine/core'
 import { IconChevronDown, IconLogout, IconSettings, IconUser } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 interface UserMenuProps {
   name: string
@@ -10,6 +11,7 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ name, role, avatarUrl, onLogout }: UserMenuProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   return (
@@ -38,17 +40,17 @@ export function UserMenu({ name, role, avatarUrl, onLogout }: UserMenuProps) {
           leftSection={<IconUser size={14} />}
           onClick={() => navigate({ to: '/dashboard/settings' })}
         >
-          Profile
+          {t('profile')}
         </Menu.Item>
         <Menu.Item 
           leftSection={<IconSettings size={14} />}
           onClick={() => navigate({ to: '/dashboard/settings' })}
         >
-          Settings
+          {t('settings')}
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item color="red" leftSection={<IconLogout size={14} />} onClick={onLogout}>
-          Log out
+          {t('log_out')}
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>

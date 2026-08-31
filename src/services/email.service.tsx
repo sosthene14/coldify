@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { notifications } from '@mantine/notifications'
 import { IconCheck, IconClock } from '@tabler/icons-react'
+import { authClient } from '#/lib/auth-client'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -14,6 +15,7 @@ export interface SendEmailParams {
   text?: string
   replyTo?: string
   templateId?: string // Track which template was used
+  timezone?: string // User timezone from settings, fallback to browser if unset
   attachments?: Array<{
     filename: string
     mimeType: string
@@ -70,7 +72,7 @@ export const emailService = {
    * Schedule email for later
    */
   async scheduleEmail(
-    params: SendEmailParams & { scheduledAt: string }
+    params: SendEmailParams & { scheduledAt: string; timezone?: string }
   ): Promise<{
     success: boolean
     scheduledId?: string
@@ -103,6 +105,24 @@ export const emailService = {
 }
 
 export class EmailSenderService {
+  static async getActiveUserTimezone(): Promise<string> {
+    try {
+      const session = await authClient.getSession()
+      const timezone = session?.data?.user?.timezone
+
+      if (timezone) {
+        return timezone
+      }
+    } catch (error) {
+      console.warn(
+        '[EmailSenderService] Unable to fetch session timezone, falling back to browser timezone',
+        error
+      )
+    }
+
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+  }
+
   static async sendEmail(emailParams: EmailParams) {
     const result = await emailService.sendEmail(emailParams)
 
@@ -130,9 +150,12 @@ export class EmailSenderService {
   }
 
   static async scheduleEmail(emailParams: EmailParams, scheduledAt: Date) {
+    const userTimezone = await EmailSenderService.getActiveUserTimezone()
+
     const result = await emailService.scheduleEmail({
       ...emailParams,
       scheduledAt: scheduledAt.toISOString(),
+      timezone: userTimezone,
     })
 
     if (!result.success) {
@@ -152,11 +175,14 @@ export class EmailSenderService {
     emailParams: EmailParams,
     scheduledAt: Date
   ) {
+    const userTimezone = await EmailSenderService.getActiveUserTimezone()
+
     const result = await axios.patch(
       `${API_URL}/scheduled-emails/${editingId}`,
       {
         ...emailParams,
         scheduledAt: scheduledAt.toISOString(),
+        timezone: userTimezone,
       },
       { withCredentials: true }
     )

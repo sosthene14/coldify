@@ -7,6 +7,6 @@ import {
 
 
 export const quickActions: QuickAction[] = [
-  { key: 'create-campaign', label: 'Create mail', icon: IconCirclePlus },
-  { key: 'connect-mailbox', label: 'Connect Mailbox', icon: IconPlugConnected },
+  { key: 'create-campaign', label: 'create_mail', icon: IconCirclePlus },
+  { key: 'connect-mailbox', label: 'connect_mailbox', icon: IconPlugConnected },
 ]

@@ -1,6 +1,9 @@
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
+import './i18n';
+import 'dayjs/locale/fr';
+import 'dayjs/locale/en';
 
 const router = createRouter({
   routeTree,

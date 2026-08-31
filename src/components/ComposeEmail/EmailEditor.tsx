@@ -8,6 +8,7 @@ import {TextStyle} from '@tiptap/extension-text-style'
 import Placeholder from '@tiptap/extension-placeholder'
 import ResizableImage from 'tiptap-extension-resize-image'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface EmailEditorProps {
   value: string
@@ -15,6 +16,8 @@ interface EmailEditorProps {
 }
 
 export function EmailEditor({ value, onChange }: EmailEditorProps) {
+  const { t } = useTranslation()
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -25,7 +28,7 @@ export function EmailEditor({ value, onChange }: EmailEditorProps) {
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       ResizableImage, // Added to support MinIO images
       Placeholder.configure({
-        placeholder: 'Write your email content here...',
+        placeholder: t('write_email_content'),
       }),
     ],
     content: value,

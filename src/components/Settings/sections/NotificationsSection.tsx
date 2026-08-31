@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Card, Stack, Switch, Divider } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
+import { useTranslation } from 'react-i18next'
 import { SectionHeader } from '../components/SectionHeader'
 import { api } from '#/lib/api'
 
@@ -9,6 +10,7 @@ interface NotificationPreferences {
 }
 
 export function NotificationsSection() {
+  const { t } = useTranslation()
   const [preferences, setPreferences] = useState<NotificationPreferences>({
     emailOpened: false
   })
@@ -39,8 +41,8 @@ export function NotificationsSection() {
       })
       
       notifications.show({
-        title: 'Préférences sauvegardées',
-        message: 'Vos préférences de notification ont été mises à jour',
+        title: t('preferences_saved'),
+        message: t('notification_preferences_updated'),
         color: 'green'
       })
     } catch (error) {
@@ -48,8 +50,8 @@ export function NotificationsSection() {
       // Revert on error
       setPreferences(preferences)
       notifications.show({
-        title: 'Erreur',
-        message: 'Impossible de sauvegarder vos préférences',
+        title: t('error_occurred'),
+        message: t('unable_save_preferences'),
         color: 'red'
       })
     } finally {
@@ -60,14 +62,14 @@ export function NotificationsSection() {
   return (
     <Card withBorder radius="md" p="lg" bg="white">
       <SectionHeader
-        title="Notifications"
-        description="Choose what you want to be notified about"
+        title={t('notifications')}
+        description={t('notification_description')}
       />
       <Divider my="md" />
       <Stack gap="md">
         <Switch
-          label="Email opened"
-          description="Get notified when someone opens your emails"
+          label={t('email_opened')}
+          description={t('email_opened_description')}
           checked={preferences.emailOpened}
           disabled={loading}
           onChange={(event) => updatePreference('emailOpened', event.currentTarget.checked)}

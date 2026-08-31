@@ -14,6 +14,7 @@ import {
 } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications'
+import { useTranslation } from 'react-i18next'
 import { useMailboxStore } from '../../../stores/mailbox.store'
 import type { Mailbox } from '../../../services/mailbox.service'
 
@@ -24,6 +25,7 @@ interface SmtpConfigModalProps {
 }
 
 export function SmtpConfigModal({ opened, onClose, editingMailbox }: SmtpConfigModalProps) {
+  const { t } = useTranslation()
   const { connectSmtp, updateSmtp } = useMailboxStore()
   const [loading, setLoading] = useState(false)
   const [config, setConfig] = useState({
@@ -68,8 +70,8 @@ export function SmtpConfigModal({ opened, onClose, editingMailbox }: SmtpConfigM
       // When editing, only password is optional
       if (!config.host || !config.username) {
         notifications.show({
-          title: 'Validation Error',
-          message: 'Please fill in all required fields',
+          title: t('validation_error'),
+          message: t('fill_required_fields'),
           color: 'red',
         })
         return
@@ -78,8 +80,8 @@ export function SmtpConfigModal({ opened, onClose, editingMailbox }: SmtpConfigM
       // When creating, all fields are required
       if (!config.email || !config.host || !config.username || !config.password) {
         notifications.show({
-          title: 'Validation Error',
-          message: 'Please fill in all required fields',
+          title: t('validation_error'),
+          message: t('fill_required_fields'),
           color: 'red',
         })
         return
@@ -106,8 +108,8 @@ export function SmtpConfigModal({ opened, onClose, editingMailbox }: SmtpConfigM
         await updateSmtp(editingMailbox.id, updateData)
 
         notifications.show({
-          title: 'Success',
-          message: 'SMTP configuration updated successfully',
+          title: t('success'),
+          message: t('smtp_updated'),
           color: 'green',
         })
       } else {
@@ -123,8 +125,8 @@ export function SmtpConfigModal({ opened, onClose, editingMailbox }: SmtpConfigM
         })
 
         notifications.show({
-          title: 'Success',
-          message: 'SMTP mailbox connected successfully',
+          title: t('success'),
+          message: t('smtp_connected'),
           color: 'green',
         })
       }
@@ -132,8 +134,8 @@ export function SmtpConfigModal({ opened, onClose, editingMailbox }: SmtpConfigM
       onClose()
     } catch (error: any) {
       notifications.show({
-        title: 'Error',
-        message: error.message || `Failed to ${editingMailbox ? 'update' : 'connect'} SMTP mailbox`,
+        title: t('error_occurred'),
+        message: error.message || t('failed_send_test'),
         color: 'red',
       })
     } finally {
@@ -145,12 +147,12 @@ export function SmtpConfigModal({ opened, onClose, editingMailbox }: SmtpConfigM
     <Modal
       opened={opened}
       onClose={onClose}
-      title={editingMailbox ? 'Edit SMTP Configuration' : 'Configure SMTP'}
+      title={editingMailbox ? t('edit_smtp_configuration') : t('configure_smtp')}
       size="lg"
     >
       <Stack gap="md">
         <TextInput
-          label="Email Address"
+          label={t('email_address')}
           placeholder="your@email.com"
           required
           value={config.email}
@@ -159,79 +161,78 @@ export function SmtpConfigModal({ opened, onClose, editingMailbox }: SmtpConfigM
         />
 
         <TextInput
-          label="Display Name"
+          label={t('display_name')}
           placeholder="Your Name"
           value={config.displayName}
           onChange={(e) => setConfig({ ...config, displayName: e.target.value })}
-          description="The name that will appear as the sender"
+          description={t('sender_name')}
         />
 
-        <Divider label="SMTP Server Configuration" />
+        <Divider label={t('smtp_server_configuration')} />
 
         <TextInput
-          label="SMTP Host"
+          label={t('smtp_host')}
           placeholder="smtp.example.com"
           required
           value={config.host}
           onChange={(e) => setConfig({ ...config, host: e.target.value })}
-          description="Your SMTP server address"
+          description={t('smtp_server_address')}
         />
 
         <Group grow>
           <NumberInput
-            label="Port"
+            label={t('port')}
             placeholder="587"
             required
             min={1}
             max={65535}
             value={config.port}
             onChange={(value) => setConfig({ ...config, port: value as number })}
-            description="Common: 587 (TLS), 465 (SSL), 25"
+            description={t('common_ports')}
           />
           <Switch
-            label="Use SSL/TLS"
+            label={t('use_ssl_tls')}
             checked={config.secure}
             onChange={(e) => setConfig({ ...config, secure: e.currentTarget.checked })}
-            description="Enable for port 465"
+            description={t('enable_port_465')}
             mt="xl"
           />
         </Group>
 
         <TextInput
-          label="Username"
+          label={t('username')}
           placeholder="username"
           required
           value={config.username}
           onChange={(e) => setConfig({ ...config, username: e.target.value })}
-          description="Usually your email address"
+          description={t('usually_email')}
         />
 
         <PasswordInput
-          label="Password"
+          label={t('password')}
           placeholder="••••••••"
           required={!editingMailbox}
           value={config.password}
           onChange={(e) => setConfig({ ...config, password: e.target.value })}
           description={
             editingMailbox
-              ? 'Leave blank to keep current password'
-              : 'Your SMTP password or app-specific password'
+              ? t('leave_blank_password')
+              : t('smtp_password_hint')
           }
         />
 
         <Alert icon={<IconInfoCircle size={16} />} color="blue" variant="light">
           <Text size="xs">
-            For Gmail, use port 587 with TLS and create an app-specific password.
-            For most providers, use port 587 without SSL/TLS.
+            {t('smtp_gmail_info')}
           </Text>
         </Alert>
 
         <Group justify="flex-end" mt="md">
           <Button variant="default" onClick={onClose} disabled={loading}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button onClick={handleSubmit} color="blue" loading={loading}>
-            {editingMailbox ? 'Update Configuration' : 'Connect SMTP'}
+            {editingMailbox ? t('update_configuration') : t('connect_smtp')}
           </Button>
         </Group>
       </Stack>

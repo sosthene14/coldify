@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Card, Text, Group, Stack, Anchor, ThemeIcon, Timeline, Loader } from '@mantine/core';
+import { Card, Text, Group, Stack, Loader } from '@mantine/core';
+import { useTranslation } from 'react-i18next'
 import {
-  IconPlayerPlay,
-  IconUsers,
-  IconMail,
-  IconArrowBackUp,
-  IconPlayerPause,
+ 
   IconTrendingUp,
   IconTrendingDown,
 } from '@tabler/icons-react';
@@ -15,70 +12,7 @@ import { subDays } from 'date-fns'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 // ---------- Activity feed ----------
-
-type Activity = {
-  icon: React.ReactNode;
-  color: string;
-  text: string;
-  time: string;
-};
-
-const activities: Activity[] = [
-  { icon: <IconPlayerPlay size={14} />, color: 'indigo', text: 'Q3 SaaS Outreach started', time: '2 hours ago' },
-  { icon: <IconUsers size={14} />, color: 'green', text: '120 leads imported to Agency Prospecting', time: '5 hours ago' },
-  { icon: <IconMail size={14} />, color: 'violet', text: 'SMTP connected for team@roxshield.com', time: '1 day ago' },
-  { icon: <IconArrowBackUp size={14} />, color: 'blue', text: 'New reply from Sarah Williams', time: '1 day ago' },
-  { icon: <IconPlayerPause size={14} />, color: 'orange', text: 'Campaign Product Launch paused', time: '2 days ago' },
-];
-
-function ActivityFeed() {
-  return (
-    <Card withBorder radius="md" p="lg" bg="white">
-      <Group justify="space-between" align="center" mb="md">
-        <Text fw={600} size="sm" c="dark.7">
-          Activity feed
-        </Text>
-        <Anchor size="xs" fw={500} c="indigo.6" underline="never">
-          View all
-        </Anchor>
-      </Group>
-
-      <Stack gap="md">
-        {activities.map((a, i) => (
-          <Group
-            key={i}
-            gap="sm"
-            align="flex-start"
-            wrap="nowrap"
-            className="
-              rounded-md
-              px-2 py-1.5
-              -mx-2
-              transition-colors
-              duration-150
-              hover:bg-gray-50
-              hover:cursor-pointer
-            "
-          >
-            <ThemeIcon color={a.color} variant="light" radius="xl" size="md">
-              {a.icon}
-            </ThemeIcon>
-            <Stack gap={2}>
-              <Text size="sm" c="dark.7">
-                {a.text}
-              </Text>
-              <Text size="xs" c="dimmed">
-                {a.time}
-              </Text>
-            </Stack>
-          </Group>
-        ))}
-      </Stack>
-    </Card>
-  );
-}
-
-// ---------- Performance summary ----------
+ 
 
 type Metric = {
   label: string;
@@ -204,38 +138,33 @@ function usePerformanceData(): PerformanceData & { loading: boolean } {
 }
 
 function PerformanceSummary() {
-  const { emailsSent, openRate, clickRate, loading } = usePerformanceData()
+  const { t } = useTranslation()
+  const { emailsSent, openRate, loading } = usePerformanceData()
 
   const metrics: Metric[] = [
     { 
-      label: 'Emails sent', 
+      label: t('emails_sent'), 
       value: emailsSent.current.toLocaleString(), 
       delta: `${emailsSent.delta >= 0 ? '+' : ''}${emailsSent.delta.toFixed(1)}%`, 
       positive: emailsSent.delta >= 0 
     },
     { 
-      label: 'Open rate', 
+      label: t('open_rate'), 
       value: `${openRate.current.toFixed(1)}%`, 
       delta: `${openRate.delta >= 0 ? '+' : ''}${openRate.delta.toFixed(1)}%`, 
       positive: openRate.delta >= 0 
     },
-    // { 
-    //   label: 'Est. click rate', 
-    //   value: `${clickRate.current.toFixed(1)}%`, 
-    //   delta: `${clickRate.delta >= 0 ? '+' : ''}${clickRate.delta.toFixed(1)}%`, 
-    //   positive: clickRate.delta >= 0 
-    // },
   ]
 
   if (loading) {
     return (
       <Card withBorder radius="md" p="lg" bg="white">
         <Text fw={600} size="sm" c="dark.7" mb="md">
-          Performance summary
+          {t('performance_summary')}
         </Text>
         <Group justify="center" py="md">
           <Loader size="sm" />
-          <Text size="xs" c="dimmed">Loading...</Text>
+          <Text size="xs" c="dimmed">{t('loading')}</Text>
         </Group>
       </Card>
     )
@@ -245,10 +174,10 @@ function PerformanceSummary() {
     <Card withBorder radius="md" p="lg" bg="white">
       <Group justify="space-between" align="center" mb="md">
         <Text fw={600} size="sm" c="dark.7">
-          Performance summary
+          {t('performance_summary')}
         </Text>
         <Text size="xs" c="dimmed">
-          Last 30 days vs previous 30
+          {t('last_30_days')}
         </Text>
       </Group>
 
@@ -293,71 +222,7 @@ function PerformanceSummary() {
   );
 }
 
-// ---------- Upcoming schedule ----------
-
-type ScheduleItem = {
-  campaign: string;
-  step: string;
-  time: string;
-};
-
-const schedule: ScheduleItem[] = [
-  { campaign: 'Q3 SaaS Outreach', step: 'Follow-up email', time: 'in 2 hours' },
-  { campaign: 'Agency Prospecting', step: 'Step 3 - Follow-up', time: 'in 5 hours' },
-  { campaign: 'Enterprise Outreach', step: 'Step 2 - Follow-up', time: 'in 1 day' },
-];
-
-function UpcomingSchedule() {
-  return (
-    <Card withBorder radius="md" p="lg" bg="white">
-      <Group justify="space-between" align="center" mb="md">
-        <Text fw={600} size="sm" c="dark.7">
-          Upcoming schedule
-        </Text>
-        <Anchor size="xs" fw={500} c="indigo.6" underline="never">
-          View calendar
-        </Anchor>
-      </Group>
-
-      <Timeline active={-1} bulletSize={10} lineWidth={2} color="indigo.6">
-        {schedule.map((s) => (
-          <Timeline.Item key={s.campaign}>
-            <Group
-              justify="space-between"
-              align="flex-start"
-              wrap="nowrap"
-              className="
-                rounded-md
-                px-2 py-1
-                -mx-2
-                transition-colors
-                duration-150
-                hover:bg-gray-50
-                hover:cursor-pointer
-              "
-            >
-              <Stack gap={2}>
-                <Text size="sm" fw={500} c="dark.7">
-                  {s.campaign}
-                </Text>
-                <Text size="xs" c="dimmed">
-                  {s.step}
-                </Text>
-              </Stack>
-              <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
-                {s.time}
-              </Text>
-            </Group>
-          </Timeline.Item>
-        ))}
-      </Timeline>
-
-      <Anchor size="sm" fw={500} c="indigo.6" underline="never" mt="sm">
-        Full schedule →
-      </Anchor>
-    </Card>
-  );
-}
+ 
 
 // ---------- Sidebar ----------
 

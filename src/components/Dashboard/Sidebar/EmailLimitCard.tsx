@@ -2,13 +2,15 @@ import { Group, Paper, Progress, Text, Tooltip, Badge } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
 import { useQuotaStore } from '../../../stores/quota.store'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function EmailLimitCard() {
+  const { t } = useTranslation()
   const { stats, loading, fetchStats } = useQuotaStore()
 
   useEffect(() => {
     fetchStats()
-  }, [fetchStats])
+  }, [])
 
   const sent = stats?.dailyUsed || 0
   const limit = stats?.dailyLimit || 0
@@ -22,9 +24,9 @@ export function EmailLimitCard() {
   }
 
   const getStatus = (percentage: number) => {
-    if (percentage >= 90) return 'Critical'
-    if (percentage >= 70) return 'Warning'
-    return 'Good'
+    if (percentage >= 90) return t('critical')
+    if (percentage >= 70) return t('warning')
+    return t('good')
   }
 
   const color = getColor(percent)
@@ -34,10 +36,10 @@ export function EmailLimitCard() {
     return (
       <Paper withBorder radius="sm" p="sm">
         <Text size="sm" fw={600} mb="sm">
-          Email sending limit
+          {t('email_sending_limit')}
         </Text>
         <Text size="sm" c="dimmed" ta="center" py="md">
-          Loading...
+          {t('loading')}
         </Text>
       </Paper>
     )
@@ -47,12 +49,12 @@ export function EmailLimitCard() {
     <Paper withBorder radius="sm" p="sm">
       <Group justify="space-between" align="center" mb="sm">
         <Text size="sm" fw={600}>
-          Email sending limit
+          {t('email_sending_limit')}
         </Text>
         <Tooltip 
-          label={`Daily email sending limit for your organization. Shared across all mailboxes. Resets every 24 hours.`}
+          label={t('daily_email_limit_tooltip')}
           multiline
-          width={200}
+          w={200}
         >
           <IconInfoCircle size={14} color="var(--mantine-color-gray-6)" style={{ cursor: 'help' }} />
         </Tooltip>
@@ -60,7 +62,7 @@ export function EmailLimitCard() {
 
       <Group justify="space-between" align="center" mb={6}>
         <Text size="sm" c="dimmed">
-          Daily limit (global)
+          {t('daily_limit_global')}
         </Text>
         <Badge 
           size="xs" 
@@ -75,9 +77,9 @@ export function EmailLimitCard() {
         value={percent} 
         color={color} 
         size="sm" 
-        radius="xl" 
+        radius="xl"  
         mb={8}
-        animate={percent > 0}
+        animated={percent > 0}
       />
 
       <Group justify="space-between">
@@ -91,13 +93,13 @@ export function EmailLimitCard() {
 
       {limit === 0 && (
         <Text size="xs" c="orange" ta="center" mt="xs">
-          No quota configured
+          {t('no_quota_configured')}
         </Text>
       )}
 
       {percent >= 90 && (
         <Text size="xs" c="red" ta="center" mt="xs">
-          ⚠️ Approaching daily limit
+          {t('approaching_daily_limit')}
         </Text>
       )}
 

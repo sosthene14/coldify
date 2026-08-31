@@ -2,7 +2,7 @@ import { SettingsPage } from '#/components/Settings/index.tsx'
 import { createFileRoute } from '@tanstack/react-router'
 
 type SettingsSearch = {
-  section?: 'profile' | 'mailboxes' | 'notifications' | 'security' | 'app'
+  section?: 'profile' | 'mailboxes' | 'subscription' | 'notifications' | 'security' | 'app'
 }
 
 export const Route = createFileRoute('/dashboard/settings/')({

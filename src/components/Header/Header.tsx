@@ -1,8 +1,9 @@
-import { Group, Burger, Drawer, Stack } from '@mantine/core'
+import { Group, Burger, Drawer, Stack, Menu, ActionIcon } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
+import { useTranslation } from 'react-i18next'
+import { IconLanguage } from '@tabler/icons-react'
 import { Logo } from './Logo'
 import { NavLinks } from './NavLinks'
-import { NotificationBell } from './NotificationBell'
 import { SearchBar } from './SearchBar'
 import { UserMenu } from './UserMenu'
 import { Link } from '@tanstack/react-router'
@@ -19,8 +20,18 @@ interface HeaderProps {
   onLogout?: () => void
 }
 
-export function Header({ user, notificationCount = 0, onLogout }: HeaderProps) {
+const languages = [
+  { code: 'fr', label: 'Français' },
+  { code: 'en', label: 'English' },
+]
+
+export function Header({ user,  onLogout }: HeaderProps) {
+  const { t, i18n } = useTranslation()
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false)
+
+  const handleChangeLanguage = (code: string) => {
+    i18n.changeLanguage(code)
+  }
 
   return (
     <>
@@ -32,14 +43,34 @@ export function Header({ user, notificationCount = 0, onLogout }: HeaderProps) {
         className='border border-gray-200'
       >
         {/* Left side - Logo + Nav (desktop) */}
-        <Group gap={{ base: 8, sm: 20, md: 40 }} wrap="nowrap">
+        <Group  wrap="nowrap">
           <Logo />
           <NavLinks />
         </Group>
 
         {/* Right side - Search + User Menu (desktop) + Burger (mobile) */}
-        <Group gap={{ base: 4, sm: 8, md: 'md' }} wrap="nowrap">
+        <Group   wrap="nowrap">
           <SearchBar />
+
+          <Menu shadow="md" width={160} position="bottom-end">
+            <Menu.Target>
+              <ActionIcon variant="subtle" color="gray" size="lg">
+                <IconLanguage size={18} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              {languages.map((lang) => (
+                <Menu.Item
+                  key={lang.code}
+                  onClick={() => handleChangeLanguage(lang.code)}
+                  fw={i18n.language === lang.code ? 700 : 400}
+                >
+                  {lang.label}
+                </Menu.Item>
+              ))}
+            </Menu.Dropdown>
+          </Menu>
+
           <UserMenu name={user.name} role={user.role} avatarUrl={user.avatarUrl} onLogout={onLogout} />
           
           {/* Burger menu for mobile */}
@@ -58,7 +89,7 @@ export function Header({ user, notificationCount = 0, onLogout }: HeaderProps) {
         onClose={closeDrawer}
         size="75%"
         padding="sm"
-        title="Navigation"
+        title={t('navigate')}
         hiddenFrom="sm"
         zIndex={1000000}
         position="right"
@@ -83,8 +114,33 @@ export function Header({ user, notificationCount = 0, onLogout }: HeaderProps) {
                   fontWeight: 500,
                 }}
               >
-                {item.label}
+                {t(item.label)}
               </Link>
+            ))}
+          </Stack>
+
+          {/* Mobile language switcher */}
+          <Stack gap="2" mt="md">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => {
+                  handleChangeLanguage(lang.code)
+                  closeDrawer()
+                }}
+                style={{
+                  textAlign: 'left',
+                  padding: '10px 12px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  background: 'transparent',
+                  fontSize: '14px',
+                  fontWeight: i18n.language === lang.code ? 700 : 400,
+                  cursor: 'pointer',
+                }}
+              >
+                {lang.label}
+              </button>
             ))}
           </Stack>
         </Stack>

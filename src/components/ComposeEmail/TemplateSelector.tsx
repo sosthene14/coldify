@@ -1,6 +1,7 @@
-import { Card, Stack, Text, Group, Badge, Button, TextInput, ScrollArea } from '@mantine/core'
+import { Card, Stack, Text, Group, Badge, TextInput, ScrollArea } from '@mantine/core'
 import { IconSearch, IconCheck } from '@tabler/icons-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Template } from '../../types/template'
 
 interface TemplateSelectorProps {
@@ -9,6 +10,7 @@ interface TemplateSelectorProps {
 }
 
 export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps) {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
@@ -21,13 +23,13 @@ export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps)
 
   const handleSelect = (template: Template) => {
     setSelectedId(template.id)
-    onSelect(template.body, template.subject, template.id)
+    onSelect(template.body as string, template.subject, template.id)
   }
 
   return (
     <Stack gap="md">
       <TextInput
-        placeholder="Search templates..."
+        placeholder={t('search_templates')}
         leftSection={<IconSearch size={16} />}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -38,7 +40,7 @@ export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps)
           {filteredTemplates.length === 0 ? (
             <Card withBorder p="lg">
               <Text size="sm" c="dimmed" ta="center">
-                No templates found
+                {t('no_templates_found')}
               </Text>
             </Card>
           ) : (
@@ -78,7 +80,7 @@ export function TemplateSelector({ templates, onSelect }: TemplateSelectorProps)
                   </Badge>
                   {template.usageCount > 0 && (
                     <Badge size="sm" variant="light" color="green">
-                      Used {template.usageCount}x
+                      {t('used_count', { count: template.usageCount })}
                     </Badge>
                   )}
                 </Group>

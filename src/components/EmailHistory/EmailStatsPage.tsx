@@ -12,10 +12,10 @@ import {
   Badge,
   Loader,
   Center,
-  Table,
   Timeline,
   ThemeIcon,
 } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 import {
   IconArrowLeft,
   IconMail,
@@ -29,7 +29,6 @@ import {
 } from '@tabler/icons-react'
 import axios from 'axios'
 import { format, formatDistance } from 'date-fns'
-import { fr } from 'date-fns/locale'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -70,6 +69,7 @@ interface EmailStats {
 }
 
 export function EmailStatsPage() {
+  const { t } = useTranslation()
   const { emailId } = useParams({ from: '/dashboard/email-history/$emailId/stats' })
   const navigate = useNavigate()
   const [stats, setStats] = useState<EmailStats | null>(null)
@@ -81,12 +81,10 @@ export function EmailStatsPage() {
 
   const fetchStats = async () => {
     try {
-      // Fetch email details
       const emailResponse = await axios.get(`${API_URL}/email-history/${emailId}`, {
         withCredentials: true,
       })
 
-      // Fetch open details
       const opensResponse = await axios.get(`${API_URL}/api/track/details/${emailId}`, {
         withCredentials: true,
       })
@@ -94,7 +92,6 @@ export function EmailStatsPage() {
       const emailData = emailResponse.data
       const opensData = opensResponse.data
 
-      // Calculate stats
       const totalOpens = opensData.length
       const firstOpen = opensData.length > 0 ? opensData[0].openedAt : null
       const lastOpen = opensData.length > 0 ? opensData[opensData.length - 1].openedAt : null
@@ -137,17 +134,17 @@ export function EmailStatsPage() {
 
   if (!stats) {
     return (
-      <Container size="lg" py="md">
+      <Container size="lg" py="md" px="md">
         <Stack gap="lg" align="center" justify="center" mih={400}>
           <Paper withBorder p="xl" radius="md" w="100%" maw={500}>
             <Stack gap="md" align="center">
               <IconX size={48} color="var(--mantine-color-red-6)" />
               <div style={{ textAlign: 'center' }}>
                 <Text size="xl" fw={700} mb="xs">
-                  Email not found
+                  {t('email_not_found')}
                 </Text>
                 <Text size="sm" c="dimmed">
-                  The email you're looking for doesn't exist or has been deleted.
+                  {t('email_not_found_desc')}
                 </Text>
               </div>
               <Button
@@ -155,7 +152,7 @@ export function EmailStatsPage() {
                 onClick={() => navigate({ to: '/dashboard/mails' })}
                 fullWidth
               >
-                Back to Email History
+                {t('back_to_email_history')}
               </Button>
             </Stack>
           </Paper>
@@ -165,7 +162,7 @@ export function EmailStatsPage() {
   }
 
   return (
-    <Container size="lg" py="md">
+    <Container size="lg" py="md" px={{ base: 'xs', sm: 'md' }}>
       <Stack gap="lg">
         {/* Header */}
         <Group>
@@ -173,52 +170,52 @@ export function EmailStatsPage() {
             variant="subtle"
             leftSection={<IconArrowLeft size={16} />}
             onClick={() => navigate({ to: '/dashboard/mails' })}
+            size="sm"
           >
-            Back to Email History
+            {t('back_to_email_history')}
           </Button>
         </Group>
 
         {/* Email Info */}
-        <Card withBorder p="lg">
+        <Card withBorder p={{ base: 'md', sm: 'lg' }}>
           <Stack gap="md">
-            <Group justify="space-between">
-              <div>
-                <Text size="xl" fw={700} mb={4}>
+            <Group justify="space-between" wrap="wrap" gap="sm">
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <Text size="xl" fw={700} mb={4} style={{ wordBreak: 'break-word' }}>
                   {stats.email.subject}
                 </Text>
-                <Group gap="xs">
-                  <Text size="sm" c="dimmed">
-                    From: <strong>{stats.email.from}</strong>
+                <Stack gap={2}>
+                  <Text size="sm" c="dimmed" style={{ wordBreak: 'break-word' }}>
+                    {t('from')}: <strong>{stats.email.from}</strong>
                   </Text>
-                  <Text size="sm" c="dimmed">•</Text>
-                  <Text size="sm" c="dimmed">
-                    To: <strong>{stats.email.to.join(', ')}</strong>
+                  <Text size="sm" c="dimmed" style={{ wordBreak: 'break-word' }}>
+                    {t('to')}: <strong>{stats.email.to.join(', ')}</strong>
                   </Text>
-                </Group>
+                </Stack>
               </div>
               {stats.stats.totalOpens > 0 ? (
                 <Badge color="green" size="lg" leftSection={<IconCheck size={14} />}>
-                  Opened
+                  {t('opened')}
                 </Badge>
               ) : (
                 <Badge color="gray" size="lg" leftSection={<IconX size={14} />}>
-                  Not Opened
+                  {t('not_opened')}
                 </Badge>
               )}
             </Group>
 
-            <Group gap="lg">
+            <Group gap="lg" wrap="wrap">
               <div>
-                <Text size="xs" c="dimmed">Sent At</Text>
+                <Text size="xs" c="dimmed">{t('sent_at')}</Text>
                 <Text size="sm" fw={600}>
-                  {format(new Date(stats.email.sentAt), 'dd MMMM yyyy à HH:mm', { locale: fr })}
+                  {format(new Date(stats.email.sentAt), 'dd MMMM yyyy à HH:mm')}
                 </Text>
               </div>
               {stats.stats.firstOpenedAt && (
                 <div>
-                  <Text size="xs" c="dimmed">First Opened</Text>
+                  <Text size="xs" c="dimmed">{t('first_opened')}</Text>
                   <Text size="sm" fw={600}>
-                    {formatDistance(new Date(stats.stats.firstOpenedAt), new Date(stats.email.sentAt), { locale: fr })} après l'envoi
+                    {formatDistance(new Date(stats.stats.firstOpenedAt), new Date(stats.email.sentAt))} {t('after_sending')}
                   </Text>
                 </div>
               )}
@@ -227,75 +224,75 @@ export function EmailStatsPage() {
         </Card>
 
         {/* Stats Cards */}
-        <Grid>
-          <Grid.Col span={3}>
-            <Card withBorder p="md">
+        <Grid >
+          <Grid.Col span={{ base: 6, sm: 3 }}>
+            <Card withBorder p="md" h="100%">
               <Stack gap="xs">
-                <Group gap="xs">
-                  <IconEye size={20} color="var(--mantine-color-blue-6)" />
+                <Group gap="xs" wrap="nowrap">
+                  <IconEye size={20} color="var(--mantine-color-blue-6)" style={{ flexShrink: 0 }} />
                   <Text size="sm" c="dimmed" fw={500}>
-                    Total Opens
+                    {t('total_opens')}
                   </Text>
                 </Group>
                 <Text size="xl" fw={700}>
                   {stats.stats.totalOpens}
                 </Text>
                 <Text size="xs" c="dimmed">
-                  Nombre d'ouvertures
+                  {t('open_count')}
                 </Text>
               </Stack>
             </Card>
           </Grid.Col>
 
-          <Grid.Col span={3}>
-            <Card withBorder p="md">
+          <Grid.Col span={{ base: 6, sm: 3 }}>
+            <Card withBorder p="md" h="100%">
               <Stack gap="xs">
-                <Group gap="xs">
-                  <IconClock size={20} color="var(--mantine-color-green-6)" />
+                <Group gap="xs" wrap="nowrap">
+                  <IconClock size={20} color="var(--mantine-color-green-6)" style={{ flexShrink: 0 }} />
                   <Text size="sm" c="dimmed" fw={500}>
-                    First Open
+                    {t('first_open')}
                   </Text>
                 </Group>
                 <Text size="xl" fw={700}>
                   {stats.stats.firstOpenedAt
-                    ? formatDistance(new Date(stats.stats.firstOpenedAt), new Date(stats.email.sentAt), { locale: fr })
+                    ? formatDistance(new Date(stats.stats.firstOpenedAt), new Date(stats.email.sentAt))
                     : '-'}
                 </Text>
                 <Text size="xs" c="dimmed">
-                  Après l'envoi
+                  {t('after_sending')}
                 </Text>
               </Stack>
             </Card>
           </Grid.Col>
 
-          <Grid.Col span={3}>
-            <Card withBorder p="md">
+          <Grid.Col span={{ base: 6, sm: 3 }}>
+            <Card withBorder p="md" h="100%">
               <Stack gap="xs">
-                <Group gap="xs">
-                  <IconClock size={20} color="var(--mantine-color-cyan-6)" />
+                <Group gap="xs" wrap="nowrap">
+                  <IconClock size={20} color="var(--mantine-color-cyan-6)" style={{ flexShrink: 0 }} />
                   <Text size="sm" c="dimmed" fw={500}>
-                    Last Open
+                    {t('last_open')}
                   </Text>
                 </Group>
                 <Text size="xl" fw={700}>
                   {stats.stats.lastOpenedAt
-                    ? formatDistance(new Date(stats.stats.lastOpenedAt), new Date(), { locale: fr, addSuffix: true })
+                    ? formatDistance(new Date(stats.stats.lastOpenedAt), new Date(), { addSuffix: true })
                     : '-'}
                 </Text>
                 <Text size="xs" c="dimmed">
-                  Dernière ouverture
+                  {t('last_open')}
                 </Text>
               </Stack>
             </Card>
           </Grid.Col>
 
-          <Grid.Col span={3}>
-            <Card withBorder p="md">
+          <Grid.Col span={{ base: 6, sm: 3 }}>
+            <Card withBorder p="md" h="100%">
               <Stack gap="xs">
-                <Group gap="xs">
-                  <IconChartLine size={20} color="var(--mantine-color-orange-6)" />
+                <Group gap="xs" wrap="nowrap">
+                  <IconChartLine size={20} color="var(--mantine-color-orange-6)" style={{ flexShrink: 0 }} />
                   <Text size="sm" c="dimmed" fw={500}>
-                    Avg Interval
+                    {t('avg_interval')}
                   </Text>
                 </Group>
                 <Text size="xl" fw={700}>
@@ -304,7 +301,7 @@ export function EmailStatsPage() {
                     : '-'}
                 </Text>
                 <Text size="xs" c="dimmed">
-                  Entre les ouvertures
+                  {t('between_opens')}
                 </Text>
               </Stack>
             </Card>
@@ -313,14 +310,14 @@ export function EmailStatsPage() {
 
         {/* Open Events Timeline */}
         {stats.opens.length > 0 && (
-          <Card withBorder p="lg">
+          <Card withBorder p={{ base: 'md', sm: 'lg' }}>
             <Stack gap="md">
               <div>
                 <Text size="lg" fw={600} mb={4}>
-                  Timeline des ouvertures
+                  {t('open_timeline')}
                 </Text>
                 <Text size="sm" c="dimmed">
-                  Historique détaillé de toutes les ouvertures
+                  {t('detailed_open_history')}
                 </Text>
               </div>
 
@@ -330,9 +327,9 @@ export function EmailStatsPage() {
                     key={open.id}
                     bullet={<IconEye size={12} />}
                     title={
-                      <Group gap="xs">
+                      <Group gap="xs" wrap="wrap">
                         <Text size="sm" fw={600}>
-                          Ouverture #{index + 1}
+                          {t('open_number', { count: index + 1 })}
                         </Text>
                         <Badge size="sm" variant="light">
                           {format(new Date(open.openedAt), 'HH:mm:ss')}
@@ -342,27 +339,34 @@ export function EmailStatsPage() {
                   >
                     <Stack gap="xs" mt="xs">
                       <Text size="xs" c="dimmed">
-                        {format(new Date(open.openedAt), 'dd MMMM yyyy à HH:mm:ss', { locale: fr })}
+                        {format(new Date(open.openedAt), 'dd MMMM yyyy à HH:mm:ss')}
                       </Text>
-                      
-                      <Group gap="md">
+
+                      <Group gap="md" wrap="wrap">
                         {open.device && (
-                          <Group gap={6}>
-                            <IconDeviceLaptop size={14} color="var(--mantine-color-gray-6)" />
+                          <Group gap={6} wrap="nowrap">
+                            <IconDeviceLaptop size={14} color="var(--mantine-color-gray-6)" style={{ flexShrink: 0 }} />
                             <Text size="xs">{open.device}</Text>
                           </Group>
                         )}
-                        
+
                         {open.location && (
-                          <Group gap={6}>
-                            <IconMapPin size={14} color="var(--mantine-color-gray-6)" />
+                          <Group gap={6} wrap="nowrap">
+                            <IconMapPin size={14} color="var(--mantine-color-gray-6)" style={{ flexShrink: 0 }} />
                             <Text size="xs">{open.location}</Text>
                           </Group>
                         )}
                       </Group>
 
                       {open.userAgent && (
-                        <Text size="xs" c="dimmed" style={{ fontFamily: 'monospace' }}>
+                        <Text
+                          size="xs"
+                          c="dimmed"
+                          style={{
+                            fontFamily: 'monospace',
+                            wordBreak: 'break-all',
+                          }}
+                        >
                           {open.userAgent.length > 100 ? open.userAgent.substring(0, 100) + '...' : open.userAgent}
                         </Text>
                       )}
@@ -383,10 +387,10 @@ export function EmailStatsPage() {
               </ThemeIcon>
               <div style={{ textAlign: 'center' }}>
                 <Text size="lg" fw={600} mb="xs">
-                  Pas encore d'ouvertures
+                  {t('no_opens_yet')}
                 </Text>
                 <Text size="sm" c="dimmed">
-                  Cet email n'a pas encore été ouvert par le destinataire.
+                  {t('email_not_opened_yet')}
                 </Text>
               </div>
             </Stack>

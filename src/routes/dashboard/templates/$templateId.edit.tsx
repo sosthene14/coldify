@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { TemplateCreatePage } from '#/components/Templates/index.tsx'
 import { templateService } from '#/services/template.service.ts'
 import { useEffect, useState } from 'react'
@@ -9,6 +10,7 @@ export const Route = createFileRoute('/dashboard/templates/$templateId/edit')({
 })
 
 function EditTemplatePage() {
+  const { t } = useTranslation()
   const { templateId } = Route.useParams()
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(true)
@@ -21,7 +23,7 @@ function EditTemplatePage() {
         setTemplate(data)
       } catch (error) {
         console.error('Failed to load template:', error)
-        alert('Failed to load template')
+        alert(t('failed_load_template'))
         navigate({ to: '/dashboard/templates' })
       } finally {
         setIsLoading(false)
@@ -36,7 +38,7 @@ function EditTemplatePage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading template...</p>
+          <p className="mt-4 text-gray-600">{t('loading_template')}</p>
         </div>
       </div>
     )

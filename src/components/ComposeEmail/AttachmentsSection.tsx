@@ -1,6 +1,7 @@
 // components/AttachmentsSection.tsx
 import { Stack, Group, Text, FileButton, Button, Card, ActionIcon } from '@mantine/core'
 import { IconPaperclip, IconX } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 import type { Attachment } from './ComposeEmailPage';
 
 interface AttachmentsSectionProps {
@@ -16,11 +17,13 @@ export function AttachmentsSection({
   onRemoveAttachment,
   formatFileSize,
 }: AttachmentsSectionProps) {
+  const { t } = useTranslation()
+
   return (
     <div>
       <Group justify="space-between" mb="xs">
         <Text size="sm" fw={500}>
-          Attachments
+          {t('attachments')}
         </Text>
         <FileButton onChange={onAddAttachments} accept="*/*" multiple>
           {(props) => (
@@ -30,7 +33,7 @@ export function AttachmentsSection({
               variant="light"
               leftSection={<IconPaperclip size={14} />}
             >
-              Add Files
+              {t('add_files')}
             </Button>
           )}
         </FileButton>
@@ -64,7 +67,7 @@ export function AttachmentsSection({
       )}
 
       <Text size="xs" c="dimmed" mt="xs">
-        Maximum 25MB total. Dangerous file types (.exe, .bat, etc.) are blocked.
+        {t('max_file_size')}
       </Text>
     </div>
   )

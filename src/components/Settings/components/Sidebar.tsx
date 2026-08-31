@@ -1,20 +1,22 @@
 import { Card, Stack, UnstyledButton, Group, Text } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 import {
   IconUser,
   IconMail,
   IconBell,
   IconLock,
   IconDeviceMobile,
+  IconCreditCard,
 } from '@tabler/icons-react'
 import type { Section, NavItem } from '../types'
 
 const navItems: NavItem[] = [
-  { section: 'profile', label: 'Profile & Account', icon: IconUser },
-  { section: 'mailboxes', label: 'Mailboxes', icon: IconMail },
-  { section: 'notifications', label: 'Notifications', icon: IconBell },
-  { section: 'security', label: 'Security', icon: IconLock },
-  { section: 'app', label: 'App & PWA', icon: IconDeviceMobile },
-  
+  { section: 'profile', label: 'profile_account', icon: IconUser },
+  { section: 'mailboxes', label: 'mailboxes', icon: IconMail },
+  { section: 'subscription', label: 'subscription', icon: IconCreditCard },
+  { section: 'notifications', label: 'notifications', icon: IconBell },
+  { section: 'security', label: 'security', icon: IconLock },
+  { section: 'app', label: 'app_pwa', icon: IconDeviceMobile },
 ]
 
 interface SidebarProps {
@@ -23,6 +25,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ active, onSectionChange }: SidebarProps) {
+  const { t } = useTranslation()
+
   return (
     <Card
       withBorder
@@ -55,7 +59,7 @@ export function Sidebar({ active, onSectionChange }: SidebarProps) {
                   fw={isActive ? 600 : 400}
                   c={isActive ? 'dark.9' : 'dark.7'}
                 >
-                  {item.label}
+                  {t(item.label)}
                 </Text>
               </Group>
             </UnstyledButton>

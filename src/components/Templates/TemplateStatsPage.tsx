@@ -16,6 +16,7 @@ import {
   ActionIcon,
   Tooltip,
 } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 import {
   IconArrowLeft,
   IconMail,
@@ -70,6 +71,7 @@ interface TemplateStats {
 }
 
 export function TemplateStatsPage() {
+  const { t } = useTranslation()
   const { templateId } = useParams({ from: '/dashboard/templates/$templateId/stats' })
   const navigate = useNavigate()
   const [stats, setStats] = useState<TemplateStats | null>(null)
@@ -111,10 +113,10 @@ export function TemplateStatsPage() {
               <IconX size={48} color="var(--mantine-color-red-6)" />
               <div style={{ textAlign: 'center' }}>
                 <Text size="xl" fw={700} mb="xs">
-                  Template not found
+                  {t('template_not_found')}
                 </Text>
                 <Text size="sm" c="dimmed">
-                  The template you're looking for doesn't exist or has been deleted.
+                  {t('template_not_found_desc')}
                 </Text>
               </div>
               <Button
@@ -122,7 +124,7 @@ export function TemplateStatsPage() {
                 onClick={() => navigate({ to: '/dashboard/templates' })}
                 fullWidth
               >
-                Back to Templates
+                {t('back_to_templates')}
               </Button>
             </Stack>
           </Paper>
@@ -133,9 +135,9 @@ export function TemplateStatsPage() {
 
   const chartData = stats.timeSeries.map(day => ({
     date: format(new Date(day.date), 'dd/MM'),
-    'Emails envoyés': day.sent,
-    'Emails ouverts': day.opened,
-    'Taux d\'ouverture (%)': Math.round(day.openRate),
+    [t('emails_sent')]: day.sent,
+    [t('emails_opened')]: day.opened,
+    [t('open_rate_percent')]: Math.round(day.openRate),
   }))
 
   return (
@@ -148,7 +150,7 @@ export function TemplateStatsPage() {
             leftSection={<IconArrowLeft size={16} />}
             onClick={() => navigate({ to: '/dashboard/templates' })}
           >
-            Back to Templates
+            {t('back_to_templates')}
           </Button>
         </Group>
 
@@ -175,14 +177,14 @@ export function TemplateStatsPage() {
                 <Group gap="xs">
                   <IconMail size={20} color="var(--mantine-color-blue-6)" />
                   <Text size="sm" c="dimmed" fw={500}>
-                    Total Sent
+                    {t('total_sent')}
                   </Text>
                 </Group>
                 <Text size="xl" fw={700}>
                   {stats.overall.totalSent}
                 </Text>
                 <Text size="xs" c="dimmed">
-                  Emails envoyés avec ce template
+                  {t('emails_sent_template')}
                 </Text>
               </Stack>
             </Card>
@@ -194,14 +196,14 @@ export function TemplateStatsPage() {
                 <Group gap="xs">
                   <IconEye size={20} color="var(--mantine-color-green-6)" />
                   <Text size="sm" c="dimmed" fw={500}>
-                    Total Opened
+                    {t('total_opened')}
                   </Text>
                 </Group>
                 <Text size="xl" fw={700}>
                   {stats.overall.totalOpened}
                 </Text>
                 <Text size="xs" c="dimmed">
-                  Emails ouverts au moins une fois
+                  {t('emails_opened_once')}
                 </Text>
               </Stack>
             </Card>
@@ -213,14 +215,14 @@ export function TemplateStatsPage() {
                 <Group gap="xs">
                   <IconChartLine size={20} color="var(--mantine-color-cyan-6)" />
                   <Text size="sm" c="dimmed" fw={500}>
-                    Open Rate
+                    {t('open_rate')}
                   </Text>
                 </Group>
                 <Text size="xl" fw={700}>
                   {stats.overall.openRate.toFixed(1)}%
                 </Text>
                 <Text size="xs" c="dimmed">
-                  Taux d'ouverture global
+                  {t('global_open_rate')}
                 </Text>
               </Stack>
             </Card>
@@ -232,14 +234,14 @@ export function TemplateStatsPage() {
                 <Group gap="xs">
                   <IconEye size={20} color="var(--mantine-color-orange-6)" />
                   <Text size="sm" c="dimmed" fw={500}>
-                    Avg Opens
+                    {t('avg_opens')}
                   </Text>
                 </Group>
                 <Text size="xl" fw={700}>
                   {stats.overall.avgOpensPerEmail.toFixed(1)}
                 </Text>
                 <Text size="xs" c="dimmed">
-                  Ouvertures moyennes par email
+                  {t('avg_opens_per_email')}
                 </Text>
               </Stack>
             </Card>
@@ -251,16 +253,16 @@ export function TemplateStatsPage() {
           <Stack gap="md">
             <div>
               <Text size="lg" fw={600} mb={4}>
-                Performance over time (Last 30 days)
+                {t('performance_over_time_30d')}
               </Text>
               <Text size="sm" c="dimmed">
-                Evolution des envois et ouvertures
+                {t('evolution_sends_opens')}
               </Text>
             </div>
 
             {chartData.length === 0 ? (
               <Center h={300}>
-                <Text c="dimmed">No data available for the last 30 days</Text>
+                <Text c="dimmed">{t('no_data_30_days')}</Text>
               </Center>
             ) : (
               <ResponsiveContainer width="100%" height={400}>
@@ -274,7 +276,7 @@ export function TemplateStatsPage() {
                   <Line
                     yAxisId="left"
                     type="monotone"
-                    dataKey="Emails envoyés"
+                    dataKey={t('emails_sent')}
                     stroke="#4C6EF5"
                     strokeWidth={2}
                     dot={{ r: 4 }}
@@ -282,7 +284,7 @@ export function TemplateStatsPage() {
                   <Line
                     yAxisId="left"
                     type="monotone"
-                    dataKey="Emails ouverts"
+                    dataKey={t('emails_opened')}
                     stroke="#51CF66"
                     strokeWidth={2}
                     dot={{ r: 4 }}
@@ -290,7 +292,7 @@ export function TemplateStatsPage() {
                   <Line
                     yAxisId="right"
                     type="monotone"
-                    dataKey="Taux d'ouverture (%)"
+                    dataKey={t('open_rate_percent')}
                     stroke="#FF6B6B"
                     strokeWidth={2}
                     strokeDasharray="5 5"
@@ -307,12 +309,12 @@ export function TemplateStatsPage() {
           <Group justify="space-between">
             <div>
               <Text size="sm" fw={500} mb={4}>
-                Template Usage
+                {t('template_usage')}
               </Text>
               <Group gap="lg">
                 <div>
                   <Text size="xs" c="dimmed">
-                    Times Used
+                    {t('times_used')}
                   </Text>
                   <Text size="sm" fw={600}>
                     {stats.template.usageCount}
@@ -321,7 +323,7 @@ export function TemplateStatsPage() {
                 {stats.template.lastUsedAt && (
                   <div>
                     <Text size="xs" c="dimmed">
-                      Last Used
+                      {t('last_used')}
                     </Text>
                     <Text size="sm" fw={600}>
                       {format(new Date(stats.template.lastUsedAt), 'dd/MM/yyyy HH:mm')}
@@ -330,13 +332,6 @@ export function TemplateStatsPage() {
                 )}
               </Group>
             </div>
-            {/* <Button
-              variant="light"
-              leftSection={<IconMail size={16} />}
-              onClick={() => navigate({ to: '/dashboard/mails/new' })}
-            >
-              Use Template
-            </Button> */}
           </Group>
         </Card>
 
@@ -345,26 +340,26 @@ export function TemplateStatsPage() {
           <Stack gap="md">
             <div>
               <Text size="lg" fw={600} mb={4}>
-                Emails sent (Last 50)
+                {t('emails_sent_last_50')}
               </Text>
               <Text size="sm" c="dimmed">
-                Détails des emails envoyés avec ce template
+                {t('emails_details_template')}
               </Text>
             </div>
 
             {stats.emails.length === 0 ? (
               <Center h={200}>
-                <Text c="dimmed">No emails sent yet</Text>
+                <Text c="dimmed">{t('no_emails_sent_yet')}</Text>
               </Center>
             ) : (
               <Table striped highlightOnHover>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>Recipient</Table.Th>
-                    <Table.Th>Sent At</Table.Th>
-                    <Table.Th>Status</Table.Th>
-                    <Table.Th>Opens</Table.Th>
-                    <Table.Th>First / Last Opened</Table.Th>
+                    <Table.Th>{t('recipient_singular')}</Table.Th>
+                    <Table.Th>{t('sent_at')}</Table.Th>
+                    <Table.Th>{t('status')}</Table.Th>
+                    <Table.Th>{t('opens')}</Table.Th>
+                    <Table.Th>{t('first_last_opened')}</Table.Th>
                     <Table.Th></Table.Th>
                   </Table.Tr>
                 </Table.Thead>
@@ -384,11 +379,11 @@ export function TemplateStatsPage() {
                       <Table.Td>
                         {email.uniqueOpens > 0 ? (
                           <Badge color="green" size="sm" leftSection={<IconCheck size={12} />}>
-                            Opened
+                            {t('opened')}
                           </Badge>
                         ) : (
                           <Badge color="gray" size="sm" leftSection={<IconX size={12} />}>
-                            Not Opened
+                            {t('not_opened')}
                           </Badge>
                         )}
                       </Table.Td>
@@ -412,7 +407,7 @@ export function TemplateStatsPage() {
                       </Table.Td>
                       <Table.Td>
                         {email.totalOpens > 0 ? (
-                          <Tooltip label="View open details">
+                          <Tooltip label={t('view_details')}>
                             <ActionIcon
                               variant="subtle"
                               size="sm"

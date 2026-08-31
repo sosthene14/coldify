@@ -12,6 +12,7 @@ import {
   Tooltip,
   Menu
 } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 import { 
   IconDots, 
   IconMail, 
@@ -55,13 +56,6 @@ const statusColor: Record<EmailStatus, string> = {
   failed: 'red',
   pending: 'orange',
   processing: 'blue',
-}
-
-const statusLabel: Record<EmailStatus, string> = {
-  sent: 'Sent',
-  failed: 'Failed',
-  pending: 'Scheduled',
-  processing: 'Sending',
 }
 
 // Hook pour récupérer les emails récents
@@ -167,10 +161,11 @@ function useRecentEmails(dateRange?: DateRange) {
 }
 
 export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
+  const { t } = useTranslation()
   const { emails, loading } = useRecentEmails(dateRange)
   const navigate = useNavigate()
 
-  const handleViewEmail = (email: RecentEmail) => {
+  const handleViewEmail = () => {
     navigate({ to: '/dashboard/mails' })
   }
 
@@ -195,11 +190,11 @@ export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
     return (
       <Card withBorder radius="md" p="lg" bg="white">
         <Text fw={600} size="sm" c="dark.7" mb="md">
-          Recent emails
+          {t('recent_emails')}
         </Text>
         <Group justify="center" py="xl">
           <Loader size="sm" />
-          <Text size="sm" c="dimmed">Loading recent emails...</Text>
+          <Text size="sm" c="dimmed">{t('loading_recent_emails')}</Text>
         </Group>
       </Card>
     )
@@ -209,26 +204,26 @@ export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
     return (
       <Card withBorder radius="md" p="lg" bg="white">
         <Text fw={600} size="sm" c="dark.7" mb="md">
-          Recent emails
+          {t('recent_emails')}
         </Text>
         <Group justify="center" py="xl">
           <Stack align="center" gap="xs">
             <IconMail size={32} color="var(--mantine-color-gray-5)" />
-            <Text size="sm" c="dimmed">No recent emails</Text>
-            <Text size="xs" c="dimmed">Start sending emails to see your activity</Text>
+            <Text size="sm" c="dimmed">{t('no_recent_emails')}</Text>
+            <Text size="xs" c="dimmed">{t('start_sending_emails')}</Text>
           </Stack>
         </Group>
       </Card>
     )
   }
 
-  const headers = ['Subject', 'Status', 'Recipients', 'Opens', 'Activity', '']
+  const headers = [t('subject'), t('status'), t('recipients'), t('opens'), t('last_activity'), '']
 
   return (
     <Card withBorder radius="md" p={{ base: 'sm', sm: 'md', md: 'xl' }} bg="white">
       <Group justify="space-between" align="center" mb={{ base: 'sm', sm: 'md', md: 'lg' }}>
-        <Text fw={600} size={{ base: 'sm', md: 'md' }} c="dark.7">
-          Recent emails
+        <Text fw={600} c="dark.7">
+          {t('recent_emails')}
         </Text>
         <Anchor 
           size="xs" 
@@ -236,7 +231,7 @@ export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
           onClick={() => navigate({ to: '/dashboard/mails' })}
           style={{ cursor: 'pointer' }}
         >
-          View all
+          {t('view_all')}
         </Anchor>
       </Group>
 
@@ -249,8 +244,8 @@ export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
       >
         <Table.Thead visibleFrom="sm">
           <Table.Tr>
-            {headers.map((h) => (
-              <Table.Th key={h}>
+            {headers.map((h, idx) => (
+              <Table.Th key={idx}>
                 {h && (
                   <Text size="xs" fw={600} c="dimmed" tt="uppercase">
                     {h}
@@ -266,7 +261,7 @@ export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
             <Table.Tr 
               key={email.id}
               style={{ cursor: 'pointer' }}
-              onClick={() => handleViewEmail(email)}
+              onClick={() => handleViewEmail()}
             >
               <Table.Td>
                 <Stack gap={4} visibleFrom="sm">
@@ -300,10 +295,10 @@ export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
                       tt="none" 
                       fw={500}
                     >
-                      {statusLabel[email.status]}
+                      {email.status === 'sent' ? t('sent') : email.status === 'failed' ? t('failed') : email.status === 'pending' ? t('scheduled') : t('sending')}
                     </Badge>
                     <Text size="xs" c="dimmed">
-                      {email.to.length} recipient{email.to.length > 1 ? 's' : ''}
+                      {email.to.length} {email.to.length > 1 ? t('recipients') : t('recipient')}
                     </Text>
                     {email.totalOpens && email.totalOpens > 0 && (
                       <Group gap={2}>
@@ -327,7 +322,7 @@ export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
                   tt="none" 
                   fw={500}
                 >
-                  {statusLabel[email.status]}
+                  {email.status === 'sent' ? t('sent') : email.status === 'failed' ? t('failed') : email.status === 'pending' ? t('scheduled') : t('sending')}
                 </Badge>
               </Table.Td>
               
@@ -365,16 +360,16 @@ export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
                     <Menu.Dropdown>
                       <Menu.Item
                         leftSection={<IconEye size={14} />}
-                        onClick={() => handleViewEmail(email)}
+                        onClick={() => handleViewEmail()}
                       >
-                        View Details
+                        {t('view_details')}
                       </Menu.Item>
                       {email.gmailMessageId && (
                         <Menu.Item
                           leftSection={<IconExternalLink size={14} />}
                           onClick={() => handleOpenInGmail(email)}
                         >
-                          Open in Gmail
+                          {t('open_in_gmail')}
                         </Menu.Item>
                       )}
                     </Menu.Dropdown>

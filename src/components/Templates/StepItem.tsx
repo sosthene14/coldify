@@ -1,6 +1,7 @@
 import type { SequenceStep, StepType } from '#/types/template.ts';
 import { Paper, Group, ActionIcon, Badge, SegmentedControl, TextInput, NumberInput, Text, Switch } from '@mantine/core'
 import { IconGripVertical, IconTrash } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
  
 
 interface StepItemProps {
@@ -12,6 +13,8 @@ interface StepItemProps {
 }
 
 export function StepItem({ step, index, onUpdate, onRemove, isFirst }: StepItemProps) {
+  const { t } = useTranslation()
+
   return (
     <Paper withBorder p="md" radius="md">
       <Group justify="space-between" mb="sm">
@@ -19,13 +22,13 @@ export function StepItem({ step, index, onUpdate, onRemove, isFirst }: StepItemP
           <ActionIcon variant="subtle" color="gray" style={{ cursor: 'grab' }}>
             <IconGripVertical size={16} />
           </ActionIcon>
-          <Badge variant="light" color="indigo">Step {index + 1}</Badge>
+          <Badge variant="light" color="indigo">{t('step', { count: index + 1 })}</Badge>
           <SegmentedControl
             size="xs"
             data={[
-              { label: 'Email', value: 'email' },
+              { label: t('email'), value: 'email' },
               { label: 'LinkedIn', value: 'linkedin' },
-              { label: 'Task', value: 'task' },
+              { label: t('tasks'), value: 'task' },
             ]}
             value={step.type}
             onChange={(v) => onUpdate(step.id, { type: v as StepType })}
@@ -40,14 +43,14 @@ export function StepItem({ step, index, onUpdate, onRemove, isFirst }: StepItemP
 
       <Group grow align="flex-end">
         <TextInput
-          label="Subject / label"
+          label={t('subject_label')}
           placeholder="e.g. Follow-up #1"
           value={step.subject}
           onChange={(e) => onUpdate(step.id, { subject: e.currentTarget.value })}
         />
         <NumberInput
-          label="Wait before sending"
-          rightSection={<Text size="xs" c="dimmed" pr={8}>days</Text>}
+          label={t('wait_before_sending')}
+          rightSection={<Text size="xs" c="dimmed" pr={8}>{t('days')}</Text>}
           value={step.delayDays}
           min={0}
           disabled={isFirst}
@@ -58,7 +61,7 @@ export function StepItem({ step, index, onUpdate, onRemove, isFirst }: StepItemP
       <Switch
         mt="sm"
         size="sm"
-        label="Stop sequence if lead replies"
+        label={t('stop_sequence_if_reply')}
         checked={step.stopOnReply}
         onChange={(e) => onUpdate(step.id, { stopOnReply: e.currentTarget.checked })}
       />

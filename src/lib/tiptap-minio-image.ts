@@ -1,5 +1,5 @@
 import { Node } from '@tiptap/core'
-import { Plugin, PluginKey } from '@tiptap/pm/state'
+import { Plugin, PluginKey, Transaction, EditorState } from '@tiptap/pm/state'
 import { api } from './api'
 
 // Cache des URLs signées pour éviter trop de requêtes
@@ -37,17 +37,17 @@ async function getSignedUrl(objectKey: string): Promise<string> {
  */
 export const MinIOImage = Node.create({
   name: 'minioImage',
-  
+
   addOptions() {
     return {
-      HTMLAttributes: {},
+      HTMLAttributes: {} as Record<string, unknown>,
     }
   },
 
   inline: false,
   group: 'block',
   draggable: true,
-  
+
   addAttributes() {
     return {
       src: {
@@ -84,16 +84,21 @@ export const MinIOImage = Node.create({
     return [
       new Plugin({
         key: new PluginKey('minioImageLoader'),
-        
-        // Transformer les minio:// en URLs signées au chargement
-        appendTransaction: (transactions, oldState, newState) => {
-          const tr = newState.tr
-          let modified = false
 
-          newState.doc.descendants((node, pos) => {
-            if (node.type.name === 'image' && node.attrs.src?.startsWith('minio://')) {
+        // Transformer les minio:// en URLs signées au chargement
+        appendTransaction: (
+          _transactions: readonly Transaction[],
+          _oldState: EditorState,
+          newState: EditorState
+        ): Transaction | null => {
+          newState.doc.descendants((node, ) => {
+            if (
+              node.type.name === 'image' &&
+              typeof node.attrs.src === 'string' &&
+              node.attrs.src.startsWith('minio://')
+            ) {
               const objectKey = node.attrs.src.replace('minio://', '')
-              
+
               // Charger l'URL signée de manière asynchrone
               getSignedUrl(objectKey).then((signedUrl) => {
                 if (signedUrl && this.editor) {
@@ -106,7 +111,9 @@ export const MinIOImage = Node.create({
             }
           })
 
-          return modified ? tr : null
+          // Cette fonction ne modifie jamais la transaction de façon synchrone
+          // (la mise à jour se fait via une commande async plus tard)
+          return null
         },
       }),
     ]

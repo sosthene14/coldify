@@ -4,7 +4,6 @@ import {
     IconClock,
   IconFolder,
   IconLayoutGrid,
-  IconPointFilled,
   IconSend,
   IconStar,
 } from '@tabler/icons-react'
@@ -12,12 +11,12 @@ import {
 
 
 export const emailFilters: CampaignFilterItem[] = [
-  { label: 'All Emails', count: 24, icon: IconLayoutGrid },
-  { label: 'Starred', count: 6, icon: IconStar },
-  { label: 'Drafts', count: 4, icon: IconFolder },
-  { label: 'Scheduled', count: 3, icon: IconClock },
-  { label: 'Sent', count: 15, icon: IconSend, iconColor: 'var(--mantine-color-blue-6)' },
-  { label: 'Failed', count: 2, icon: IconAlertCircle, iconColor: 'var(--mantine-color-red-6)' },
+  { label: 'all_emails', count: 24, icon: IconLayoutGrid },
+  { label: 'starred', count: 6, icon: IconStar },
+  { label: 'drafts', count: 4, icon: IconFolder },
+  { label: 'scheduled', count: 3, icon: IconClock },
+  { label: 'sent', count: 15, icon: IconSend, iconColor: 'var(--mantine-color-blue-6)' },
+  { label: 'failed', count: 2, icon: IconAlertCircle, iconColor: 'var(--mantine-color-red-6)' },
 ]
 
 
@@ -32,4 +31,3 @@ export const EMAIL_CONSTANTS = {
     '.msp', '.cpl', '.jar'
   ]
 } as const
-

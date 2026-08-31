@@ -1,6 +1,7 @@
 import { Modal, SegmentedControl, TextInput, FileButton, Button, Stack, Group, Text, Image as MantineImage } from '@mantine/core'
 import { IconUpload } from '@tabler/icons-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ImageInsertModalProps {
   opened: boolean
@@ -9,6 +10,7 @@ interface ImageInsertModalProps {
 }
 
 export function ImageInsertModal({ opened, onClose, onInsert }: ImageInsertModalProps) {
+  const { t } = useTranslation()
   const [mode, setMode] = useState<'url' | 'upload'>('url')
   const [url, setUrl] = useState('')
   const [file, setFile] = useState<File | null>(null)
@@ -38,15 +40,15 @@ export function ImageInsertModal({ opened, onClose, onInsert }: ImageInsertModal
   }
 
   return (
-    <Modal opened={opened} onClose={reset} title="Insert image" centered>
+    <Modal opened={opened} onClose={reset} title={t('insert_image')} centered>
       <Stack gap="md">
         <SegmentedControl
           fullWidth
           value={mode}
           onChange={(v) => setMode(v as 'url' | 'upload')}
           data={[
-            { label: 'From URL', value: 'url' },
-            { label: 'Upload from computer', value: 'upload' },
+            { label: t('from_url'), value: 'url' },
+            { label: t('upload_from_computer'), value: 'upload' },
           ]}
         />
 
@@ -61,7 +63,7 @@ export function ImageInsertModal({ opened, onClose, onInsert }: ImageInsertModal
             <FileButton onChange={handleFile} accept="image/png,image/jpeg,image/gif,image/webp">
               {(props) => (
                 <Button {...props} variant="default" leftSection={<IconUpload size={14} />}>
-                  Choose file
+                  {t('choose_file')}
                 </Button>
               )}
             </FileButton>
@@ -74,9 +76,9 @@ export function ImageInsertModal({ opened, onClose, onInsert }: ImageInsertModal
         )}
 
         <Group justify="flex-end">
-          <Button variant="subtle" color="gray" onClick={reset}>Cancel</Button>
+          <Button variant="subtle" color="gray" onClick={reset}>{t('cancel')}</Button>
           <Button color="blue" onClick={handleInsert} disabled={mode === 'url' ? !url : !preview}>
-            Insert
+            {t('insert')}
           </Button>
         </Group>
       </Stack>

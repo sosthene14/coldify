@@ -1,6 +1,6 @@
 // src/hooks/useLogin.ts
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate, useSearch } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { authClient, twoFactor, setTwoFactorRedirectCallback, set2FAInProgress, is2FAInProgress } from '#/lib/auth-client.ts'
 
 export type LoginFormValues = {
@@ -10,7 +10,7 @@ export type LoginFormValues = {
 }
 
 export function useLogin() {
-  const searchParams = useSearch({ strict: false })
+  const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -23,11 +23,7 @@ export function useLogin() {
   const [twoFactorCode, setTwoFactorCode] = useState('')
   const [twoFactorLoading, setTwoFactorLoading] = useState(false)
 
-  // Get redirect URL from query params or default to dashboard
-  const getRedirectUrl = () => {
-    const redirect = (searchParams as any)?.redirect
-    return redirect && typeof redirect === 'string' ? redirect : '/dashboard'
-  }
+ 
 
   // Register callback pour la redirection 2FA
   const handle2FARedirect = useCallback((methods: string[]) => {
@@ -71,19 +67,17 @@ export function useLogin() {
         email,
         password,
         rememberMe,
-      }, {
-        dontNavigate: true,
       })
 
       if (signInError) {
-        setError(signInError.message ?? 'Email ou mot de passe incorrect')
+        setError(signInError.message ?? t('incorrect_email_password'))
         return
       }
 
       // Si on arrive ici sans 2FA redirect, login réussi
       // La redirection est gérée par __root.tsx useEffect
     } catch (err) {
-      setError('Une erreur inattendue est survenue')
+      setError(t('unexpected_error'))
     } finally {
       // Le loading sera mis à false par handle2FARedirect si 2FA requis
       if (!requires2FA) {
@@ -100,7 +94,7 @@ export function useLogin() {
     try {
       const res = await twoFactor.verifyTotp({ code })
       if (res.error) {
-        setError(res.error.message ?? 'Code invalide. Réessayez.')
+        setError(res.error.message ?? t('invalid_code_retry'))
         return
       }
       // Login réussi, la session est maintenant active
@@ -110,7 +104,7 @@ export function useLogin() {
       setRequires2FA(false)
       // La redirection est gérée par __root.tsx
     } catch {
-      setError('Échec de la vérification du code TOTP')
+      setError(t('totp_verification_failed'))
     } finally {
       setTwoFactorLoading(false)
     }
@@ -124,7 +118,7 @@ export function useLogin() {
     try {
       const res = await twoFactor.verifyOtp({ code })
       if (res.error) {
-        setError(res.error.message ?? 'Code email invalide. Réessayez.')
+        setError(res.error.message ?? t('invalid_email_code_retry'))
         return
       }
       // Login réussi
@@ -132,7 +126,7 @@ export function useLogin() {
       sessionStorage.removeItem('_2fa_methods')
       setRequires2FA(false)
     } catch {
-      setError('Échec de la vérification du code Email OTP')
+      setError(t('email_otp_verification_failed'))
     } finally {
       setTwoFactorLoading(false)
     }
@@ -144,18 +138,18 @@ export function useLogin() {
     try {
       const res = await twoFactor.sendOtp()
       if (res.error) {
-        setError(res.error.message ?? "Impossible d'envoyer le code")
+        setError(res.error.message ?? t('unable_send_code'))
         return
       }
       // Succès - afficher une notification
       const { notifications } = await import('@mantine/notifications')
       notifications.show({
-        title: 'Code envoyé',
-        message: 'Un nouveau code de vérification a été envoyé à votre email',
+        title: t('code_sent'),
+        message: t('new_verification_code_sent'),
         color: 'green',
       })
     } catch {
-      setError("Erreur lors de l'envoi du code")
+      setError(t('error_sending_code'))
     }
   }
 
@@ -167,14 +161,14 @@ export function useLogin() {
     try {
       const res = await twoFactor.verifyBackupCode({ code })
       if (res.error) {
-        setError(res.error.message ?? 'Code de récupération invalide')
+        setError(res.error.message ?? t('invalid_recovery_code'))
         return
       }
       set2FAInProgress(false)
       sessionStorage.removeItem('_2fa_methods')
       setRequires2FA(false)
     } catch {
-      setError('Échec de la vérification du code de récupération')
+      setError(t('recovery_code_verification_failed'))
     } finally {
       setTwoFactorLoading(false)
     }
@@ -182,7 +176,6 @@ export function useLogin() {
 
   const loginWithGoogle = async () => {
     setError(null)
-    const redirectUrl = getRedirectUrl()
     await authClient.signIn.social({ 
       provider: 'google', 
       callbackURL: `${import.meta.env.VITE_FRONTEND_URL}/dashboard`,
@@ -193,7 +186,7 @@ export function useLogin() {
     setError(null)
 
     if (!email) {
-      setError('Entre ton email pour réinitialiser ton mot de passe')
+      setError(t('enter_email_reset'))
       return
     }
 
@@ -204,9 +197,9 @@ export function useLogin() {
 
     if (resetError) {
       if (resetError.status === 429) {
-        setError('Trop de tentatives, réessaie dans quelques minutes')
+        setError(t('too_many_attempts'))
       } else {
-        setError(resetError.message ?? "Impossible d'envoyer l'email de réinitialisation")
+        setError(resetError.message ?? t('unable_send_reset_email'))
       }
     }
   }

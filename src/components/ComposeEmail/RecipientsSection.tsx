@@ -1,6 +1,7 @@
 // components/RecipientsSection.tsx
 import { Group, ActionIcon, Alert, Text, Button } from '@mantine/core'
 import { IconX } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 import { EmailPillsInput } from './EmailPillsInput'
 
 interface RecipientsSectionProps {
@@ -28,11 +29,13 @@ export function RecipientsSection({
   onToggleCc,
   onToggleBcc,
 }: RecipientsSectionProps) {
+  const { t } = useTranslation()
+
   return (
     <>
       <EmailPillsInput
-        label="To"
-        placeholder="recipient@example.com (press comma or enter to add)"
+        label={t('to')}
+        placeholder={t('recipient_placeholder')}
         value={to}
         onChange={onToChange}
         required
@@ -41,7 +44,7 @@ export function RecipientsSection({
       {to.length > 1 && (
         <Alert color="blue" variant="light" p="xs">
           <Text size="xs">
-            📧 Each recipient will receive a separate, individual email. They won't see the other recipients.
+            {t('each_recipient_individual')}
           </Text>
         </Alert>
       )}
@@ -49,12 +52,12 @@ export function RecipientsSection({
       <Group gap="xs">
         {!showCc && (
           <Button size="compact-sm" variant="subtle" onClick={onToggleCc}>
-            Add Cc
+            {t('add_cc')}
           </Button>
         )}
         {!showBcc && (
           <Button size="compact-sm" variant="subtle" onClick={onToggleBcc}>
-            Add Bcc
+            {t('add_bcc')}
           </Button>
         )}
       </Group>
@@ -63,7 +66,7 @@ export function RecipientsSection({
         <Group align="flex-start" gap="xs">
           <div style={{ flex: 1 }}>
             <EmailPillsInput
-              label="Cc"
+              label={t('cc')}
               placeholder="cc@example.com"
               value={cc}
               onChange={onCcChange}
@@ -87,7 +90,7 @@ export function RecipientsSection({
         <Group align="flex-start" gap="xs">
           <div style={{ flex: 1 }}>
             <EmailPillsInput
-              label="Bcc"
+              label={t('bcc')}
               placeholder="bcc@example.com"
               value={bcc}
               onChange={onBccChange}

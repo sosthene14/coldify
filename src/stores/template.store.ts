@@ -22,7 +22,7 @@ interface TemplateStore {
   duplicateTemplate: (id: string) => Promise<Template>
 }
 
-export const useTemplateStore = create<TemplateStore>((set, get) => ({
+export const useTemplateStore = create<TemplateStore>((set, ) => ({
   templates: [],
   selectedTemplate: null,
   search: '',

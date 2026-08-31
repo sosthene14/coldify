@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 import { PasswordInput, Button, Text, Stack, Alert } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 import { AuthLayout } from '#/components/Layout/AuthLayout'
 import { authClient } from '#/lib/auth-client'
 
@@ -9,6 +10,7 @@ export const Route = createFileRoute('/reset-password')({
 })
 
 function ResetPasswordPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const searchParams = useSearch({ strict: false }) as any
   const [password, setPassword] = useState('')
@@ -22,13 +24,13 @@ function ResetPasswordPage() {
     setError(null)
 
     if (password !== confirmPassword) {
-      setError('Les mots de passe ne correspondent pas')
+      setError(t('password_mismatch_error'))
       setLoading(false)
       return
     }
 
     if (password.length < 8) {
-      setError('Le mot de passe doit contenir au moins 8 caractères')
+      setError(t('password_min_length_error'))
       setLoading(false)
       return
     }
@@ -37,7 +39,7 @@ function ResetPasswordPage() {
       const token = searchParams.token
 
       if (!token) {
-        setError('Token de réinitialisation manquant')
+        setError(t('missing_reset_token'))
         setLoading(false)
         return
       }
@@ -48,19 +50,19 @@ function ResetPasswordPage() {
       })
 
       if (resetError) {
-        setError(resetError.message ?? 'Impossible de réinitialiser le mot de passe')
+        setError(resetError.message ?? t('unable_reset_password'))
       } else {
         navigate({ to: '/login' })
       }
     } catch {
-      setError('Une erreur inattendue est survenue')
+      setError(t('unexpected_error'))
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <AuthLayout title="Nouveau mot de passe" subtitle="Entre ton nouveau mot de passe">
+    <AuthLayout title={t('new_password_title')} subtitle={t('enter_new_password_subtitle')}>
       <Stack gap="md">
         {error && (
           <Alert color="red" radius="md">
@@ -71,16 +73,16 @@ function ResetPasswordPage() {
         <form onSubmit={handleSubmit}>
           <Stack gap="sm">
             <PasswordInput
-              label="Nouveau mot de passe"
-              placeholder="Au moins 8 caractères"
+              label={t('new_password')}
+              placeholder={t('at_least_8_chars')}
               value={password}
               onChange={(e) => setPassword(e.currentTarget.value)}
               radius="md"
               required
             />
             <PasswordInput
-              label="Confirmer le mot de passe"
-              placeholder="Retape ton mot de passe"
+              label={t('confirm_password_label')}
+              placeholder={t('retype_password_placeholder')}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.currentTarget.value)}
               radius="md"
@@ -88,13 +90,13 @@ function ResetPasswordPage() {
             />
 
             <Button type="submit" color="blue" radius="md" fullWidth mt="xs" loading={loading}>
-              Réinitialiser le mot de passe
+              {t('reset_password_button')}
             </Button>
           </Stack>
         </form>
 
         <Text size="xs" c="dimmed" ta="center">
-          Après réinitialisation, tu seras redirigé vers la page de connexion
+          {t('redirect_after_reset')}
         </Text>
       </Stack>
     </AuthLayout>

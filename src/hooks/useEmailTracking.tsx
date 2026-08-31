@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { notifications } from '@mantine/notifications';
 import { IconEye } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 
 const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace('http', 'ws');
 
@@ -23,6 +24,7 @@ const listeners = new Set<(data: EmailOpenedEvent) => void>();
  * Uses a singleton pattern to ensure only one WebSocket connection exists
  */
 export function useEmailTracking(organizationId: string | undefined, onEmailOpened?: (data: EmailOpenedEvent) => void) {
+  const { t } = useTranslation();
   const listenerRef = useRef(onEmailOpened);
 
   // Keep listener ref up to date
@@ -72,8 +74,8 @@ export function useEmailTracking(organizationId: string | undefined, onEmailOpen
 
             // Show notification
             notifications.show({
-              title: '📧 Email ouvert',
-              message: `${data.recipient} a ouvert votre email (${data.totalOpens}x)`,
+              title: t('email_opened_title'),
+              message: t('email_opened_message', { recipient: data.recipient, count: data.totalOpens }),
               color: 'blue',
               icon: <IconEye size={16} />,
               autoClose: 5000,

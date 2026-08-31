@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Group, Stack, Text, Modal, Divider, ScrollArea, Badge, Loader } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
+import { useTranslation } from 'react-i18next'
 import { 
   IconLayoutGrid, 
   IconClock, 
@@ -14,27 +15,27 @@ import { format } from 'date-fns'
 // Filtres d'emails sans "Starred" et "Drafts"
 const emailFilters = [
   { 
-    label: 'All Emails', 
+    label: 'all_emails', 
     count: 0, 
     icon: 'IconLayoutGrid',
     apiFilter: null 
   },
   { 
-    label: 'Scheduled', 
+    label: 'scheduled', 
     count: 0, 
     icon: 'IconClock',
     apiFilter: 'pending',
     iconColor: 'var(--mantine-color-orange-6)'
   },
   { 
-    label: 'Sent', 
+    label: 'sent', 
     count: 0, 
     icon: 'IconSend',
     apiFilter: 'sent',
     iconColor: 'var(--mantine-color-green-6)'
   },
   { 
-    label: 'Failed', 
+    label: 'failed', 
     count: 0, 
     icon: 'IconAlertCircle',
     apiFilter: 'failed',
@@ -56,6 +57,7 @@ type EmailItem = {
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 export function CampaignsCard() {
+  const { t } = useTranslation()
   const [opened, { open, close }] = useDisclosure(false)
   const [selected, setSelected] = useState<(typeof emailFilters)[number] | null>(null)
   const [emails, setEmails] = useState<EmailItem[]>([])
@@ -174,9 +176,9 @@ export function CampaignsCard() {
 
   const getEmailDate = (email: EmailItem) => {
     if (email.sentAt) return format(email.sentAt, 'MMM d, HH:mm')
-    if (email.scheduledAt) return `Scheduled: ${format(email.scheduledAt, 'MMM d, HH:mm')}`
+    if (email.scheduledAt) return `${t('scheduled')}: ${format(email.scheduledAt, 'MMM d, HH:mm')}`
     if (email.createdAt) return format(email.createdAt, 'MMM d, HH:mm')
-    return 'Unknown date'
+    return t('unknown_date')
   }
 
   // Mettre à jour les compteurs dans les filtres
@@ -187,12 +189,12 @@ export function CampaignsCard() {
 
   return (
     <>
-      <SidebarCard title="Emails" viewAllHref="/dashboard/mails">
+      <SidebarCard title={t('emails')} viewAllHref="/dashboard/mails">
         <Stack gap={2} className='w-auto'>
           {loading ? (
             <Group justify="center" py="md">
               <Loader size="xs" />
-              <Text size="xs" c="dimmed">Loading...</Text>
+              <Text size="xs" c="dimmed">{t('loading')}</Text>
             </Group>
           ) : (
             filtersWithCounts.map((item) => (
@@ -215,7 +217,7 @@ export function CampaignsCard() {
                   {item.icon === 'IconSend' && <IconSend size={15} color={item.iconColor ?? 'var(--mantine-color-gray-6)'} />}
                   {item.icon === 'IconAlertCircle' && <IconAlertCircle size={15} color={item.iconColor ?? 'var(--mantine-color-gray-6)'} />}
                   <Text size="sm" c="dark.6">
-                    {item.label}
+                    {t(item.label)}
                   </Text>
                 </Group>
 
@@ -231,7 +233,7 @@ export function CampaignsCard() {
       <Modal
         opened={opened}
         onClose={close}
-        title={selected ? `Emails — ${selected.label}` : 'Emails'}
+        title={selected ? `${t('emails')} — ${t(selected.label)}` : t('emails')}
         size="md"
         radius="md"
         centered
@@ -242,11 +244,11 @@ export function CampaignsCard() {
         {modalLoading ? (
           <Group justify="center" py="xl">
             <Loader size="sm" />
-            <Text size="sm" c="dimmed">Loading emails...</Text>
+            <Text size="sm" c="dimmed">{t('loading_emails')}</Text>
           </Group>
         ) : emails.length === 0 ? (
           <Text size="sm" c="dimmed" ta="center" py="md">
-            No emails found for this filter.
+            {t('no_emails_filter')}
           </Text>
         ) : (
           <ScrollArea.Autosize mah={400}>
@@ -262,7 +264,7 @@ export function CampaignsCard() {
                       {email.subject}
                     </Text>
                     <Text size="xs" c="dimmed" truncate>
-                      To: {email.to.join(', ')} • {getEmailDate(email)}
+                      {t('to')}: {email.to.join(', ')} • {getEmailDate(email)}
                     </Text>
                   </div>
                   <Badge 
@@ -271,7 +273,7 @@ export function CampaignsCard() {
                     color={getStatusColor(email.status)} 
                     radius="sm"
                   >
-                    {email.status === 'pending' ? 'scheduled' : email.status}
+                    {email.status === 'pending' ? t('scheduled') : email.status}
                   </Badge>
                 </Group>
               ))}

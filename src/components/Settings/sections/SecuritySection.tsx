@@ -5,7 +5,6 @@ import {
   Divider,
   Group,
   Text,
-  Switch,
   Badge,
   Button,
   Loader,
@@ -19,18 +18,15 @@ import {
   Tooltip,
   CopyButton,
 } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 import { 
   IconDeviceLaptop, 
   IconDeviceDesktop, 
   IconDeviceMobile,
   IconShieldCheck,
-  IconQrcode,
-  IconMail,
-  IconKey,
   IconCopy,
   IconCheck,
-  IconAlertTriangle,
-  IconLock
+  IconAlertTriangle
 } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications'
 import { SectionHeader } from '../components/SectionHeader'
@@ -47,12 +43,12 @@ interface Session {
 }
 
 export function SecuritySection() {
+  const { t } = useTranslation()
   const { data: sessionData, refetch } = useSession()
   const is2FAEnabled = Boolean(sessionData?.user?.twoFactorEnabled)
 
   const [sessions, setSessions] = useState<Session[]>([])
   const [loadingSessions, setLoadingSessions] = useState(true)
-  const [revoking, setRevoking] = useState<string | null>(null)
 
   // 2FA Modal States
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -83,27 +79,27 @@ export function SecuritySection() {
   }, [])
 
   // Révoquer une session
-  const revokeSession = async (sessionId: string) => {
-    setRevoking(sessionId)
-    try {
-      await api.delete(`/user/sessions/${sessionId}`)
-      setSessions(prev => prev.filter(s => s.id !== sessionId))
-      notifications.show({
-        title: 'Session révoquée',
-        message: 'La session a été révoquée avec succès',
-        color: 'green'
-      })
-    } catch (error) {
-      console.error('Failed to revoke session:', error)
-      notifications.show({
-        title: 'Erreur',
-        message: 'Impossible de révoquer la session',
-        color: 'red'
-      })
-    } finally {
-      setRevoking(null)
-    }
-  }
+  // const revokeSession = async (sessionId: string) => {
+  //   setRevoking(sessionId)
+  //   try {
+  //     await api.delete(`/user/sessions/${sessionId}`)
+  //     setSessions(prev => prev.filter(s => s.id !== sessionId))
+  //     notifications.show({
+  //       title: t('session_revoked'),
+  //       message: t('session_revoked_success'),
+  //       color: 'green'
+  //     })
+  //   } catch (error) {
+  //     console.error('Failed to revoke session:', error)
+  //     notifications.show({
+  //       title: t('error_occurred'),
+  //       message: t('unable_revoke_session'),
+  //       color: 'red'
+  //     })
+  //   } finally {
+  //     setRevoking(null)
+  //   }
+  // }
 
   // Ouvrir le modal d'activation
   const handleOpenEnableModal = () => {
@@ -125,7 +121,7 @@ export function SecuritySection() {
   // Générer les informations TOTP (Google Authenticator)
   const handleStartTOTPSetup = async () => {
     if (!password) {
-      setErrorMessage('Veuillez entrer votre mot de passe pour continuer')
+      setErrorMessage(t('enter_password_continue'))
       return
     }
     setActionLoading(true)
@@ -134,7 +130,7 @@ export function SecuritySection() {
     try {
       const res = await twoFactor.enable({ password })
       if (res.error) {
-        setErrorMessage(res.error.message || 'Mot de passe incorrect ou erreur')
+        setErrorMessage(res.error.message || t('incorrect_password_or_error'))
         return
       }
 
@@ -145,7 +141,7 @@ export function SecuritySection() {
       }
       setSetupStep('totp')
     } catch (err: any) {
-      setErrorMessage(err.message || 'Impossible de générer le QR Code TOTP')
+      setErrorMessage(err.message || t('unable_generate_totp_qr'))
     } finally {
       setActionLoading(false)
     }
@@ -154,7 +150,7 @@ export function SecuritySection() {
   // Démarrer la configuration Email OTP
   const handleStartEmailOTPSetup = async () => {
     if (!password) {
-      setErrorMessage('Veuillez entrer votre mot de passe pour continuer')
+      setErrorMessage(t('enter_password_continue'))
       return
     }
     setActionLoading(true)
@@ -163,24 +159,24 @@ export function SecuritySection() {
     try {
       const enableRes = await twoFactor.enable({ password })
       if (enableRes.error) {
-        setErrorMessage(enableRes.error.message || 'Mot de passe incorrect')
+        setErrorMessage(enableRes.error.message || t('incorrect_password'))
         return
       }
 
       const sendRes = await twoFactor.sendOtp()
       if (sendRes.error) {
-        setErrorMessage(sendRes.error.message || "Impossible d'envoyer l'email OTP")
+        setErrorMessage(sendRes.error.message || t('unable_send_otp_email'))
         return
       }
 
       notifications.show({
-        title: 'Code envoyé',
-        message: 'Un code de vérification à 6 chiffres a été envoyé par email',
+        title: t('code_sent'),
+        message: t('verification_code_sent_email'),
         color: 'blue'
       })
       setSetupStep('email')
     } catch (err: any) {
-      setErrorMessage(err.message || "Erreur lors de l'envoi de l'OTP")
+      setErrorMessage(err.message || t('error_sending_otp'))
     } finally {
       setActionLoading(false)
     }
@@ -189,7 +185,7 @@ export function SecuritySection() {
   // Vérifier et activer TOTP
   const handleVerifyTOTP = async () => {
     if (!verificationCode || verificationCode.length < 6) {
-      setErrorMessage('Veuillez entrer le code à 6 chiffres de votre application d\'authentification')
+      setErrorMessage(t('enter_6digit_auth_code'))
       return
     }
     setActionLoading(true)
@@ -198,13 +194,13 @@ export function SecuritySection() {
     try {
       const res = await twoFactor.verifyTotp({ code: verificationCode })
       if (res.error) {
-        setErrorMessage(res.error.message || 'Code invalide')
+        setErrorMessage(res.error.message || t('invalid_code'))
         return
       }
 
       notifications.show({
-        title: '2FA Activé !',
-        message: 'L\'authentification Google Authenticator est maintenant activée',
+        title: t('2fa_activated'),
+        message: t('google_auth_activated'),
         color: 'green'
       })
       if (backupCodes.length > 0) {
@@ -214,7 +210,7 @@ export function SecuritySection() {
         refetch?.()
       }
     } catch (err: any) {
-      setErrorMessage(err.message || 'Échec de vérification du code TOTP')
+      setErrorMessage(err.message || t('totp_verification_failed'))
     } finally {
       setActionLoading(false)
     }
@@ -223,7 +219,7 @@ export function SecuritySection() {
   // Vérifier et activer Email OTP
   const handleVerifyEmailOTP = async () => {
     if (!verificationCode || verificationCode.length < 6) {
-      setErrorMessage('Veuillez entrer le code à 6 chiffres reçu par email')
+      setErrorMessage(t('enter_6digit_email_code_received'))
       return
     }
     setActionLoading(true)
@@ -232,19 +228,19 @@ export function SecuritySection() {
     try {
       const res = await twoFactor.verifyOtp({ code: verificationCode })
       if (res.error) {
-        setErrorMessage(res.error.message || 'Code email invalide')
+        setErrorMessage(res.error.message || t('invalid_email_code'))
         return
       }
 
       notifications.show({
-        title: '2FA Activé !',
-        message: 'L\'authentification 2FA par email est activée avec succès',
+        title: t('2fa_activated'),
+        message: t('email_2fa_activated'),
         color: 'green'
       })
       setIsModalOpen(false)
       refetch?.()
     } catch (err: any) {
-      setErrorMessage(err.message || 'Échec de vérification du code Email OTP')
+      setErrorMessage(err.message || t('email_otp_verification_failed'))
     } finally {
       setActionLoading(false)
     }
@@ -253,7 +249,7 @@ export function SecuritySection() {
   // Désactiver la 2FA
   const handleDisable2FA = async () => {
     if (!password) {
-      setErrorMessage('Veuillez entrer votre mot de passe pour confirmer la désactivation')
+      setErrorMessage(t('enter_password_disable'))
       return
     }
     setActionLoading(true)
@@ -262,19 +258,19 @@ export function SecuritySection() {
     try {
       const res = await twoFactor.disable({ password })
       if (res.error) {
-        setErrorMessage(res.error.message || 'Mot de passe incorrect')
+        setErrorMessage(res.error.message || t('incorrect_password'))
         return
       }
 
       notifications.show({
-        title: '2FA Désactivé',
-        message: 'L\'authentification à deux facteurs a été désactivée',
+        title: t('2fa_disabled'),
+        message: t('two_factor_disabled'),
         color: 'gray'
       })
       setIsModalOpen(false)
       refetch?.()
     } catch (err: any) {
-      setErrorMessage(err.message || 'Impossible de désactiver la 2FA')
+      setErrorMessage(err.message || t('unable_disable_2fa'))
     } finally {
       setActionLoading(false)
     }
@@ -298,8 +294,8 @@ export function SecuritySection() {
     <>
       <Card withBorder radius="md" p="lg" bg="white">
         <SectionHeader 
-          title="Two-Factor Authentication (2FA)" 
-          description="Add an extra layer of security to your account using Google Authenticator or Email OTP."
+          title={t('two_factor_auth_2fa')} 
+          description={t('add_extra_security')}
         />
         <Divider my="md" />
         
@@ -316,40 +312,40 @@ export function SecuritySection() {
             <div>
               <Group gap="xs">
                 <Text fw={600} size="sm">
-                  {is2FAEnabled ? 'Two-Factor Authentication is Enabled' : 'Two-Factor Authentication is Disabled'}
+                  {is2FAEnabled ? t('two_factor_enabled_status') : t('two_factor_disabled_status')}
                 </Text>
                 <Badge color={is2FAEnabled ? 'green' : 'gray'} variant="light" size="sm">
-                  {is2FAEnabled ? 'Active' : 'Off'}
+                  {is2FAEnabled ? t('active') : t('off')}
                 </Badge>
               </Group>
               <Text size="xs" c="dimmed">
                 {is2FAEnabled 
-                  ? 'Your account is protected with 2FA code verification on login.' 
-                  : 'Protect your account from unauthorized access by requiring a verification code upon login.'}
+                  ? t('account_protected_2fa') 
+                  : t('protect_account_2fa')}
               </Text>
             </div>
           </Group>
 
           {is2FAEnabled ? (
             <Button variant="outline" color="red" size="xs" onClick={handleOpenDisableModal}>
-              Disable 2FA
+              {t('disable_2fa')}
             </Button>
           ) : (
             <Button color="blue" size="xs" onClick={handleOpenEnableModal}>
-              Enable 2FA
+              {t('enable_2fa')}
             </Button>
           )}
         </Group>
       </Card>
 
       <Card withBorder radius="md" p="lg" bg="white">
-        <SectionHeader title="Active Sessions" description="Manage devices currently signed into your account." />
+        <SectionHeader title={t('active_sessions')} description={t('manage_devices')} />
         <Divider my="md" />
         
         {loadingSessions ? (
           <Group justify="center" py="md">
             <Loader size="sm" />
-            <Text size="sm" c="dimmed">Loading sessions...</Text>
+            <Text size="sm" c="dimmed">{t('loading_sessions')}</Text>
           </Group>
         ) : (
           <Stack gap="sm">
@@ -367,7 +363,7 @@ export function SecuritySection() {
                 </Group>
                 {s.current ? (
                   <Badge size="sm" variant="light" color="green">
-                    This device
+                    {t('this_device')}
                   </Badge>
                 ) : (
                   null
@@ -376,7 +372,7 @@ export function SecuritySection() {
             ))}
             {sessions.length === 0 && (
               <Text size="sm" c="dimmed" ta="center" py="md">
-                Aucune session active trouvée
+                {t('no_active_sessions')}
               </Text>
             )}
           </Stack>
@@ -389,7 +385,7 @@ export function SecuritySection() {
         onClose={() => setIsModalOpen(false)}
         title={
           <Text fw={700} size="md">
-            {setupStep === 'disable' ? 'Disable 2FA' : 'Set Up Two-Factor Authentication'}
+            {setupStep === 'disable' ? t('disable_2fa_title') : t('set_up_2fa_title')}
           </Text>
         }
         radius="md"
@@ -406,22 +402,22 @@ export function SecuritySection() {
         {setupStep === 'method' && (
           <Stack gap="md">
             <Text size="sm">
-              Choose your preferred authentication method and enter your current password to continue.
+              {t('choose_auth_method')}
             </Text>
 
             <SegmentedControl
               value={twoFactorMethod}
               onChange={(val: any) => setTwoFactorMethod(val)}
               data={[
-                { label: 'Google Authenticator (TOTP)', value: 'totp' },
-                { label: 'Email OTP', value: 'email' },
+                { label: t('google_authenticator_totp'), value: 'totp' },
+                { label: t('email_otp'), value: 'email' },
               ]}
               fullWidth
             />
 
             <PasswordInput
-              label="Confirm your password"
-              placeholder="Enter your account password"
+              label={t('confirm_your_password')}
+              placeholder={t('enter_account_password')}
               value={password}
               onChange={(e) => setPassword(e.currentTarget.value)}
               required
@@ -429,14 +425,14 @@ export function SecuritySection() {
 
             <Group justify="flex-end" mt="sm">
               <Button variant="default" onClick={() => setIsModalOpen(false)}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button 
                 color="blue" 
                 loading={actionLoading}
                 onClick={twoFactorMethod === 'totp' ? handleStartTOTPSetup : handleStartEmailOTPSetup}
               >
-                Continue
+                {t('continue')}
               </Button>
             </Group>
           </Stack>
@@ -446,7 +442,7 @@ export function SecuritySection() {
         {setupStep === 'totp' && (
           <Stack gap="md" align="center">
             <Text size="sm" ta="center">
-              Scan this QR code with <strong>Google Authenticator</strong> or your preferred 2FA app (Authy, 1Password).
+              {t('scan_qr_code', { app: t('google_authenticator') })}
             </Text>
 
             {qrCodeUrl && (
@@ -457,13 +453,13 @@ export function SecuritySection() {
 
             {totpSecret && (
               <Group gap="xs" justify="center">
-                <Text size="xs" c="dimmed">Secret key:</Text>
+                <Text size="xs" c="dimmed">{t('secret_key')}</Text>
                 <Text size="xs" fw={700} style={{ fontFamily: 'monospace', letterSpacing: 1 }}>
                   {totpSecret}
                 </Text>
                 <CopyButton value={totpSecret}>
                   {({ copied, copy }) => (
-                    <Tooltip label={copied ? 'Copied' : 'Copy key'}>
+                    <Tooltip label={copied ? t('copied') : t('copy_key')}>
                       <ActionIcon size="sm" variant="subtle" color={copied ? 'teal' : 'gray'} onClick={copy}>
                         {copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
                       </ActionIcon>
@@ -474,7 +470,7 @@ export function SecuritySection() {
             )}
 
             <TextInput
-              label="Enter 6-digit code"
+              label={t('enter_6digit_code')}
               placeholder="123456"
               value={verificationCode}
               onChange={(e) => setVerificationCode(e.currentTarget.value)}
@@ -485,10 +481,10 @@ export function SecuritySection() {
 
             <Group justify="flex-end" style={{ width: '100%' }} mt="xs">
               <Button variant="default" onClick={() => setIsModalOpen(false)}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button color="blue" loading={actionLoading} onClick={handleVerifyTOTP}>
-                Verify & Activate
+                {t('verify_activate')}
               </Button>
             </Group>
           </Stack>
@@ -498,11 +494,11 @@ export function SecuritySection() {
         {setupStep === 'email' && (
           <Stack gap="md">
             <Text size="sm">
-              We have sent a 6-digit verification code to your email. Enter it below to activate 2FA.
+              {t('verification_code_sent')}
             </Text>
 
             <TextInput
-              label="Enter 6-digit Email code"
+              label={t('enter_6digit_email_code')}
               placeholder="123456"
               value={verificationCode}
               onChange={(e) => setVerificationCode(e.currentTarget.value)}
@@ -512,14 +508,14 @@ export function SecuritySection() {
 
             <Group justify="space-between" mt="xs">
               <Button variant="subtle" size="xs" onClick={handleStartEmailOTPSetup} loading={actionLoading}>
-                Resend email code
+                {t('resend_email_code')}
               </Button>
               <Group gap="xs">
                 <Button variant="default" onClick={() => setIsModalOpen(false)}>
-                  Cancel
+                  {t('cancel')}
                 </Button>
                 <Button color="blue" loading={actionLoading} onClick={handleVerifyEmailOTP}>
-                  Verify & Activate
+                  {t('verify_activate')}
                 </Button>
               </Group>
             </Group>
@@ -530,7 +526,7 @@ export function SecuritySection() {
         {setupStep === 'backup' && (
           <Stack gap="md">
             <Text size="sm">
-              Save your recovery backup codes. If you lose access to your authenticator app, these codes will allow you to sign in.
+              {t('save_backup_codes')}
             </Text>
 
             <Paper p="md" withBorder bg="gray.0" radius="md">
@@ -552,12 +548,12 @@ export function SecuritySection() {
                     leftSection={copied ? <IconCheck size={16} /> : <IconCopy size={16} />}
                     onClick={copy}
                   >
-                    {copied ? 'Copied!' : 'Copy all codes'}
+                    {copied ? t('copied_exclamation') : t('copy_all_codes')}
                   </Button>
                 )}
               </CopyButton>
               <Button color="blue" onClick={() => { setIsModalOpen(false); refetch?.(); }}>
-                Done
+                {t('done')}
               </Button>
             </Group>
           </Stack>
@@ -567,12 +563,12 @@ export function SecuritySection() {
         {setupStep === 'disable' && (
           <Stack gap="md">
             <Text size="sm">
-              Are you sure you want to disable Two-Factor Authentication? Your account will be less secure.
+              {t('disable_2fa_confirm')}
             </Text>
 
             <PasswordInput
-              label="Confirm your password"
-              placeholder="Enter your account password"
+              label={t('confirm_your_password')}
+              placeholder={t('enter_account_password')}
               value={password}
               onChange={(e) => setPassword(e.currentTarget.value)}
               required
@@ -580,10 +576,10 @@ export function SecuritySection() {
 
             <Group justify="flex-end" mt="xs">
               <Button variant="default" onClick={() => setIsModalOpen(false)}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button color="red" loading={actionLoading} onClick={handleDisable2FA}>
-                Disable 2FA
+                {t('disable_2fa')}
               </Button>
             </Group>
           </Stack>

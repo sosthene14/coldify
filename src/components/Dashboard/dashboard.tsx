@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSession } from "#/lib/auth-client.ts";
+import { useTranslation } from 'react-i18next'
 import { PageHeader } from "../PageHeader";
-import { ActivitySidebar } from "./activity-feed";
 import { EmailActivityOverview } from "./email-activity-overview";
 import { RecentCampaigns } from "./recent-campaigns";
 import { Sidebar } from "./Sidebar";
-import { TopPerformingCampaigns } from "./top-performing-campaigns";
 import { subDays, startOfDay, endOfDay } from 'date-fns'
 import axios from 'axios'
 import { Grid, Container, Card, Stack, Group, Text, Progress, Badge, Button } from '@mantine/core'
@@ -99,13 +98,14 @@ function calculateHealthScore(mailbox: any): number {
 }
 
 export const Dashboard = () => {
+  const { t } = useTranslation()
   const {data: session} = useSession()
-  const { totalSent, totalLimit, mailboxes, loading } = useEmailLimitData()
+  const { totalSent, totalLimit, mailboxes } = useEmailLimitData()
   const navigate = useNavigate()
   
   // State pour la plage de dates
   const [dateRange, setDateRange] = useState<{startDate: Date, endDate: Date}>({
-    startDate: startOfDay(subDays(new Date(), 6)), // 7 derniers jours
+    startDate: startOfDay(subDays(new Date(), 6)),
     endDate: endOfDay(new Date())
   })
 
@@ -121,8 +121,8 @@ export const Dashboard = () => {
   return (
     <Container size="full" px="md" py="md" className="bg-slate-50/10">
       <PageHeader
-        title={`Welcome back, ${session?.user?.firstName || session?.user?.name?.split(' ')[0] || 'there'}`}
-        subtitle="Prêt à envoyer de nouveaux mails ?"
+        title={`${t('welcome_back')}, ${session?.user?.firstName || session?.user?.name?.split(' ')[0] || 'there'}`}
+        subtitle={t('ready_to_send_emails')}
         onDateRangeChange={handleDateRangeChange}
       />
 
@@ -132,9 +132,9 @@ export const Dashboard = () => {
         <Card withBorder p="sm" radius="md">
           <Stack gap="xs">
             <Group justify="space-between">
-              <Text size="xs" fw={500} c="dimmed">Daily email limit</Text>
+              <Text size="xs" fw={500} c="dimmed">{t('daily_email_limit')}</Text>
               <Badge size="xs" color={usagePercent < 80 ? 'green' : usagePercent < 95 ? 'orange' : 'red'} variant="light">
-                {usagePercent < 80 ? 'Good' : usagePercent < 95 ? 'Warning' : 'Critical'}
+                {usagePercent < 80 ? t('good') : usagePercent < 95 ? t('warning') : t('critical')}
               </Badge>
             </Group>
             <Group justify="space-between">
@@ -147,8 +147,8 @@ export const Dashboard = () => {
 
         {/* Quick Actions */}
         <Card withBorder p="sm" radius="md">
-          <Text size="xs" fw={500} c="dimmed" mb="xs">Quick actions</Text>
-          <Grid gutter="xs">
+          <Text size="xs" fw={500} c="dimmed" mb="xs">{t('quick_actions')}</Text>
+          <Grid >
             <Grid.Col span={6}>
               <Button 
                 variant="light" 
@@ -157,7 +157,7 @@ export const Dashboard = () => {
                 leftSection={<IconSend size={14} />}
                 onClick={() => navigate({ to: '/dashboard/mails/new' })}
               >
-                Send email
+                {t('send_email')}
               </Button>
             </Grid.Col>
             <Grid.Col span={6}>
@@ -168,7 +168,7 @@ export const Dashboard = () => {
                 leftSection={<IconTemplate size={14} />}
                 onClick={() => navigate({ to: '/dashboard/templates/new' })}
               >
-                New template
+                {t('new_template')}
               </Button>
             </Grid.Col>
             <Grid.Col span={6}>
@@ -179,7 +179,7 @@ export const Dashboard = () => {
                 leftSection={<IconMail size={14} />}
                 onClick={() => navigate({ to: '/dashboard/mails' })}
               >
-                Email History
+                {t('email_history')}
               </Button>
             </Grid.Col>
             <Grid.Col span={6}>
@@ -188,16 +188,19 @@ export const Dashboard = () => {
                 fullWidth 
                 size="xs" 
                 leftSection={<IconCalendar size={14} />}
-                onClick={() => navigate({ to: '/dashboard/settings?section=mailboxes' })}
+                onClick={() => navigate({
+                  to: '/dashboard/settings',
+                  search: { section: 'mailboxes' },
+                })}
               >
-                Liez votre email
+                {t('link_your_email')}
               </Button>
             </Grid.Col>
           </Grid>
         </Card>
       </Stack>
       
-      <Grid mt="md" gutter="md">
+      <Grid mt="md">
         {/* Sidebar - Hidden on mobile, shown on md+ screens */}
         <Grid.Col span={{ base: 12, md: 3, lg: 2.5 }} visibleFrom="md">
           <Sidebar

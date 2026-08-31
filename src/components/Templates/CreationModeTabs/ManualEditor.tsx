@@ -14,6 +14,7 @@ import SubScript from '@tiptap/extension-subscript'
 import ResizableImage  from 'tiptap-extension-resize-image'
 import {  IconPhoto } from '@tabler/icons-react'
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ImageInsertModal } from './InsertModal'
 
 interface ManualEditorProps {
@@ -24,6 +25,7 @@ interface ManualEditorProps {
 }
 
 export function ManualEditor({ subjectLine, setSubjectLine, emailBody, setEmailBody }: ManualEditorProps) {
+  const { t } = useTranslation()
   const [tagMenuOpen, setTagMenuOpen] = useState(false)
   const [imageModalOpen, setImageModalOpen] = useState(false)
 
@@ -67,7 +69,7 @@ export function ManualEditor({ subjectLine, setSubjectLine, emailBody, setEmailB
   return (
     <Stack gap="sm">
       <TextInput
-        label="Subject line"
+        label={t('subject_line')}
         placeholder="Il me faut un taff"
         value={subjectLine}
         onChange={(e) => setSubjectLine(e.currentTarget.value)}
@@ -125,8 +127,8 @@ export function ManualEditor({ subjectLine, setSubjectLine, emailBody, setEmailB
           <RichTextEditor.ControlsGroup>
            <RichTextEditor.Control
   onClick={() => setImageModalOpen(true)}
-  aria-label="Insert image"
-  title="Insert image"
+  aria-label={t('insert_image')}
+  title={t('insert_image')}
 >
   <IconPhoto size={16} />
 </RichTextEditor.Control>
@@ -168,7 +170,7 @@ export function ManualEditor({ subjectLine, setSubjectLine, emailBody, setEmailB
         <RichTextEditor.Content />
       </RichTextEditor>
 
-      <Text size="xs" c="dimmed">{wordCount} words • Spam score: Low</Text>
+      <Text size="xs" c="dimmed">{t('words_spam_score', { count: wordCount })}</Text>
 
       <ImageInsertModal
   opened={imageModalOpen}

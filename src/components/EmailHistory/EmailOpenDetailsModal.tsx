@@ -8,8 +8,8 @@ import {
   Card,
   Badge,
 } from "@mantine/core";
+import { useTranslation } from 'react-i18next'
 import {
-  IconX,
   IconEye,
   IconCalendar,
   IconDeviceDesktop,
@@ -19,7 +19,6 @@ import {
 } from "@tabler/icons-react";
 import { emailTrackingService, type OpenDetail } from "../../services/email-tracking.service";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
 import type React from "react";
 import { UAParser } from "ua-parser-js";
 
@@ -34,6 +33,7 @@ export function EmailOpenDetailsModal({
   isOpen,
   onClose,
 }: EmailOpenDetailsModalProps) {
+  const { t } = useTranslation()
   const [openDetails, setOpenDetails] = useState<OpenDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +52,7 @@ export function EmailOpenDetailsModal({
       setOpenDetails(details);
     } catch (err) {
       console.error("Failed to load open details:", err);
-      setError("Impossible de charger les détails des ouvertures");
+      setError(t('error_sending_email'));
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ export function EmailOpenDetailsModal({
   // Parse user agent to extract browser/device info using ua-parser-js
   const parseUserAgent = (userAgent?: string): { icon: React.ReactNode; label: string } => {
     if (!userAgent) {
-      return { icon: <IconDeviceDesktop size={16} color="#868E96" />, label: "Inconnu" };
+      return { icon: <IconDeviceDesktop size={16} color="#868E96" />, label: t('unknown') };
     }
 
     const parser = new UAParser(userAgent);
@@ -73,19 +73,19 @@ export function EmailOpenDetailsModal({
 
     if (result.device.type === 'mobile') {
       icon = <IconDeviceMobile size={16} color="#868E96" />;
-      deviceType = 'Mobile';
+      deviceType = t('mobile');
     } else if (result.device.type === 'tablet') {
       icon = <IconDeviceTablet size={16} color="#868E96" />;
-      deviceType = 'Tablette';
+      deviceType = t('tablet');
     } else {
       icon = <IconBrowser size={16} color="#868E96" />;
-      deviceType = 'Desktop';
+      deviceType = t('desktop');
     }
 
     // Build label with browser and OS info
-    const browserName = result.browser.name || 'Navigateur';
+    const browserName = result.browser.name || t('browser');
     const osName = result.os.name || deviceType;
-    const label = `${browserName} sur ${osName}`;
+    const label = `${browserName} ${t('on')} ${osName}`;
 
     return { icon, label };
   };
@@ -97,7 +97,7 @@ export function EmailOpenDetailsModal({
       title={
         <Group gap="xs">
           <IconEye size={20} />
-          <Text fw={600}>Détails des ouvertures</Text>
+          <Text fw={600}>{t('open_details')}</Text>
         </Group>
       }
       size="lg"
@@ -114,7 +114,7 @@ export function EmailOpenDetailsModal({
         ) : openDetails.length === 0 ? (
           <Stack align="center" gap="md" py="xl">
             <IconEye size={48} color="#868E96" />
-            <Text c="dimmed">Aucune ouverture enregistrée</Text>
+            <Text c="dimmed">{t('no_opens_recorded')}</Text>
           </Stack>
         ) : (
           <Stack gap="xs">
@@ -131,7 +131,7 @@ export function EmailOpenDetailsModal({
                   <Stack gap="xs">
                     <Group justify="space-between">
                       <Text size="sm" fw={600}>
-                        Ouverture #{openDetails.length - index}
+                        {t('open_number', { count: openDetails.length - index })}
                       </Text>
                       <Badge size="sm" variant="light">
                         {detail.recipient}
@@ -144,8 +144,7 @@ export function EmailOpenDetailsModal({
                         <Text size="sm" c="dimmed">
                           {format(
                             new Date(detail.openedAt),
-                            "dd MMM yyyy 'à' HH:mm",
-                            { locale: fr }
+                            "dd MMM yyyy 'à' HH:mm"
                           )}
                         </Text>
                       </Group>
@@ -166,8 +165,7 @@ export function EmailOpenDetailsModal({
 
         {openDetails.length > 0 && (
           <Text size="sm" c="dimmed" ta="center" mt="md">
-            Total: {openDetails.length} ouverture
-            {openDetails.length > 1 ? "s" : ""}
+            {t('total_openings', { count: openDetails.length })}
           </Text>
         )}
       </Stack>

@@ -16,7 +16,7 @@ function RegisterPageRoute() {
     if (!isPending && session?.user) {
       navigate({ to: '/dashboard' })
     }
-  }, [session, isPending, navigate])
+  }, [session, isPending])
 
   // Show nothing while checking or if already logged in
   if (isPending || session?.user) {

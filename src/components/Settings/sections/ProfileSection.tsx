@@ -4,7 +4,6 @@ import {
   Stack,
   Divider,
   Group,
-  Avatar,
   Button,
   TextInput,
   Select,
@@ -12,11 +11,13 @@ import {
   Loader,
 } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
+import { useTranslation } from 'react-i18next'
 import { SectionHeader } from '../components/SectionHeader'
 import { useSession, updateUser } from '#/lib/auth-client'
 import { api } from '#/lib/api'
 
 export function ProfileSection() {
+  const { t } = useTranslation()
   const { data } = useSession()
   
   // États pour les données du profil
@@ -45,8 +46,8 @@ export function ProfileSection() {
       setProfileData({
         firstName: data.user.firstName || data.user.name?.split(' ')[0] || '',
         lastName: data.user.lastName || data.user.name?.split(' ')[1] || '',
-        timezone: data.user.timezone || detectedTimezone || 'UTC', // Utiliser sauvegardé > détecté > UTC
-        language: data.user.language || 'English' // Utiliser sauvegardé ou défaut
+        timezone: data.user.timezone || detectedTimezone || 'UTC',
+        language: data.user.language || 'English'
       })
     }
   }, [data?.user])
@@ -140,7 +141,7 @@ const timezoneOptions = useMemo(() => {
       })
 
       if (error) {
-        throw new Error(error.message || 'Impossible de mettre à jour le profil')
+        throw new Error(error.message || t('unable_update_profile'))
       }
 
       // Appeler également le contrôleur user si nécessaire
@@ -154,15 +155,15 @@ const timezoneOptions = useMemo(() => {
       })
 
       notifications.show({
-        title: 'Profil mis à jour',
-        message: 'Vos informations ont été sauvegardées avec succès',
+        title: t('profile_updated'),
+        message: t('profile_saved_success'),
         color: 'green'
       })
     } catch (error: any) {
       console.error('Erreur lors de la mise à jour du profil:', error)
-      const errorMessage = error.response?.data?.error || error.message || 'Impossible de mettre à jour le profil'
+      const errorMessage = error.response?.data?.error || error.message || t('unable_update_profile')
       notifications.show({
-        title: 'Erreur',
+        title: t('error_occurred'),
         message: errorMessage,
         color: 'red'
       })
@@ -175,8 +176,8 @@ const timezoneOptions = useMemo(() => {
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       notifications.show({
-        title: 'Erreur',
-        message: 'Les mots de passe ne correspondent pas',
+        title: t('error_occurred'),
+        message: t('password_mismatch'),
         color: 'red'
       })
       return
@@ -184,8 +185,8 @@ const timezoneOptions = useMemo(() => {
 
     if (passwordData.newPassword.length < 8) {
       notifications.show({
-        title: 'Erreur',
-        message: 'Le mot de passe doit contenir au moins 8 caractères',
+        title: t('error_occurred'),
+        message: t('password_min_length'),
         color: 'red'
       })
       return
@@ -205,15 +206,15 @@ const timezoneOptions = useMemo(() => {
       })
       
       notifications.show({
-        title: 'Mot de passe modifié',
-        message: 'Votre mot de passe a été changé avec succès',
+        title: t('password_changed'),
+        message: t('password_changed_success'),
         color: 'green'
       })
     } catch (error: any) {
       console.error('Erreur lors du changement de mot de passe:', error)
-      const errorMessage = error.response?.data?.message || error.message || 'Impossible de changer le mot de passe. Vérifiez votre mot de passe actuel.'
+      const errorMessage = error.response?.data?.message || error.message || t('unable_change_password')
       notifications.show({
-        title: 'Erreur',
+        title: t('error_occurred'),
         message: errorMessage,
         color: 'red'
       })
@@ -227,7 +228,7 @@ const timezoneOptions = useMemo(() => {
       <Card withBorder radius="md" p="lg" bg="white">
         <Group justify="center" py="xl">
           <Loader size="sm" />
-          <span>Loading profile...</span>
+          <span>{t('loading_profile')}</span>
         </Group>
       </Card>
     )
@@ -237,8 +238,8 @@ const timezoneOptions = useMemo(() => {
     <>
       <Card withBorder radius="md" p="lg" bg="white">
         <SectionHeader
-          title="Profile"
-          description="Your personal information"
+          title={t('profile')}
+          description={t('your_personal_information')}
         />
         <Divider my="md" />
         <Group align="flex-start" gap="xl">
@@ -246,29 +247,29 @@ const timezoneOptions = useMemo(() => {
           <Stack gap="sm" style={{ flex: 1 }}>
             <Group grow>
              <TextInput 
-  label="First name" 
+  label={t('first_name')} 
   value={profileData.firstName}
   onChange={(event) => {
     const value = event.currentTarget.value
     setProfileData(prev => ({ ...prev, firstName: value }))
   }}
-  placeholder="Enter your first name"
+  placeholder={t('enter_first_name')}
 />
 <TextInput 
-  label="Last name" 
+  label={t('last_name')} 
   value={profileData.lastName}
   onChange={(event) => {
     const value = event.currentTarget.value
     setProfileData(prev => ({ ...prev, lastName: value }))
   }}
-  placeholder="Enter your last name"
+  placeholder={t('enter_last_name')}
 />
             </Group>
             <TextInput 
-              label="Email" 
+              label={t('email')} 
               value={data?.user?.email || ''} 
               disabled
-              description="Email cannot be modified for security reasons"
+              description={t('email_cannot_modified')}
               styles={{
                 input: {
                   backgroundColor: '#f8f9fa',
@@ -279,7 +280,7 @@ const timezoneOptions = useMemo(() => {
             />
             <Group grow>
               <Select 
-                label="Timezone" 
+                label={t('timezone')} 
                 value={profileData.timezone}
                 onChange={(value) => setProfileData(prev => ({
                   ...prev,
@@ -290,7 +291,7 @@ const timezoneOptions = useMemo(() => {
                 clearable={false}
                />
               <Select 
-                label="Interface language" 
+                label={t('interface_language')} 
                 value={profileData.language}
                 onChange={(value) => setProfileData(prev => ({
                   ...prev,
@@ -313,43 +314,43 @@ const timezoneOptions = useMemo(() => {
             radius='sm'
             disabled={!data?.user}
           >
-            Save changes
+            {t('save_changes')}
           </Button>
         </Group>
       </Card>
 
       <Card withBorder radius="md" p="lg" bg="white" mb='lg'>
-        <SectionHeader title="Password" description="Change your account password" />
+        <SectionHeader title={t('password')} description={t('change_account_password')} />
         <Divider my="md" />
          
         <PasswordInput 
-  label="Current password" 
+  label={t('current_password')} 
   value={passwordData.currentPassword}
   onChange={(event) => {
     const value = event.currentTarget.value
     setPasswordData(prev => ({ ...prev, currentPassword: value }))
   }}
-  placeholder="Enter your current password"
+  placeholder={t('enter_current_password')}
 />
 <PasswordInput 
-  label="New password" 
+  label={t('new_password')} 
   value={passwordData.newPassword}
   onChange={(event) => {
     const value = event.currentTarget.value
     setPasswordData(prev => ({ ...prev, newPassword: value }))
   }}
-  placeholder="Enter your new password"
-  description="Must be at least 8 characters"
+  placeholder={t('enter_new_password')}
+  description={t('must_be_8_chars')}
 />
 <PasswordInput 
-  label="Confirm new password" 
+  label={t('confirm_new_password')} 
   value={passwordData.confirmPassword}
   onChange={(event) => {
     const value = event.currentTarget.value
     setPasswordData(prev => ({ ...prev, confirmPassword: value }))
   }}
-  placeholder="Confirm your new password"
-  error={passwordData.confirmPassword && passwordData.newPassword !== passwordData.confirmPassword ? 'Passwords do not match' : undefined}
+  placeholder={t('confirm_your_new_password')}
+  error={passwordData.confirmPassword && passwordData.newPassword !== passwordData.confirmPassword ? t('passwords_do_not_match') : undefined}
 />
          <Group justify="flex-end" mt="md">
           <Button 
@@ -359,7 +360,7 @@ const timezoneOptions = useMemo(() => {
             loading={isLoadingPassword}
             disabled={!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
           >
-            Update password
+            {t('update_password')}
           </Button>
         </Group>
       </Card>

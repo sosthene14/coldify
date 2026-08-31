@@ -3,14 +3,10 @@ import type { NavItem } from "#/types/header.ts";
 
 
 
+// nav.config.ts
 export const navItems: NavItem[] = [
-  { label: 'Overview', href: '/dashboard' },
-  { label: 'Mails', href: '/dashboard/mails' },
-  // { label: 'Leads', href: '/dashboard/leads' },
-  
-  { label: 'Templates', href: '/dashboard/templates' },
-  // { label: 'Reports', href: '/dashboard/reports' },
-  // { label: 'Inbox', href: '/dashboard/inbox' },
-  //  { label: 'Calendar', href: '/dashboard/calendar' },
-  { label: 'Settings', href: '/dashboard/settings' },
+  { label: 'overview', href: '/dashboard' },
+  { label: 'emails', href: '/dashboard/mails' },
+  { label: 'templates', href: '/dashboard/templates' },
+  { label: 'settings', href: '/dashboard/settings' },
 ]

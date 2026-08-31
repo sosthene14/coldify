@@ -1,4 +1,5 @@
 import { Group, Paper, Stack, Text, UnstyledButton, Tooltip } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 import { 
   IconCirclePlus,
   IconPlugConnected,
@@ -20,34 +21,34 @@ interface QuickAction {
 const quickActions: QuickAction[] = [
   { 
     key: 'create-mail', 
-    label: 'Create mail', 
+    label: 'create_mail', 
     icon: IconCirclePlus,
     href: '/dashboard/mails/new',
-    tooltip: 'Compose and send a new email',
+    tooltip: 'compose_send_new_email',
     priority: 'primary'
   },
   { 
     key: 'templates', 
-    label: 'Templates', 
+    label: 'templates', 
     icon: IconTemplate,
     href: '/dashboard/templates',
-    tooltip: 'Manage your email templates',
+    tooltip: 'manage_email_templates',
     priority: 'secondary'
   },
   { 
     key: 'email-history', 
-    label: 'Email History', 
+    label: 'email_history', 
     icon: IconHistory,
     href: '/dashboard/mails',
-    tooltip: 'View sent and scheduled emails',
+    tooltip: 'view_sent_scheduled_emails',
     priority: 'secondary'
   },
   { 
     key: 'connect-mailbox', 
-    label: 'Connect Mailbox', 
+    label: 'connect_mailbox', 
     icon: IconPlugConnected,
     href: '/dashboard/settings?section=mailboxes',
-    tooltip: 'Add or manage your mailbox connections',
+    tooltip: 'add_manage_mailbox',
     priority: 'primary'
   },
 ]
@@ -57,6 +58,7 @@ interface QuickActionsCardProps {
 }
 
 export function QuickActionsCard({ onAction }: QuickActionsCardProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const handleAction = (action: QuickAction) => {
@@ -70,14 +72,14 @@ export function QuickActionsCard({ onAction }: QuickActionsCardProps) {
   return (
     <Paper withBorder radius="sm" p="sm">
       <Text size="sm" fw={600} mb="sm">
-        Quick actions
+        {t('quick_actions')}
       </Text>
 
       <Stack gap={4}>
         {quickActions.map((action) => (
           <Tooltip
             key={action.key}
-            label={action.tooltip}
+            label={t(action.tooltip || '')}
             position="right"
             withArrow
             disabled={!action.tooltip}
@@ -127,7 +129,7 @@ export function QuickActionsCard({ onAction }: QuickActionsCardProps) {
                       group-hover:font-medium
                     "
                   >
-                    {action.label}
+                    {t(action.label)}
                   </Text>
                 </Group>
 

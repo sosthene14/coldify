@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Card, Stack, Text, Button, Group, Badge, Divider } from '@mantine/core'
 import { IconDownload, IconRefresh, IconCheck, IconDeviceMobile } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 import { usePWA } from '../../../hooks/usePWA'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -9,6 +10,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function AppSection() {
+  const { t } = useTranslation()
   const { needRefresh, offlineReady, updateServiceWorker } = usePWA()
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isInstalled, setIsInstalled] = useState(false)
@@ -31,7 +33,7 @@ export function AppSection() {
 
   const handleInstall = async () => {
     if (!deferredPrompt) {
-      alert('Installation not available. Try using Chrome, Edge, or another compatible browser.')
+      alert(t('use_compatible_browser'))
       return
     }
 
@@ -53,15 +55,15 @@ export function AppSection() {
           <Group justify="space-between">
             <div>
               <Text size="lg" fw={600} mb={4}>
-                Progressive Web App
+                {t('progressive_web_app')}
               </Text>
               <Text size="sm" c="dimmed">
-                Install So-mails as a standalone app on your device
+                {t('install_standalone')}
               </Text>
             </div>
             {isInstalled && (
               <Badge color="green" variant="light" size="lg" leftSection={<IconCheck size={14} />}>
-                Installed
+                {t('installed')}
               </Badge>
             )}
           </Group>
@@ -70,20 +72,20 @@ export function AppSection() {
 
           {/* Installation Status */}
           <Stack gap="sm">
-            <Text size="sm" fw={500}>Installation Status</Text>
+            <Text size="sm" fw={500}>{t('installation_status')}</Text>
             
             {isInstalled ? (
               <Group gap="xs">
                 <IconCheck size={16} color="var(--mantine-color-green-6)" />
                 <Text size="sm" c="dimmed">
-                  So-mails is installed and running as a PWA
+                  {t('installed_running_pwa')}
                 </Text>
               </Group>
             ) : (
               <Group gap="xs">
                 <IconDeviceMobile size={16} color="var(--mantine-color-gray-6)" />
                 <Text size="sm" c="dimmed">
-                  So-mails is not installed yet
+                  {t('not_installed_yet')}
                 </Text>
               </Group>
             )}
@@ -95,13 +97,13 @@ export function AppSection() {
               <Divider />
               <div>
                 <Text size="sm" fw={500} mb="xs">
-                  Benefits of Installation
+                  {t('benefits_installation')}
                 </Text>
                 <Stack gap={4}>
-                  <Text size="xs" c="dimmed">• Faster load times and better performance</Text>
-                  <Text size="xs" c="dimmed">• Works offline with cached data</Text>
-                  <Text size="xs" c="dimmed">• Quick access from home screen</Text>
-                  <Text size="xs" c="dimmed">• Native app-like experience</Text>
+                  <Text size="xs" c="dimmed">• {t('faster_load')}</Text>
+                  <Text size="xs" c="dimmed">• {t('works_offline')}</Text>
+                  <Text size="xs" c="dimmed">• {t('quick_access_home')}</Text>
+                  <Text size="xs" c="dimmed">• {t('native_app_experience')}</Text>
                 </Stack>
               </div>
               
@@ -111,12 +113,12 @@ export function AppSection() {
                 disabled={!deferredPrompt && !isInstalled}
                 fullWidth
               >
-                {deferredPrompt ? 'Install App' : 'Installation Not Available'}
+                {deferredPrompt ? t('install_app') : t('installation_not_available')}
               </Button>
               
               {!deferredPrompt && !isInstalled && (
                 <Text size="xs" c="dimmed" ta="center">
-                  Use Chrome, Edge, or another compatible browser to install the app
+                  {t('use_compatible_browser')}
                 </Text>
               )}
             </>
@@ -129,7 +131,7 @@ export function AppSection() {
               <Group gap="xs">
                 <IconCheck size={16} color="var(--mantine-color-green-6)" />
                 <Text size="sm" c="dimmed">
-                  App is ready to work offline
+                  {t('app_ready_offline')}
                 </Text>
               </Group>
             </>
@@ -145,11 +147,11 @@ export function AppSection() {
               <Group gap="xs" mb="xs">
                 <IconRefresh size={20} color="var(--mantine-color-blue-6)" />
                 <Text size="sm" fw={600}>
-                  Update Available
+                  {t('update_available')}
                 </Text>
               </Group>
               <Text size="sm" c="dimmed">
-                A new version of So-mails is available. Click reload to update to the latest version.
+                {t('new_version_available')}
               </Text>
             </div>
             <Button
@@ -157,7 +159,7 @@ export function AppSection() {
               onClick={() => updateServiceWorker(true)}
               leftSection={<IconRefresh size={14} />}
             >
-              Reload Now
+              {t('reload_now')}
             </Button>
           </Group>
         </Card>
@@ -166,19 +168,19 @@ export function AppSection() {
       {/* App Information */}
       <Card withBorder radius="md" p="lg">
         <Stack gap="sm">
-          <Text size="sm" fw={600}>About This App</Text>
+          <Text size="sm" fw={600}>{t('about_this_app')}</Text>
           <Group justify="space-between">
-            <Text size="sm" c="dimmed">Version</Text>
+            <Text size="sm" c="dimmed">{t('version')}</Text>
             <Text size="sm" fw={500}>1.0.0</Text>
           </Group>
           <Group justify="space-between">
-            <Text size="sm" c="dimmed">Build</Text>
-            <Text size="sm" fw={500}>Production</Text>
+            <Text size="sm" c="dimmed">{t('build')}</Text>
+            <Text size="sm" fw={500}>{t('production')}</Text>
           </Group>
           <Group justify="space-between">
-            <Text size="sm" c="dimmed">PWA Support</Text>
+            <Text size="sm" c="dimmed">{t('pwa_support')}</Text>
             <Badge color="green" variant="light" size="sm">
-              Enabled
+              {t('enabled')}
             </Badge>
           </Group>
         </Stack>

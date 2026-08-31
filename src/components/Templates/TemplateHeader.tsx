@@ -1,6 +1,7 @@
 import { Group, Button, Badge } from '@mantine/core'
-import { IconArrowLeft, IconSend, IconDeviceFloppy, IconChartArcs } from '@tabler/icons-react'
+import { IconArrowLeft,IconChartArcs } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { templateService } from '#/services/template.service.ts'
 import { replaceBase64WithMinIO } from '#/lib/image-upload.ts'
 import { useState } from 'react'
@@ -25,7 +26,6 @@ export function TemplateHeader({
   templateId,
   isEditMode = false,
   templateName,
-  description,
   category,
   language,
   subjectLine,
@@ -34,9 +34,10 @@ export function TemplateHeader({
   htmlContent,
   aiGeneratedHtml,
 }: TemplateHeaderProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [isPublishing, setIsPublishing] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+  const [isSaving, ] = useState(false)
 
   const activeContent =
     creationMode === 'manual' ? emailBody :
@@ -45,15 +46,15 @@ export function TemplateHeader({
 
   const validateTemplate = () => {
     if (!templateName.trim()) {
-      alert('Template name is required')
+      alert(t('template_name_required'))
       return false
     }
     if (!subjectLine.trim()) {
-      alert('Subject line is required')
+      alert(t('subject_line_required'))
       return false
     }
     if (!activeContent.trim()) {
-      alert('Email body is required')
+      alert(t('email_body_required'))
       return false
     }
     return true
@@ -98,12 +99,12 @@ export function TemplateHeader({
       if (isEditMode && templateId) {
         // Update existing template
         const result = await templateService.updateTemplate(templateId, payload)
-        alert('Template updated successfully')
+        alert(t('template_updated_success'))
         console.log('Template updated →', result)
       } else {
         // Create new template
         const result = await templateService.createTemplate(payload)
-        alert('Template published successfully')
+        alert(t('template_published_success'))
         console.log('Template published →', result)
       }
       
@@ -113,7 +114,7 @@ export function TemplateHeader({
       }, 1000)
     } catch (error) {
       console.error('Publish error:', error)
-      alert('Failed to publish template: ' + (error instanceof Error ? error.message : 'Unknown error'))
+      alert(t('failed_publish_template') + ': ' + (error instanceof Error ? error.message : t('unexpected_error')))
     } finally {
       setIsPublishing(false)
     }
@@ -127,13 +128,13 @@ export function TemplateHeader({
           leftSection={<IconArrowLeft size={16} />}
           onClick={() => navigate({ to: '/dashboard/templates' })}
         >
-          <span className="hidden sm:inline">Back to Templates</span>
-          <span className="sm:hidden">Back</span>
+          <span className="hidden sm:inline">{t('back_to_templates')}</span>
+          <span className="sm:hidden">{t('back')}</span>
         </Button>
       </Group>
       <Group gap="sm" wrap="wrap">
         <Badge size="lg" variant="light" color="gray">
-          {isEditMode ? 'Edit' : 'Draft'}
+          {isEditMode ? t('edit') : t('draft')}
         </Badge>
         {templateId && (
           <Button 
@@ -141,8 +142,8 @@ export function TemplateHeader({
             leftSection={<IconChartArcs size={16} />} 
             onClick={handleStats}
           >
-            <span className="hidden sm:inline">Statistiques</span>
-            <span className="sm:hidden">Stats</span>
+            <span className="hidden sm:inline">{t('statistics_full')}</span>
+            <span className="sm:hidden">{t('stats')}</span>
           </Button>
         )}
  
@@ -152,8 +153,8 @@ export function TemplateHeader({
           loading={isPublishing}
           disabled={isSaving}
         >
-          <span className="hidden sm:inline">{isEditMode ? 'Update Template' : 'Publish Template'}</span>
-          <span className="sm:hidden">{isEditMode ? 'Update' : 'Publish'}</span>
+          <span className="hidden sm:inline">{isEditMode ? t('update_template') : t('publish_template')}</span>
+          <span className="sm:hidden">{isEditMode ? t('update') : t('publish')}</span>
         </Button>
       </Group>
     </Group>

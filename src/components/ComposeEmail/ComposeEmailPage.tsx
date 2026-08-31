@@ -3,10 +3,11 @@ import { useEmailForm } from "#/hooks/useEmailForm"
 import { useEmailValidation } from "#/hooks/useEmailValidation"
 import { useScheduledEmailLoader } from "#/hooks/useScheduledEmailLoader"
 import { EmailSenderService } from "#/services/email.service"
-import { Alert, Anchor, Container, Paper, Stack, TextInput } from "@mantine/core"
+import { Alert, Anchor, Paper, Stack, TextInput } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import { IconAlertCircle } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router"
+import { useTranslation } from 'react-i18next'
 import { EmailActions } from "./EmailActions";
 import { ScheduleSection } from "./ScheduleSection";
 import { AttachmentsSection } from "./AttachmentsSection";
@@ -57,6 +58,7 @@ export interface EmailParams {
 
 
 export function ComposeEmailPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { 
     formData, 
@@ -96,7 +98,7 @@ export function ComposeEmailPage() {
     const error = validateForm(validationPayload)
     if (error) {
       notifications.show({
-        title: 'Validation Error',
+        title: t('validation_error'),
         message: error,
         color: 'red',
       })
@@ -141,8 +143,8 @@ export function ComposeEmailPage() {
       navigate({ to: '/dashboard/mails' })
     } catch (error: any) {
       notifications.show({
-        title: 'Error',
-        message: error.message || 'Failed to send email',
+        title: t('error_occurred'),
+        message: error.message || t('failed_send_test'),
         color: 'red',
       })
     } finally {
@@ -162,22 +164,22 @@ export function ComposeEmailPage() {
   const connectedMailboxes = mailboxes.filter((mb) => mb.status === 'connected')
 
   return (
-    <Container size="lg" py="md">
+    <div className="mx-4 md:mx-10 py-4">
       <Stack gap="md">
         <EmailHeader editingId={uiState.editingScheduledId} />
 
         {connectedMailboxes.length === 0 && (
           <Alert icon={<IconAlertCircle size={16} />} color="yellow">
-            No connected mailboxes. Please{' '}
+            {t('no_connected_mailboxes')}{' '}
             <Anchor 
               component="button"
               onClick={() => navigate({ to: '/dashboard/settings' })}
               fw={600}
               c="yellow.9"
             >
-              connect a mailbox in Settings
+              {t('connect_mailbox_settings')}
             </Anchor>{' '}
-            first.
+            {t('first')}
           </Alert>
         )}
 
@@ -203,8 +205,8 @@ export function ComposeEmailPage() {
             />
 
             <TextInput
-              label="Subject"
-              placeholder="Email subject"
+              label={t('subject')}
+              placeholder={t('email_subject_placeholder')}
               value={formData.subject}
               onChange={(e) => updateField('subject', e.target.value)}
               required
@@ -241,6 +243,6 @@ export function ComposeEmailPage() {
           </Stack>
         </Paper>
       </Stack>
-    </Container>
+    </div>
   )
 }

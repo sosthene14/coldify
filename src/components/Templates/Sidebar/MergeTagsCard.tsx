@@ -1,11 +1,14 @@
 import { mergeTagGroups } from '#/types/template.ts';
 import { Card, Text, ScrollArea, Stack, Group, ActionIcon, CopyButton } from '@mantine/core'
 import { IconCheck, IconCopy } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
  
 export function MergeTagsCard() {
+  const { t } = useTranslation()
+
   return (
     <Card withBorder radius="md" p="lg" bg="white">
-      <Text size="sm" fw={600} mb="sm">Merge tags</Text>
+      <Text size="sm" fw={600} mb="sm">{t('merge_tags')}</Text>
       <ScrollArea h={180}>
         <Stack gap={6}>
           {mergeTagGroups.map(group => (

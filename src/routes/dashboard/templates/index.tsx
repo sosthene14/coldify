@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Stack, Text, Button, Group, Card, Grid, Badge, ActionIcon, Menu, TextInput, Select, Tabs, Divider } from '@mantine/core'
 import { IconPlus, IconSearch, IconDots, IconEdit, IconCopy, IconTrash, IconStar, IconStarFilled, IconMail, IconClock, IconChartLine, IconMailOff, IconTemplate, IconEye } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 import { TemplatesSkeleton } from '#/components/Templates/TemplatesSkeleton'
 import { useTemplateStore } from '#/stores/template.store.ts';
 import { useEffect, useState, useMemo } from 'react'
@@ -11,20 +12,13 @@ export const Route = createFileRoute('/dashboard/templates/')({
   pendingComponent: TemplatesSkeleton,
 })
 
-const categories = ['All Categories', 'Professional', 'Sales', 'Marketing', 'Follow-up', 'Personal', 'Transactional', 'Newsletter', 'Support', 'Recruitment', 'Networking']
+const categories = ['all_categories', 'Professional', 'Sales', 'Marketing', 'Follow-up', 'Personal', 'Transactional', 'Newsletter', 'Support', 'Recruitment', 'Networking']
 
 type TabValue = 'all' | 'starred' | 'recent'
-type SortOption = 'Most Used' | 'Highest Open Rate' | 'Recently Created' | 'Recently Used'
-
-function formatRelativeTime(dateStr?: string): string {
-  if (!dateStr) return 'Never used'
-  const diffDays = Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24))
-  if (diffDays === 0) return 'Used today'
-  if (diffDays === 1) return 'Used yesterday'
-  return `Used ${diffDays}d ago`
-}
+type SortOption = 'most_used' | 'highest_open_rate' | 'recently_created' | 'recently_used'
 
 function TemplatesPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { templates, isLoading, fetchTemplates, starTemplate, unstarTemplate, deleteTemplate, duplicateTemplate } = useTemplateStore()
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -32,12 +26,20 @@ function TemplatesPage() {
   // Filters state
   const [activeTab, setActiveTab] = useState<TabValue>('all')
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('All Categories')
-  const [sortBy, setSortBy] = useState<SortOption>('Most Used')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all_categories')
+  const [sortBy, setSortBy] = useState<SortOption>('most_used')
 
   useEffect(() => {
     fetchTemplates()
   }, [])
+
+  const formatRelativeTime = (dateStr?: string): string => {
+    if (!dateStr) return t('never_used')
+    const diffDays = Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24))
+    if (diffDays === 0) return t('used_today')
+    if (diffDays === 1) return t('used_yesterday')
+    return t('used_days_ago', { count: diffDays })
+  }
 
   // Filtered and sorted templates
   const filteredTemplates = useMemo(() => {
@@ -61,23 +63,23 @@ function TemplatesPage() {
     }
 
     // Filter by category
-    if (selectedCategory && selectedCategory !== 'All Categories') {
+    if (selectedCategory && selectedCategory !== 'all_categories') {
       result = result.filter(t => t.category === selectedCategory)
     }
 
     // Sort
     switch (sortBy) {
-      case 'Most Used':
+      case 'most_used':
         result.sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0))
         break
-      case 'Highest Open Rate':
+      case 'highest_open_rate':
         result.sort((a, b) => (b.openRate || 0) - (a.openRate || 0))
         break
       
-      case 'Recently Created':
+      case 'recently_created':
         result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         break
-      case 'Recently Used':
+      case 'recently_used':
         result.sort((a, b) => {
           if (!a.lastUsedAt) return 1
           if (!b.lastUsedAt) return -1
@@ -120,21 +122,21 @@ function TemplatesPage() {
     e.stopPropagation()
     try {
       await duplicateTemplate(id)
-      alert('Template duplicated successfully')
+      alert(t('template_duplicated'))
     } catch (error) {
-      alert('Failed to duplicate template')
+      alert(t('failed_duplicate_template'))
     }
   }
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation()
-    if (!confirm('Are you sure you want to delete this template?')) return
+    if (!confirm(t('delete_template_confirm'))) return
 
     setDeletingId(id)
     try {
       await deleteTemplate(id)
     } catch (error) {
-      alert('Failed to delete template')
+      alert(t('failed_delete_template'))
     } finally {
       setDeletingId(null)
     }
@@ -145,21 +147,21 @@ function TemplatesPage() {
   }
 
   return (
-    <div className='mx-0 md:mx-4 pt-2 md:pt-4 px-2 md:px-0'>
-      <Stack gap={{ base: 'xs', sm: 'sm', md: 'lg' }} >
+    <div className='mx-0 md:mx-10 pt-2 md:pt-4 px-2 md:px-0'>
+      <Stack  >
         {/* Header */}
         <Group justify="space-between" align="flex-start" wrap="wrap" gap="xs">
           <div>
             <Text size="xl" fw={700}>
-              Email Templates
+              {t('email_templates')}
             </Text>
             <Group gap={6} mt={4} visibleFrom="sm">
               <Text size="sm" c="dimmed">
-                {templates.length} templates
+                {t('templates_count', { count: templates.length })}
               </Text>
               <Text size="sm" c="dimmed">•</Text>
               <Text size="sm" c="dimmed">
-                {starredCount} starred
+                {t('starred_count', { count: starredCount })}
               </Text>
             </Group>
           </div>
@@ -169,8 +171,8 @@ function TemplatesPage() {
             radius='sm'
             onClick={() => navigate({ to: '/dashboard/templates/new' })}
           >
-            <span className="hidden sm:inline">New Template</span>
-            <span className="sm:hidden">New</span>
+            <span className="hidden sm:inline">{t('new_template')}</span>
+            <span className="sm:hidden">{t('new_template_short')}</span>
           </Button>
         </Group>
 
@@ -181,7 +183,7 @@ function TemplatesPage() {
               <Group gap="xs" mb={4}>
                 <IconTemplate size={16} color="var(--mantine-color-blue-6)" />
                 <Text size="xs" c="dimmed" fw={500}>
-                  Templates
+                  {t('templates')}
                 </Text>
               </Group>
               <Text size="lg" fw={700}>
@@ -193,7 +195,7 @@ function TemplatesPage() {
               <Group gap="xs" mb={4}>
                 <IconMail size={16} color="var(--mantine-color-cyan-6)" />
                 <Text size="xs" c="dimmed" fw={500}>
-                  Usage
+                  {t('usage')}
                 </Text>
               </Group>
               <Text size="lg" fw={700}>
@@ -205,7 +207,7 @@ function TemplatesPage() {
               <Group gap="xs" mb={4}>
                 <IconEye size={16} color="var(--mantine-color-green-6)" />
                 <Text size="xs" c="dimmed" fw={500}>
-                  Avg Open
+                  {t('avg_open')}
                 </Text>
               </Group>
               <Text size="lg" fw={700} c="green">
@@ -219,18 +221,18 @@ function TemplatesPage() {
             <Tabs value={activeTab} onChange={(value) => setActiveTab(value as TabValue)} variant="pills" color="blue">
               <Tabs.List>
                 <Tabs.Tab value="all">
-                  <span className="hidden sm:inline">All Templates</span>
-                  <span className="sm:hidden">All</span>
+                  <span className="hidden sm:inline">{t('all_templates')}</span>
+                  <span className="sm:hidden">{t('all')}</span>
                   <Badge size="sm" ml={6} variant="light" color="gray">{templates.length}</Badge>
                 </Tabs.Tab>
                 <Tabs.Tab value="starred">
-                  <span className="hidden sm:inline">Starred</span>
+                  <span className="hidden sm:inline">{t('starred')}</span>
                   <span className="sm:hidden">★</span>
                   <Badge size="sm" ml={6} variant="light" color="gray">{starredCount}</Badge>
                 </Tabs.Tab>
                 <Tabs.Tab value="recent">
-                  <span className="hidden sm:inline">Recently Used</span>
-                  <span className="sm:hidden">Recent</span>
+                  <span className="hidden sm:inline">{t('recently_used')}</span>
+                  <span className="sm:hidden">{t('recent')}</span>
                   <Badge size="sm" ml={6} variant="light" color="gray">{recentCount}</Badge>
                 </Tabs.Tab>
               </Tabs.List>
@@ -240,22 +242,22 @@ function TemplatesPage() {
 
             <Stack gap="xs">
               <TextInput
-                placeholder="Search templates..."
+                placeholder={t('search_templates')}
                 leftSection={<IconSearch size={16} />}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <Group gap="xs">
                 <Select
-                  placeholder="Category"
+                  placeholder={t('category_sort')}
                   data={categories}
                   style={{ flex: 1 }}
                   value={selectedCategory}
-                  onChange={(value) => setSelectedCategory(value || 'All Categories')}
+                  onChange={(value) => setSelectedCategory(value || 'all_categories')}
                 />
                 <Select
-                  placeholder="Sort by"
-                  data={['Most Used', 'Highest Open Rate',  'Recently Created', 'Recently Used'] as SortOption[]}
+                  placeholder={t('sort_by')}
+                  data={['most_used', 'highest_open_rate', 'recently_created', 'recently_used'] as SortOption[]}
                   style={{ flex: 1 }}
                   value={sortBy}
                   onChange={(value) => setSortBy(value as SortOption)}
@@ -266,8 +268,8 @@ function TemplatesPage() {
         </Card>
 
        {filteredTemplates.length === 0 ? (
-  <Card withBorder radius="md" p={{ base: 'md', sm: 'lg', md: 'xl' }} bg="white">
-    <Stack align="center" gap={{ base: 'md', sm: 'lg' }} >
+  <Card withBorder radius="md" p={{ base: 'md', sm: 'lg', md: 'xl' }} bg="white" className='mb-10'>
+    <Stack align="center"  >
       <div
         style={{
           width: 80,
@@ -284,12 +286,12 @@ function TemplatesPage() {
 
       <Stack align="center" gap={4}>
         <Text size="lg" fw={700} c="dark.8" ta="center">
-          {templates.length === 0 ? 'No templates yet' : 'No templates match your filters'}
+          {templates.length === 0 ? t('no_templates_yet') : t('no_templates_match')}
         </Text>
         <Text size="sm" c="dimmed" ta="center" style={{ maxWidth: 400 }}>
           {templates.length === 0
-            ? 'Create your first email template to get started with automated campaigns.'
-            : 'Try adjusting your search query, selecting another category, or resetting filters.'}
+            ? t('create_first_template_desc')
+            : t('try_adjusting_template_filters')}
         </Text>
       </Stack>
 
@@ -301,7 +303,7 @@ function TemplatesPage() {
           radius="sm"
           onClick={() => navigate({ to: '/dashboard/templates/new' })}
         >
-          Create your first template
+          {t('create_first_template')}
         </Button>
       )}
     </Stack>
@@ -359,7 +361,7 @@ function TemplatesPage() {
                                 navigate({ to: `/dashboard/templates/${template.id}/edit` })
                               }}
                             >
-                              Edit
+                              {t('edit')}
                             </Menu.Item>
                             <Menu.Item
                               leftSection={<IconChartLine size={14} />}
@@ -368,13 +370,13 @@ function TemplatesPage() {
                                 navigate({ to: `/dashboard/templates/${template.id}/stats` })
                               }}
                             >
-                              View Stats
+                              {t('view_stats')}
                             </Menu.Item>
                             <Menu.Item
                               leftSection={<IconCopy size={14} />}
                               onClick={(e) => handleDuplicate(e, template.id)}
                             >
-                              Duplicate
+                              {t('duplicate')}
                             </Menu.Item>
                             <Menu.Divider />
                             <Menu.Item
@@ -382,7 +384,7 @@ function TemplatesPage() {
                               leftSection={<IconTrash size={14} />}
                               onClick={(e) => handleDelete(e, template.id)}
                             >
-                              Delete
+                              {t('delete')}
                             </Menu.Item>
                           </Menu.Dropdown>
                         </Menu>
@@ -412,16 +414,13 @@ function TemplatesPage() {
                           <IconClock size={12} color="var(--mantine-color-gray-5)" />
                           <Text size="xs" c="dimmed">{formatRelativeTime(template.lastUsedAt || undefined)}</Text>
                         </Group>
-                        <Text size="xs" fw={500} c="dimmed">{template.usageCount} uses</Text>
+                        <Text size="xs" fw={500} c="dimmed">{t('uses', { count: template.usageCount })}</Text>
                       </Group>
 
                       <Group gap="lg" mt={4}>
                         <Text size="xs" c="dimmed">
-                          Open <Text component="span" fw={600} c="dark">{template.openRate || 0}%</Text>
+                          {t('open')} <Text component="span" fw={600} c="dark">{template.openRate || 0}%</Text>
                         </Text>
-                        {/* <Text size="xs" c="dimmed">
-                          Reply <Text component="span" fw={600} c="dark">{template.replyRate || 0}%</Text>
-                        </Text> */}
                       </Group>
                     </div>
                   </Stack>

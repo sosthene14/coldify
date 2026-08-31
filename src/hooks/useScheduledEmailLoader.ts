@@ -1,8 +1,8 @@
-
 // hooks/useScheduledEmailLoader.ts
 import { useEffect } from 'react'
 import axios from 'axios'
 import { notifications } from '@mantine/notifications'
+import { useTranslation } from 'react-i18next'
 import type { EmailFormData } from '#/components/ComposeEmail/ComposeEmailPage.tsx';
 import { API_URL } from '#/configs/emailFilters.config.ts';
 
@@ -11,6 +11,8 @@ export const useScheduledEmailLoader = (
   editingId: string | null,
   onLoad: (data: Partial<EmailFormData>) => void
 ) => {
+  const { t } = useTranslation()
+
   useEffect(() => {
     if (!editingId) return
 
@@ -34,15 +36,15 @@ export const useScheduledEmailLoader = (
         })
 
         notifications.show({
-          title: 'Loaded',
-          message: 'Scheduled email loaded for editing',
+          title: t('loaded'),
+          message: t('scheduled_email_loaded'),
           color: 'blue',
         })
       } catch (error) {
         console.error('Failed to load scheduled email:', error)
         notifications.show({
-          title: 'Error',
-          message: 'Failed to load scheduled email',
+          title: t('error_occurred'),
+          message: t('failed_load_scheduled_email'),
           color: 'red',
         })
       }

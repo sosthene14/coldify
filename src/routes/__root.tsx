@@ -12,6 +12,10 @@ import { useSession, signOut, authClient, is2FAInProgress } from '#/lib/auth-cli
 import { useEffect, useState } from 'react';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt'
 import { PWAUpdatePrompt } from '../components/PWAUpdatePrompt'
+import {Toaster} from 'react-hot-toast';
+import { DatesProvider } from '@mantine/dates';
+import { useTranslation } from 'react-i18next';
+
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -19,64 +23,92 @@ export const Route = createRootRoute({
 
 const theme = createTheme({
   primaryColor: 'brand',
+
   components: {
+    Text: {
+      styles: {
+        root: {
+          fontWeight: 500,
+        },
+      },
+    },
+
     Input: {
       styles: {
         input: { fontWeight: 500 },
       },
     },
+
     Alert: {
       styles: {
         message: { fontWeight: 500 },
       },
     },
+
     Checkbox: {
       styles: {
         label: { fontWeight: 400 },
       },
     },
-     Menu: {
+
+    Menu: {
       styles: {
-        item: { fontSize: '14px', fontWeight: 500 },
+        item: {
+          fontSize: '14px',
+          fontWeight: 500,
+        },
       },
     },
-     Select: {
+
+    Select: {
       styles: {
-        input: { fontWeight: 500 },   
-        option: { fontWeight: 500 },  
+        input: { fontWeight: 500 },
+        option: { fontWeight: 500 },
       },
     },
+
     Tabs: {
-  styles: {
-    tab: {
-      fontWeight: 500,
+      styles: {
+        tab: {
+          fontWeight: 500,
+        },
+        tabLabel: {
+          fontWeight: 500,
+        },
+      },
     },
-    tabLabel: {
-      fontWeight: 500,
+
+    RichTextEditor: {
+      styles: {
+        content: {
+          fontWeight: 300,
+        },
+      },
     },
-  },
-},
-RichTextEditor: {
-  styles: {
-    content: {
-      fontWeight: 300,
-    },
-  },
-},
+
     Switch: {
-  styles: {
-    label: { fontWeight: 500 },
-    description : { fontWeight: 400 }
+      styles: {
+        label: { fontWeight: 500 },
+        description: { fontWeight: 400 },
+      },
+    },
   },
-},
-  },
+
   colors: {
     brand: [
-      '#eaf3ff', '#d3e4ff', '#a5c6ff', '#75a8ff', '#4d8dff',
-      '#3b7cf5', '#2e6de0', '#2359c2', '#1a49a3', '#0f3785',
+      '#eaf3ff',
+      '#d3e4ff',
+      '#a5c6ff',
+      '#75a8ff',
+      '#4d8dff',
+      '#3b7cf5',
+      '#2e6de0',
+      '#2359c2',
+      '#1a49a3',
+      '#0f3785',
     ],
   },
-})
+});
 
 const PUBLIC_ROUTES = ['/login', '/register', '/verify-email', '/forgot-password', '/reset-password']
 
@@ -85,6 +117,7 @@ function RootComponent() {
   const navigate = useNavigate()
   const { data: session, isPending } = useSession()
   const isPublicRoute = PUBLIC_ROUTES.some(route => location.pathname.startsWith(route))
+  const { i18n } = useTranslation();
 
   // null = pas encore vérifié, true/false = résultat connu
   const [hasOrganization, setHasOrganization] = useState<boolean | null>(null)
@@ -168,7 +201,23 @@ function RootComponent() {
 
   return (
     <div>
+      <DatesProvider settings={{ locale: i18n.language }}>
+
       <MantineProvider theme={theme}>
+     <Toaster
+  position="top-right"
+  toastOptions={{
+    duration: 3000,
+    style: {
+      color: '#1f2937',
+      border: '1px solid #e5e7eb',
+      borderRadius: '8px',
+     
+      fontSize: '14px',
+      fontWeight: 500,
+    },
+  }}
+/>
         <ModalsProvider>
           <Notifications position='top-right' />
           {showHeader && (
@@ -181,7 +230,7 @@ function RootComponent() {
               onLogout={handleLogout}
             />
           )}
-<div className='bg-gray-50/30'>
+<div className='bg-gray-50/10'>
 <Outlet />
 </div>
           
@@ -200,6 +249,7 @@ function RootComponent() {
           />
         </ModalsProvider>
       </MantineProvider>
+       </DatesProvider>
     </div>
   )
 }

@@ -3,10 +3,12 @@ import { useState } from 'react'
 import { TextInput, Button, Stack, Text, ThemeIcon, Alert } from '@mantine/core'
 import { IconMailCheck } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { AuthLayout } from '../Layout/AuthLayout'
 import { authClient } from '#/lib/auth-client.ts'
 
 export function ForgotPasswordPage() {
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -25,7 +27,7 @@ export function ForgotPasswordPage() {
     setLoading(false)
 
     if (resetError) {
-      setError(resetError.message ?? "Une erreur est survenue")
+      setError(resetError.message ?? t('error_occurred'))
       return
     }
 
@@ -34,16 +36,16 @@ export function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <AuthLayout title="Check your inbox" subtitle="We've sent you a reset link">
+      <AuthLayout title={t('check_your_inbox')} subtitle={t('reset_link_sent')}>
         <Stack align="center" gap="md" py="xl">
           <ThemeIcon color="blue" variant="light" radius="xl" size={56}>
             <IconMailCheck size={28} />
           </ThemeIcon>
           <Text size="sm" c="dimmed" ta="center">
-            If an account exists for <Text span fw={500} c="dark.7">{email}</Text>, you'll receive a password reset link shortly.
+            {t('reset_link_message', { email })}
           </Text>
           <Button component={Link} to="/login" variant="default" radius="md" fullWidth mt="sm">
-            Back to login
+            {t('back_to_login')}
           </Button>
         </Stack>
       </AuthLayout>
@@ -51,7 +53,7 @@ export function ForgotPasswordPage() {
   }
 
   return (
-    <AuthLayout title="Forgot password?" subtitle="Enter your email to reset your password">
+    <AuthLayout title={t('forgot_password_title')} subtitle={t('enter_email_reset')}>
       <Stack gap="sm">
         {error && (
           <Alert color="red" radius="md">
@@ -62,8 +64,8 @@ export function ForgotPasswordPage() {
         <form onSubmit={handleSubmit}>
           <Stack gap="sm">
             <TextInput
-              label="Email"
-              placeholder="you@company.com"
+              label={t('email')}
+              placeholder={t('you_company_com')}
               value={email}
               onChange={(e) => setEmail(e.currentTarget.value)}
               radius="md"
@@ -71,15 +73,15 @@ export function ForgotPasswordPage() {
             />
 
             <Button type="submit" color="blue" radius="md" fullWidth mt="xs" loading={loading}>
-              Send reset link
+              {t('send_reset_link')}
             </Button>
           </Stack>
         </form>
 
         <Text size="sm" c="dimmed" ta="center">
-          Remembered your password?{' '}
+          {t('remembered_password')}{' '}
           <Link className="text-blue-400" to="/login">
-            Log in
+            {t('log_in')}
           </Link>
         </Text>
       </Stack>

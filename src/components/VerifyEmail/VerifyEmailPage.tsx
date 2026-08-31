@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Button, Stack, Text, ThemeIcon, Loader } from '@mantine/core'
 import { IconMailCheck, IconCircleCheck, IconCircleX } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 import { AuthLayout } from '../Layout/AuthLayout';
 import { useSearch } from '@tanstack/react-router';
 import { authClient } from '#/lib/auth-client.ts';
@@ -16,10 +17,11 @@ type VerifyEmailSearch = {
 const RESEND_COOLDOWN = 30 // secondes
 
 export function VerifyEmailPage() {
- const search = useSearch({ strict: false }) as VerifyEmailSearch
-const emailFromStorage = typeof window !== 'undefined' 
-  ? sessionStorage.getItem('pendingVerificationEmail') 
-  : null
+  const { t } = useTranslation()
+  const search = useSearch({ strict: false }) as VerifyEmailSearch
+  const emailFromStorage = typeof window !== 'undefined' 
+    ? sessionStorage.getItem('pendingVerificationEmail') 
+    : null
   const email = search.email ?? emailFromStorage ?? undefined
   const { data: session } = authClient.useSession()
   const status: VerifyStatus = search.error ? 'error' : session?.user?.emailVerified ? 'success' : 'pending'
@@ -30,54 +32,54 @@ const emailFromStorage = typeof window !== 'undefined'
 
 
   const handleResend = async () => {
-  if (!email) return
+    if (!email) return
 
     if (session?.user?.emailVerified) {
-    setResendMessage({ type: 'error', text: "Ce compte est déjà vérifié." })
-    return
+      setResendMessage({ type: 'error', text: t('account_already_verified') })
+      return
+    }
+
+    setResending(true)
+    const { error } = await authClient.sendVerificationEmail({
+      email: email,
+      callbackURL: '/verify-email?verified=true',
+    })
+    setResending(false)
+
+
+
+    if (!error) {
+      setCooldown(RESEND_COOLDOWN)
+      setResendMessage({ type: 'success', text: t('email_sent_success') })
+      const interval = setInterval(() => {
+        setCooldown((c) => {
+          if (c <= 1) {
+            clearInterval(interval)
+            return 0
+          }
+          return c - 1
+        })
+      }, 1000)
+    }
+    else {
+      setResendMessage({ type: 'error', text: error.message ?? t('error_sending_email') })
+    }
   }
-
-  setResending(true)
-  const { error } = await authClient.sendVerificationEmail({
-    email: email,
-    callbackURL: '/verify-email?verified=true',
-  })
-  setResending(false)
-
-
-
-  if (!error) {
-    setCooldown(RESEND_COOLDOWN)
-        setResendMessage({ type: 'success', text: 'Email envoyé avec succès !' })
-    const interval = setInterval(() => {
-      setCooldown((c) => {
-        if (c <= 1) {
-          clearInterval(interval)
-          return 0
-        }
-        return c - 1
-      })
-    }, 1000)
-  }
-  else {
-    setResendMessage({ type: 'error', text: error.message ?? "Erreur lors de l'envoi" })
-  }
-}
 
   if (status === 'success') {
       sessionStorage.removeItem('pendingVerificationEmail')
 
     return (
-      <AuthLayout title="Email verified" subtitle="Your account is ready to go">
+      <AuthLayout title={t('email_verified_title')} subtitle={t('account_ready')}>
         <Stack align="center" gap="md" py="xl">
           <ThemeIcon color="blue" variant="light" radius="xl" size={56}>
             <IconCircleCheck size={28} />
           </ThemeIcon>
           <Text size="sm" c="dimmed" ta="center">
-            Your email has been verified successfully.
+            {t('email_verified_success')}
           </Text>
           <Button color="blue" radius="md" fullWidth mt="sm" component="a" href="/login">
-            Continue to log in
+            {t('continue_to_log_in')}
           </Button>
         </Stack>
       </AuthLayout>
@@ -86,13 +88,13 @@ const emailFromStorage = typeof window !== 'undefined'
 
   if (status === 'error') {
     return (
-      <AuthLayout title="Verification failed" subtitle="This link may have expired">
+      <AuthLayout title={t('verification_failed_title')} subtitle={t('link_may_expired')}>
         <Stack align="center" gap="md" py="xl">
           <ThemeIcon color="red" variant="light" radius="xl" size={56}>
             <IconCircleX size={28} />
           </ThemeIcon>
           <Text size="sm" c="dimmed" ta="center">
-            We couldn't verify your email. The link may be invalid or expired.
+            {t('couldnt_verify_email')}
           </Text>
           <Button
             color="blue"
@@ -103,7 +105,7 @@ const emailFromStorage = typeof window !== 'undefined'
             loading={resending}
             disabled={cooldown > 0}
           >
-            {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend verification email'}
+            {cooldown > 0 ? t('resend_in', { count: cooldown }) : t('resend_verification_email')}
           </Button>
         </Stack>
       </AuthLayout>
@@ -112,24 +114,24 @@ const emailFromStorage = typeof window !== 'undefined'
 
   // status === 'pending' — juste après l'inscription, en attente de clic
   return (
-    <AuthLayout title="Check your inbox" subtitle="We've sent you a verification link">
+    <AuthLayout title={t('check_your_inbox')} subtitle={t('check_inbox_verification')}>
       <Stack align="center" gap="md" py="xl">
         <ThemeIcon color="blue" variant="light" radius="xl" size={56}>
           <IconMailCheck size={28} />
         </ThemeIcon>
-{resendMessage && (
-  <Text size="xs" c={resendMessage.type === 'success' ? 'green.6' : 'red.6'} ta="center">
-    {resendMessage.text}
-  </Text>
-)}
+        {resendMessage && (
+          <Text size="xs" c={resendMessage.type === 'success' ? 'green.6' : 'red.6'} ta="center">
+            {resendMessage.text}
+          </Text>
+        )}
         <Text size="sm" c="dimmed" ta="center">
           {email ? (
             <>
-              We sent a verification link to <Text span fw={500} c="dark.7">{email}</Text>.
-              Click the link to activate your account.
+              {t('we_sent_verification_link', { email })}{' '}
+              {t('click_link_activate')}
             </>
           ) : (
-            'Click the link we sent you to activate your account.'
+            t('click_link_sent_activate')
           )}
         </Text>
 
@@ -143,13 +145,13 @@ const emailFromStorage = typeof window !== 'undefined'
           loading={resending}
           disabled={cooldown > 0}
         >
-          {resending ? <Loader size="xs" /> : cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend email'}
+          {resending ? <Loader size="xs" /> : cooldown > 0 ? t('resend_in', { count: cooldown }) : t('resend_email')}
         </Button>
 
         <Text size="xs" c="dimmed" ta="center">
-          Wrong email?{' '}
+          {t('wrong_email')}{' '}
           <Text span c="blue.6" style={{ cursor: 'pointer' }} onClick={() => window.history.back()}>
-            Go back
+            {t('go_back')}
           </Text>
         </Text>
       </Stack>

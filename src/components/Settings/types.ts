@@ -6,6 +6,7 @@ export type Section =
   | 'notifications'
   | 'integrations'
   | 'billing'
+  | 'subscription'
   | 'customFields'
   | 'compliance'
   | 'security'

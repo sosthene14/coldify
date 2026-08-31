@@ -16,7 +16,7 @@ function LoginPageRoute() {
     if (!isPending && session?.user) {
       navigate({ to: '/dashboard' })
     }
-  }, [session, isPending, navigate])
+  }, [session, isPending])
 
   // Show nothing only if already logged in to prevent content flash during redirect
   if (session?.user) {

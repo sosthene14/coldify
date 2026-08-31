@@ -10,14 +10,13 @@ import {
   ScrollArea, 
   Loader,
   ActionIcon,
-  UnstyledButton,
-  Paper
+  UnstyledButton
 } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 import { 
   IconSearch, 
   IconTemplate, 
   IconMail, 
-  IconHistory,
   IconX,
   IconArrowRight
 } from '@tabler/icons-react'
@@ -41,7 +40,8 @@ interface SearchResult {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
-export function SearchBar({ placeholder = 'Search templates, emails, contacts...' }: SearchBarProps) {
+export function SearchBar({ placeholder }: SearchBarProps) {
+  const { t } = useTranslation()
   const [opened, setOpened] = useState(false)
   const [query, setQuery] = useState('')
   const [debouncedQuery] = useDebouncedValue(query, 300)
@@ -98,10 +98,10 @@ export function SearchBar({ placeholder = 'Search templates, emails, contacts...
               id: template.id,
               type: 'template',
               title: template.name,
-              description: template.description || 'Email template',
+              description: template.description || t('email_template'),
               url: `/dashboard/templates/${template.id}/edit`,
               icon: <IconTemplate size={16} />,
-              badge: `${template.usageCount} uses`
+              badge: t('uses', { count: template.usageCount })
             })
           })
       }
@@ -121,7 +121,7 @@ export function SearchBar({ placeholder = 'Search templates, emails, contacts...
               id: email.id,
               type: 'email',
               title: email.subject,
-              description: `To: ${email.to.join(', ')}`,
+              description: `${t('to')}: ${email.to.join(', ')}`,
               url: `/dashboard/mails`,
               icon: <IconMail size={16} />,
               badge: email.status
@@ -190,7 +190,7 @@ export function SearchBar({ placeholder = 'Search templates, emails, contacts...
     <>
       {/* Desktop SearchBar - clickable to open modal */}
       <TextInput
-        placeholder={placeholder}
+        placeholder={placeholder || t('search_templates_emails_contacts')}
         radius="sm"
         leftSection={<IconSearch size={16} />}
         rightSection={<Kbd size="xs">⌘K</Kbd>}
@@ -222,11 +222,7 @@ export function SearchBar({ placeholder = 'Search templates, emails, contacts...
         padding={0}
         radius="md"
         centered
-        styles={{
-          modal: {
-            maxHeight: '80vh',
-          }
-        }}
+     
       >
         <Stack gap={0}>
           {/* Search Input */}
@@ -234,7 +230,7 @@ export function SearchBar({ placeholder = 'Search templates, emails, contacts...
             <IconSearch size={20} color="var(--mantine-color-dimmed)" />
             <TextInput
               ref={inputRef}
-              placeholder="Search templates, emails, contacts..."
+              placeholder={t('search_templates_emails_contacts')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -252,7 +248,7 @@ export function SearchBar({ placeholder = 'Search templates, emails, contacts...
             {loading ? (
               <Group justify="center" p="xl">
                 <Loader size="sm" />
-                <Text size="sm" c="dimmed">Searching...</Text>
+                <Text size="sm" c="dimmed">{t('searching')}</Text>
               </Group>
             ) : results.length > 0 ? (
               <Stack gap={0}>
@@ -305,9 +301,9 @@ export function SearchBar({ placeholder = 'Search templates, emails, contacts...
               <Group justify="center" p="xl">
                 <Stack align="center" gap="xs">
                   <IconSearch size={32} color="var(--mantine-color-dimmed)" />
-                  <Text size="sm" c="dimmed">No results found for "{query}"</Text>
+                  <Text size="sm" c="dimmed">{t('no_results_for', { query })}</Text>
                   <Text size="xs" c="dimmed">
-                    Try searching for templates, emails, or contacts
+                    {t('try_searching')}
                   </Text>
                 </Stack>
               </Group>
@@ -315,9 +311,9 @@ export function SearchBar({ placeholder = 'Search templates, emails, contacts...
               <Group justify="center" p="xl">
                 <Stack align="center" gap="xs">
                   <IconSearch size={32} color="var(--mantine-color-dimmed)" />
-                  <Text size="sm" c="dimmed">Start typing to search</Text>
+                  <Text size="sm" c="dimmed">{t('start_typing_search')}</Text>
                   <Text size="xs" c="dimmed">
-                    Find templates, emails, contacts and more
+                    {t('find_templates_emails')}
                   </Text>
                 </Stack>
               </Group>
@@ -337,19 +333,19 @@ export function SearchBar({ placeholder = 'Search templates, emails, contacts...
               <Group gap="md">
                 <Group gap="xs">
                   <Kbd size="xs">↑↓</Kbd>
-                  <Text size="xs" c="dimmed">Navigate</Text>
+                  <Text size="xs" c="dimmed">{t('navigate')}</Text>
                 </Group>
                 <Group gap="xs">
                   <Kbd size="xs">↵</Kbd>
-                  <Text size="xs" c="dimmed">Select</Text>
+                  <Text size="xs" c="dimmed">{t('select')}</Text>
                 </Group>
                 <Group gap="xs">
                   <Kbd size="xs">Esc</Kbd>
-                  <Text size="xs" c="dimmed">Close</Text>
+                  <Text size="xs" c="dimmed">{t('close')}</Text>
                 </Group>
               </Group>
               <Text size="xs" c="dimmed">
-                {results.length} result{results.length !== 1 ? 's' : ''}
+                {t('results_count', { count: results.length })}
               </Text>
             </Group>
           )}

@@ -20,6 +20,8 @@ import {
 } from '@tabler/icons-react'
 import axios from 'axios'
 import { format } from 'date-fns'
+import DOMPurify from 'dompurify'
+import { useTranslation } from 'react-i18next'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -30,7 +32,7 @@ interface EmailHistoryItem {
   cc?: string[]
   bcc?: string[]
   subject: string
-  htmlContent: string
+  snippet: string
   hasAttachments: boolean
   attachmentCount: number
   attachmentNames?: string[]
@@ -40,10 +42,15 @@ interface EmailHistoryItem {
 }
 
 export function EmailHistoryList() {
+  const { t } = useTranslation()
   const [emails, setEmails] = useState<EmailHistoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedEmail, setSelectedEmail] = useState<EmailHistoryItem | null>(null)
   const [modalOpened, setModalOpened] = useState(false)
+
+  const [emailContent, setEmailContent] = useState<string | null>(null)
+  const [loadingContent, setLoadingContent] = useState(false)
+  const [contentError, setContentError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchEmails()
@@ -62,9 +69,25 @@ export function EmailHistoryList() {
     }
   }
 
-  const handleViewDetails = (email: EmailHistoryItem) => {
+  const handleViewDetails = async (email: EmailHistoryItem) => {
     setSelectedEmail(email)
     setModalOpened(true)
+    setEmailContent(null)
+    setContentError(null)
+    setLoadingContent(true)
+
+    try {
+      const response = await axios.get(
+        `${API_URL}/email-history/${email.id}/content`,
+        { withCredentials: true }
+      )
+      setEmailContent(response.data.htmlContent)
+    } catch (error) {
+      console.error('Failed to fetch email content:', error)
+      setContentError(t('error_sending_email'))
+    } finally {
+      setLoadingContent(false)
+    }
   }
 
   const handleOpenInGmail = (email: EmailHistoryItem) => {
@@ -90,7 +113,7 @@ export function EmailHistoryList() {
         <Stack align="center" gap="sm">
           <IconClock size={48} color="#868E96" />
           <Text size="sm" c="dimmed" ta="center">
-            No emails sent yet
+            {t('no_emails_sent')}
           </Text>
         </Stack>
       </Card>
@@ -110,7 +133,7 @@ export function EmailHistoryList() {
                       {email.subject}
                     </Text>
                     {email.hasAttachments && (
-                      <Tooltip label={`${email.attachmentCount} attachment(s)`}>
+                      <Tooltip label={t('attachments_count', { count: email.attachmentCount })}>
                         <Badge
                           size="sm"
                           variant="light"
@@ -123,20 +146,28 @@ export function EmailHistoryList() {
                   </Group>
                   <Group gap="xs">
                     <Text size="xs" c="dimmed">
-                      To: {email.to.join(', ')}
+                      {t('to')}: {email.to.join(', ')}
                     </Text>
                     {email.cc && email.cc.length > 0 && (
                       <Text size="xs" c="dimmed">
-                        • Cc: {email.cc.join(', ')}
+                        • {t('cc')}: {email.cc.join(', ')}
                       </Text>
                     )}
                   </Group>
+                  <Text
+                    size="xs"
+                    c="dimmed"
+                    lineClamp={1}
+                    style={{ maxWidth: '400px', fontWeight: 300 }}
+                  >
+                    {email.snippet}
+                  </Text>
                   <Text size="xs" c="dimmed">
                     {format(new Date(email.sentAt), 'PPpp')}
                   </Text>
                 </div>
                 <Group gap="xs">
-                  <Tooltip label="View details">
+                  <Tooltip label={t('view_details')}>
                     <ActionIcon
                       variant="subtle"
                       onClick={() => handleViewDetails(email)}
@@ -145,7 +176,7 @@ export function EmailHistoryList() {
                     </ActionIcon>
                   </Tooltip>
                   {email.gmailMessageId && (
-                    <Tooltip label="Open in Gmail">
+                    <Tooltip label={t('open_in_gmail')}>
                       <ActionIcon
                         variant="subtle"
                         onClick={() => handleOpenInGmail(email)}
@@ -160,7 +191,7 @@ export function EmailHistoryList() {
               {email.attachmentNames && email.attachmentNames.length > 0 && (
                 <Group gap="xs" mt="xs">
                   <Text size="xs" c="dimmed">
-                    Attachments:
+                    {t('attachments')}:
                   </Text>
                   {email.attachmentNames.map((name, idx) => (
                     <Badge key={idx} size="xs" variant="dot">
@@ -177,56 +208,42 @@ export function EmailHistoryList() {
       <Modal
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
-        title="Email Details"
+        title={t('email_details')}
         size="lg"
       >
         {selectedEmail && (
           <Stack gap="md">
             <div>
-              <Text size="xs" c="dimmed">
-                From
-              </Text>
+              <Text size="xs" c="dimmed">{t('from')}</Text>
               <Text size="sm">{selectedEmail.from}</Text>
             </div>
 
             <div>
-              <Text size="xs" c="dimmed">
-                To
-              </Text>
+              <Text size="xs" c="dimmed">{t('to')}</Text>
               <Text size="sm">{selectedEmail.to.join(', ')}</Text>
             </div>
 
             {selectedEmail.cc && selectedEmail.cc.length > 0 && (
               <div>
-                <Text size="xs" c="dimmed">
-                  Cc
-                </Text>
+                <Text size="xs" c="dimmed">{t('cc')}</Text>
                 <Text size="sm">{selectedEmail.cc.join(', ')}</Text>
               </div>
             )}
 
             {selectedEmail.bcc && selectedEmail.bcc.length > 0 && (
               <div>
-                <Text size="xs" c="dimmed">
-                  Bcc
-                </Text>
+                <Text size="xs" c="dimmed">{t('bcc')}</Text>
                 <Text size="sm">{selectedEmail.bcc.join(', ')}</Text>
               </div>
             )}
 
             <div>
-              <Text size="xs" c="dimmed">
-                Subject
-              </Text>
-              <Text size="sm" fw={600}>
-                {selectedEmail.subject}
-              </Text>
+              <Text size="xs" c="dimmed">{t('subject')}</Text>
+              <Text size="sm" fw={600}>{selectedEmail.subject}</Text>
             </div>
 
             <div>
-              <Text size="xs" c="dimmed">
-                Sent
-              </Text>
+              <Text size="xs" c="dimmed">{t('sent')}</Text>
               <Text size="sm">
                 {format(new Date(selectedEmail.sentAt), 'PPpp')}
               </Text>
@@ -235,7 +252,7 @@ export function EmailHistoryList() {
             {selectedEmail.hasAttachments && (
               <div>
                 <Text size="xs" c="dimmed">
-                  Attachments ({selectedEmail.attachmentCount})
+                  {t('attachments_count', { count: selectedEmail.attachmentCount })}
                 </Text>
                 <Group gap="xs" mt={4}>
                   {selectedEmail.attachmentNames?.map((name, idx) => (
@@ -245,21 +262,32 @@ export function EmailHistoryList() {
                   ))}
                 </Group>
                 <Text size="xs" c="dimmed" mt={4}>
-                  Files are not stored on our servers for security reasons
+                  {t('files_not_stored')}
                 </Text>
               </div>
             )}
 
             <div>
-              <Text size="xs" c="dimmed" mb="xs">
-                Content
-              </Text>
+              <Text size="xs" c="dimmed" mb="xs">{t('content')}</Text>
               <Card withBorder p="md">
-                <div
-                  dangerouslySetInnerHTML={{ __html: selectedEmail.htmlContent }}
-                  style={{ maxHeight: 300, overflow: 'auto' }}
-                />
+                {loadingContent ? (
+                  <Group justify="center" py="md">
+                    <Loader size="sm" />
+                  </Group>
+                ) : contentError ? (
+                  <Text size="sm" c="dimmed">{contentError}</Text>
+                ) : (
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(emailContent || ''),
+                    }}
+                    style={{ maxHeight: 300, overflow: 'auto' }}
+                  />
+                )}
               </Card>
+              <Text size="xs" c="dimmed" mt={4}>
+                {t('content_fetched_on_demand')}
+              </Text>
             </div>
 
             {selectedEmail.gmailMessageId && (
@@ -268,7 +296,7 @@ export function EmailHistoryList() {
                 onClick={() => handleOpenInGmail(selectedEmail)}
                 fullWidth
               >
-                Open in Gmail
+                {t('open_in_gmail')}
               </Button>
             )}
           </Stack>

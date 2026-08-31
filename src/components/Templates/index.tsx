@@ -1,11 +1,8 @@
 import { useTemplateCreation } from '#/hooks/useTemplateCreation.tsx';
-import { useTemplateSteps } from '#/hooks/useTemplateSteps.tsx';
 import { Stack, Grid, Card } from '@mantine/core'
-import { createFileRoute } from '@tanstack/react-router'
 import { TemplateHeader } from './TemplateHeader';
 import { TemplateInfo } from './TemplateInfo';
 import { CreationModeTabs } from './CreationModeTabs';
-import { SequenceSteps } from './SequenceSteps';
 import { Sidebar } from './Sidebar';
 import type { Template } from '#/types/template.ts';
 
@@ -24,7 +21,7 @@ export function TemplateCreatePage({ initialTemplate, isEditMode = false }: Temp
 
   return (
     <div className="p-2 sm:p-4 bg-slate-50/10 min-h-screen">
-      <Stack gap={{ base: 'xs', sm: 'sm', md: 'md' }}>
+      <Stack >
         <TemplateHeader
   templateId={initialTemplate?.id}
   isEditMode={isEditMode}
@@ -39,9 +36,9 @@ export function TemplateCreatePage({ initialTemplate, isEditMode = false }: Temp
   aiGeneratedHtml={creation.aiGeneratedHtml}
 />
 
-        <Grid gutter={{ base: 'xs', sm: 'sm', md: 'md' }}>
+        <Grid >
           <Grid.Col span={{ base: 12, lg: 8 }}>
-            <Stack gap={{ base: 'xs', sm: 'sm', md: 'md' }}>
+            <Stack >
               <TemplateInfo
                 templateName={creation.templateName}
                 setTemplateName={creation.setTemplateName}

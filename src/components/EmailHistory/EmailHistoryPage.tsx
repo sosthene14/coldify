@@ -16,7 +16,6 @@ import {
   Paper,
   Pagination,
   Menu,
-  Grid,
   Table,
 } from '@mantine/core'
 import {
@@ -33,6 +32,7 @@ import {
   IconSend,
   IconUsers,
   IconChartLine,
+  IconChartBar,
 } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
 import axios from 'axios'
@@ -41,6 +41,8 @@ import { notifications } from '@mantine/notifications'
 import { EmailOpenDetailsModal } from "./EmailOpenDetailsModal";
 import { useEmailTracking } from "../../hooks/useEmailTracking";
 import { useSession } from '#/lib/auth-client';
+import DOMPurify from 'dompurify'
+import { useTranslation } from 'react-i18next';
 
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -56,6 +58,7 @@ interface EmailHistoryItem {
   htmlContent: string
   hasAttachments: boolean
   attachmentCount: number
+  snippet:string
   attachmentNames?: string[]
   gmailMessageId?: string
   status: string
@@ -194,6 +197,9 @@ export function EmailHistoryPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
   const [trackingModalEmailId, setTrackingModalEmailId] = useState<string | null>(null)
+  const [isFetchingContent, setIsFetchingContent] = useState(false)
+    const [emailContent, setEmailContent] = useState<string | null>(null)
+  const { t } = useTranslation()
 
   const {data} = useSession()
 
@@ -229,26 +235,34 @@ export function EmailHistoryPage() {
   const handleEmailOpened = useCallback((_trackingData: { emailHistoryId: string; totalOpens: number }) => {
     // Force refresh to get updated stats
     refetchEmails()
-  }, [refetchEmails]);
+  }, [ ]);
 
   useEmailTracking(data?.session?.activeOrganizationId as string, handleEmailOpened);
 
   useEffect(() => {
     fetchEmails(1)
-  }, [fetchEmails])
+  }, [])
 
   // Reset to page 1 when filters change
   useEffect(() => {
     fetchEmails(1)
-  }, [searchQuery, statusFilter, fetchEmails])
+  }, [searchQuery, statusFilter])
 
   const handlePageChange = (page: number) => {
     fetchEmails(page)
   }
 
-  const handleViewDetails = (email: EmailHistoryItem) => {
+  const handleViewDetails = async (email: EmailHistoryItem) => {
     setSelectedEmail(email)
     setModalOpened(true)
+    setIsFetchingContent(true)
+    const response = await axios.get(
+        `${API_URL}/email-history/${email.id}/content`,
+        { withCredentials: true }
+      )
+      setEmailContent(response.data.htmlContent)
+    
+    setIsFetchingContent(false)
   }
 
   const handleOpenInGmail = (email: EmailHistoryItem) => {
@@ -260,7 +274,7 @@ export function EmailHistoryPage() {
     }
   }
 
-  const handleCancelScheduled = async (email: EmailHistoryItem) => {
+const handleCancelScheduled = async (email: EmailHistoryItem) => {
     if (email.type !== 'scheduled' || email.status !== 'pending') return
 
     try {
@@ -272,15 +286,15 @@ export function EmailHistoryPage() {
       setModalOpened(false)
 
       notifications.show({
-        title: 'Cancelled',
-        message: 'Scheduled email cancelled successfully',
+        title: t('cancelled_title'),
+        message: t('scheduled_email_cancelled'),
         color: 'blue',
       })
     } catch (error: any) {
       console.error('Failed to cancel scheduled email:', error)
       notifications.show({
-        title: 'Error',
-        message: 'Failed to cancel scheduled email',
+        title: t('error_occurred'),
+        message: t('failed_cancel_scheduled'),
         color: 'red',
       })
     }
@@ -288,7 +302,7 @@ export function EmailHistoryPage() {
 
   const handleDeleteEmail = async (email: EmailHistoryItem) => {
     const confirmed = window.confirm(
-      `Are you sure you want to delete this email?\nSubject: ${email.subject}`
+      t('are_you_sure_delete', { subject: email.subject })
     )
 
     if (!confirmed) return
@@ -308,15 +322,15 @@ export function EmailHistoryPage() {
       setModalOpened(false)
 
       notifications.show({
-        title: 'Deleted',
-        message: 'Email deleted successfully',
+        title: t('deleted_title'),
+        message: t('email_deleted_success'),
         color: 'green',
       })
     } catch (error: any) {
       console.error('Failed to delete email:', error)
       notifications.show({
-        title: 'Error',
-        message: 'Failed to delete email',
+        title: t('error_occurred'),
+        message: t('failed_delete_email'),
         color: 'red',
       })
     }
@@ -345,17 +359,17 @@ export function EmailHistoryPage() {
   const paginatedEmails = filteredEmails
 
   return (
-    <div className='mx-0 md:mx-4'>
+   <div className='mx-0 md:mx-6'>
   <Container size="full"  py={{ base: 'xs', sm: 'sm', md: 'md' }} px={{ base: 'xs', sm: 'sm', md: 'md' }} >
-      <Stack gap={{ base: 'xs', sm: 'sm', md: 'md' }}>
+      <Stack >
         {/* Header */}
         <Group justify="space-between" wrap="wrap" gap="xs">
           <div>
             <Text size="xl" fw={700}>
-              Email History
+              {t('email_history')}
             </Text>
             <Text size="sm" c="dimmed" visibleFrom="sm">
-              View all emails you've sent
+              {t('view_emails_sent')}
             </Text>
           </div>
           <Button
@@ -363,8 +377,8 @@ export function EmailHistoryPage() {
             radius="sm"
             onClick={() => navigate({ to: '/dashboard/mails/new' })}
           >
-            <span >Send Email</span>
-            <span >Send</span>
+            <span className="hidden sm:inline">{t('send_email')}</span>
+            <span className="sm:hidden">{t('send')}</span>
           </Button>
         </Group>
 
@@ -375,7 +389,7 @@ export function EmailHistoryPage() {
               <Group gap="xs" mb={4}>
                 <IconSend size={16} color="var(--mantine-color-blue-6)" />
                 <Text size="xs" c="dimmed" fw={500}>
-                  Sent
+                  {t('sent')}
                 </Text>
               </Group>
               <Text size="lg" fw={700}>
@@ -387,7 +401,7 @@ export function EmailHistoryPage() {
               <Group gap="xs" mb={4}>
                 <IconUsers size={16} color="var(--mantine-color-cyan-6)" />
                 <Text size="xs" c="dimmed" fw={500}>
-                  Recipients
+                  {t('recipients')}
                 </Text>
               </Group>
               <Text size="lg" fw={700}>
@@ -399,7 +413,7 @@ export function EmailHistoryPage() {
               <Group gap="xs" mb={4}>
                 <IconEye size={16} color="var(--mantine-color-green-6)" />
                 <Text size="xs" c="dimmed" fw={500}>
-                  Open Rate
+                  {t('open_rate')}
                 </Text>
               </Group>
               <Text size="lg" fw={700} c="green">
@@ -413,19 +427,19 @@ export function EmailHistoryPage() {
         <Card withBorder p={{ base: 'xs', sm: 'sm', md: 'md' }}>
           <Stack gap="xs">
             <TextInput
-              placeholder="Search..."
+              placeholder={t('search')}
               leftSection={<IconSearch size={16} />}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <Select
-              placeholder="Status"
+              placeholder={t('status')}
               data={[
-                { value: 'sent', label: 'Sent' },
-                { value: 'pending', label: 'Scheduled' },
-                { value: 'processing', label: 'Processing' },
-                { value: 'failed', label: 'Failed' },
-                { value: 'cancelled', label: 'Cancelled' },
+                { value: 'sent', label: t('sent') },
+                { value: 'pending', label: t('scheduled') },
+                { value: 'processing', label: t('processing') },
+                { value: 'failed', label: t('failed') },
+                { value: 'cancelled', label: t('cancelled') },
               ]}
               value={statusFilter}
               onChange={setStatusFilter}
@@ -441,7 +455,7 @@ export function EmailHistoryPage() {
           </Group>
         ) : filteredEmails.length === 0 ? (
           <Paper withBorder p={{ base: 'md', sm: 'lg' }} radius="md">
-            <Stack align="center" gap={{ base: 'md', sm: 'lg' }}>
+            <Stack align="center" gap="lg">
               <img 
                 src="/postal-box.png" 
                 alt="Empty mailbox" 
@@ -453,12 +467,12 @@ export function EmailHistoryPage() {
               />
               <Stack align="center" gap={4}>
                 <Text size="lg" fw={700} ta="center">
-                  {pagination.total === 0 ? 'No emails sent yet' : 'No emails found'}
+                  {pagination.total === 0 ? t('no_emails_sent_yet') : t('no_emails_found')}
                 </Text>
                 <Text size="sm" c="dimmed" ta="center" style={{ maxWidth: 400 }}>
                   {pagination.total === 0
-                    ? 'Start by sending your first email'
-                    : 'Try adjusting your filters'}
+                    ? t('start_first_email')
+                    : t('try_adjusting_filters')}
                 </Text>
               </Stack>
               {pagination.total === 0 && (
@@ -469,7 +483,7 @@ export function EmailHistoryPage() {
                   variant="filled"
                   radius="md"
                 >
-                  Send Your First Email
+                  {t('send_your_first_email')}
                 </Button>
               )}
             </Stack>
@@ -479,16 +493,16 @@ export function EmailHistoryPage() {
             <Table highlightOnHover verticalSpacing="xs" horizontalSpacing="xs">
               <Table.Thead visibleFrom="sm">
                 <Table.Tr>
-                  <Table.Th>Subject</Table.Th>
-                  <Table.Th>Recipient</Table.Th>
-                  <Table.Th>Status</Table.Th>
-                  <Table.Th>Opens</Table.Th>
-                  <Table.Th>Date</Table.Th>
+                  <Table.Th>{t('subject')}</Table.Th>
+                  <Table.Th>{t('recipient_singular')}</Table.Th>
+                  <Table.Th>{t('status')}</Table.Th>
+                  <Table.Th>{t('opens')}</Table.Th>
+                  <Table.Th>{t('date')}</Table.Th>
                   <Table.Th w={60}></Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {paginatedEmails.map((email) => (
+                {paginatedEmails?.map((email) => (
                   <Table.Tr 
                     key={email.id} 
                     style={{ cursor: 'pointer' }}
@@ -499,7 +513,7 @@ export function EmailHistoryPage() {
                       <Stack gap={4} visibleFrom="sm">
                         <Group gap="xs" wrap="nowrap">
                           {email.hasAttachments && (
-                            <Tooltip label={`${email.attachmentCount} attachment${email.attachmentCount > 1 ? 's' : ''}`}>
+                            <Tooltip label={t('attachments_count_simple', { count: email.attachmentCount })}>
                               <IconPaperclip size={14} color="var(--mantine-color-gray-6)" />
                             </Tooltip>
                           )}
@@ -511,18 +525,10 @@ export function EmailHistoryPage() {
                           size="xs" 
                           c="dimmed" 
                           lineClamp={1}
-                          style={{ 
-                            maxWidth: '400px',
-                            fontWeight: 300
-                          }}
-                          dangerouslySetInnerHTML={{
-                            __html: email.htmlContent
-                              .replace(/<[^>]*>/g, '')
-                              .replace(/&nbsp;/g, ' ')
-                              .trim()
-                              .substring(0, 100)
-                          }}
-                        />
+                          style={{ maxWidth: '400px', fontWeight: 300 }}
+                        >
+                          {email?.snippet}
+                        </Text>
                       </Stack>
 
                       {/* Mobile view - compact with sent and open info */}
@@ -548,7 +554,7 @@ export function EmailHistoryPage() {
                               email.status === 'cancelled' ? 'gray' : 'green'
                             }
                           >
-                            {email.status === 'pending' ? 'scheduled' : email.status}
+                            {email.status === 'pending' ? t('scheduled') : email.status}
                           </Badge>
                           <Group gap={4}>
                             <IconClock size={10} color="var(--mantine-color-gray-6)" />
@@ -567,7 +573,7 @@ export function EmailHistoryPage() {
                             </Group>
                           )}
                           <Text size="xs" c="dimmed">
-                            {email.to.length > 1 ? `${email.to.length} recipients` : email.to[0].length > 20 ? `${email.to[0].substring(0, 20)}...` : email.to[0]}
+                            {email.to.length > 1 ? `${email.to.length} ${t('recipients')}` : email.to[0].length > 20 ? `${email.to[0].substring(0, 20)}...` : email.to[0]}
                           </Text>
                         </Group>
                       </Stack>
@@ -598,13 +604,13 @@ export function EmailHistoryPage() {
                           email.status === 'cancelled' ? 'gray' : 'green'
                         }
                       >
-                        {email.status === 'pending' ? 'scheduled' : email.status}
+                        {email.status === 'pending' ? t('scheduled') : email.status}
                       </Badge>
                     </Table.Td>
                     
                     <Table.Td visibleFrom="sm">
                       {email.type === 'sent' && email.totalOpens && email.totalOpens > 0 ? (
-                        <Tooltip label="Click to view open details">
+                        <Tooltip label={t('click_view_open_details')}>
                           <Badge
                             size="sm"
                             variant="light"
@@ -649,14 +655,14 @@ export function EmailHistoryPage() {
                             leftSection={<IconEye size={14} />}
                             onClick={() => handleViewDetails(email)}
                           >
-                            View Details
+                            {t('view_details')}
                           </Menu.Item>
                           {email.type === 'sent' && (
                             <Menu.Item
                               leftSection={<IconChartLine size={14} />}
                               onClick={() => navigate({ to: `/dashboard/email-history/${email.id}/stats` })}
                             >
-                              View Stats
+                              {t('view_stats')}
                             </Menu.Item>
                           )}
                           {email.type === 'scheduled' && email.status === 'pending' && (
@@ -665,13 +671,13 @@ export function EmailHistoryPage() {
                                 leftSection={<IconEdit size={14} />}
                                 onClick={() => handleEditScheduled(email)}
                               >
-                                Edit
+                                {t('edit')}
                               </Menu.Item>
                               <Menu.Item
                                 leftSection={<IconX size={14} />}
                                 onClick={() => handleCancelScheduled(email)}
                               >
-                                Cancel Schedule
+                                {t('cancel_schedule')}
                               </Menu.Item>
                             </>
                           )}
@@ -680,7 +686,7 @@ export function EmailHistoryPage() {
                               leftSection={<IconExternalLink size={14} />}
                               onClick={() => handleOpenInGmail(email)}
                             >
-                              Open in Gmail
+                              {t('open_in_gmail')}
                             </Menu.Item>
                           )}
                           <Menu.Divider />
@@ -689,7 +695,7 @@ export function EmailHistoryPage() {
                             leftSection={<IconTrash size={14} />}
                             onClick={() => handleDeleteEmail(email)}
                           >
-                            Delete
+                            {t('delete')}
                           </Menu.Item>
                         </Menu.Dropdown>
                       </Menu>
@@ -703,8 +709,8 @@ export function EmailHistoryPage() {
             {pagination.totalPages > 1 && (
               <Group justify="space-between" p={{ base: 'xs', sm: 'sm', md: 'md' }} style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }} wrap="wrap" gap="xs">
                 <Text size="xs" c="dimmed">
-                  Page {pagination.currentPage} of {pagination.totalPages}
-                  <span className="hidden sm:inline"> ({pagination.total} total)</span>
+                  {t('page_of', { current: pagination.currentPage, total: pagination.totalPages })}
+                  <span className="hidden sm:inline"> {t('total_count', { count: pagination.total })}</span>
                 </Text>
                 <Pagination
                   total={pagination.totalPages}
@@ -722,21 +728,21 @@ export function EmailHistoryPage() {
       <Modal
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
-        title="Email Details"
-        size="xl"
+        title={t('email_details')}
+        size="lg"
       >
         {selectedEmail && (
           <Stack gap="md">
             <div>
               <Text size="xs" c="dimmed">
-                From
+                {t('from')}
               </Text>
               <Text size="sm">{selectedEmail.from}</Text>
             </div>
 
             <div>
               <Text size="xs" c="dimmed">
-                To
+                {t('to')}
               </Text>
               <Text size="sm">{selectedEmail.to.join(', ')}</Text>
             </div>
@@ -744,7 +750,7 @@ export function EmailHistoryPage() {
             {selectedEmail.cc && selectedEmail.cc.length > 0 && (
               <div>
                 <Text size="xs" c="dimmed">
-                  Cc
+                  {t('cc')}
                 </Text>
                 <Text size="sm">{selectedEmail.cc.join(', ')}</Text>
               </div>
@@ -753,7 +759,7 @@ export function EmailHistoryPage() {
             {selectedEmail.bcc && selectedEmail.bcc.length > 0 && (
               <div>
                 <Text size="xs" c="dimmed">
-                  Bcc
+                  {t('bcc')}
                 </Text>
                 <Text size="sm">{selectedEmail.bcc.join(', ')}</Text>
               </div>
@@ -761,7 +767,7 @@ export function EmailHistoryPage() {
 
             <div>
               <Text size="xs" c="dimmed">
-                Subject
+                {t('subject')}
               </Text>
               <Text size="sm" fw={600}>
                 {selectedEmail.subject}
@@ -770,14 +776,14 @@ export function EmailHistoryPage() {
 
             <div>
               <Text size="xs" c="dimmed">
-                Sent
+                {t('sent')}
               </Text>
               <Text size="sm">
                 {selectedEmail.sentAt
                   ? format(new Date(selectedEmail.sentAt), 'PPpp')
                   : selectedEmail.scheduledAt
-                  ? `Scheduled for ${format(new Date(selectedEmail.scheduledAt), 'PPpp')}`
-                  : 'Pending'}
+                  ? t('scheduled_for', { date: format(new Date(selectedEmail.scheduledAt), 'PPpp') })
+                  : t('pending')}
               </Text>
             </div>
 
@@ -787,14 +793,14 @@ export function EmailHistoryPage() {
                 <Stack gap="xs">
                   <Group justify="space-between">
                     <Text size="sm" fw={600} c="blue">
-                      Email Tracking
+                      {t('email_tracking')}
                     </Text>
                     <Button
                       size="xs"
                       variant="light"
                       onClick={() => setTrackingModalEmailId(selectedEmail.id)}
                     >
-                      View Details
+                      {t('view_details')}
                     </Button>
                   </Group>
                   
@@ -804,7 +810,7 @@ export function EmailHistoryPage() {
                         {selectedEmail.totalOpens}
                       </Text>
                       <Text size="xs" c="dimmed">
-                        Total Opens
+                        {t('total_opens')}
                       </Text>
                     </div>
                     <div>
@@ -812,14 +818,14 @@ export function EmailHistoryPage() {
                         {selectedEmail.uniqueOpens || 0}
                       </Text>
                       <Text size="xs" c="dimmed">
-                        Unique Opens
+                        {t('unique_opens')}
                       </Text>
                     </div>
                   </Group>
 
                   {selectedEmail.firstOpenedAt && (
                     <Text size="xs" c="dimmed">
-                      First opened: {format(new Date(selectedEmail.firstOpenedAt), 'PPpp')}
+                      {t('first_opened_date', { date: format(new Date(selectedEmail.firstOpenedAt), 'PPpp') })}
                     </Text>
                   )}
                 </Stack>
@@ -829,7 +835,7 @@ export function EmailHistoryPage() {
             {selectedEmail.hasAttachments && (
               <div>
                 <Text size="xs" c="dimmed">
-                  Attachments ({selectedEmail.attachmentCount})
+                  {t('attachments_count', { count: selectedEmail.attachmentCount })}
                 </Text>
                 <Group gap="xs" mt={4}>
                   {selectedEmail.attachmentNames?.map((name, idx) => (
@@ -839,22 +845,30 @@ export function EmailHistoryPage() {
                   ))}
                 </Group>
                 <Text size="xs" c="dimmed" mt={4}>
-                  Files are not stored on our servers for security reasons
+                  {t('files_not_stored')}
                 </Text>
               </div>
             )}
 
-            <div>
-              <Text size="xs" c="dimmed" mb="xs">
-                Content
-              </Text>
-              <Card withBorder p="md">
-                <div
-                  dangerouslySetInnerHTML={{ __html: selectedEmail.htmlContent }}
-                  style={{ maxHeight: 300, overflow: 'auto',fontWeight:300 }}
-                />
-              </Card>
-            </div>
+        <div>
+  <Text size="xs" c="dimmed" mb="xs">
+    {t('content')}
+  </Text>
+  <Card withBorder p="md">
+    {isFetchingContent ? (
+      <Group justify="center" py="md">
+        <Loader size="sm" />
+      </Group>
+    ) : (
+      <div
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(emailContent || ''),
+        }}
+        style={{ maxHeight: 300, overflow: 'auto', fontWeight: 300 }}
+      />
+    )}
+  </Card>
+</div>
 
             {/* Action Buttons */}
             <Group gap="xs" mt="md">
@@ -865,9 +879,23 @@ export function EmailHistoryPage() {
                   onClick={() => handleOpenInGmail(selectedEmail)}
                   style={{ flex: 1 }}
                 >
-                  Gmail
+                  {t('gmail')}
                 </Button>
               )}
+
+              <Button
+    variant="default"
+    leftSection={<IconChartBar size={16} />}
+    onClick={() =>
+      navigate({
+        to: '/dashboard/email-history/$emailId/stats',
+        params: { emailId: selectedEmail.id },
+      })
+    }
+    style={{ flex: 1 }}
+  >
+    {t('statistics')}
+  </Button>
 
               {selectedEmail.type === 'scheduled' && selectedEmail.status === 'pending' && (
                 <>
@@ -877,7 +905,7 @@ export function EmailHistoryPage() {
                     onClick={() => handleEditScheduled(selectedEmail)}
                     style={{ flex: 1 }}
                   >
-                    Edit
+                    {t('edit')}
                   </Button>
                   <Button
                     variant="default"
@@ -886,7 +914,7 @@ export function EmailHistoryPage() {
                     onClick={() => handleCancelScheduled(selectedEmail)}
                     style={{ flex: 1 }}
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                 </>
               )}
@@ -898,7 +926,7 @@ export function EmailHistoryPage() {
                 onClick={() => handleDeleteEmail(selectedEmail)}
                 style={{ flex: 1 }}
               >
-                Delete
+                {t('delete')}
               </Button>
             </Group>
           </Stack>

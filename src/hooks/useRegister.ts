@@ -1,6 +1,7 @@
 // src/hooks/useRegister.ts
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { authClient } from '#/lib/auth-client.ts'
 
 export type RegisterFormValues = {
@@ -12,6 +13,7 @@ export type RegisterFormValues = {
 }
 
 export function useRegister() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -33,16 +35,16 @@ export function useRegister() {
       })
 
       if (signUpError) {
-        setError(signUpError.message ?? "Une erreur est survenue lors de l'inscription")
+        setError(signUpError.message ?? t('account_creation_error'))
         return
       }
-sessionStorage.setItem('pendingVerificationEmail', email)
-navigate({ 
-  to: '/verify-email', 
-  search: { email, error: false } 
-})
+      sessionStorage.setItem('pendingVerificationEmail', email)
+      navigate({ 
+        to: '/verify-email', 
+        search: { email, error: false } 
+      })
     } catch {
-      setError('Une erreur inattendue est survenue')
+      setError(t('unexpected_error'))
     } finally {
       setLoading(false)
     }

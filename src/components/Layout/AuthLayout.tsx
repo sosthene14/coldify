@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Stack, Text } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 
 type AuthLayoutProps = {
   title: string
@@ -8,6 +9,8 @@ type AuthLayoutProps = {
 }
 
 export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="flex min-h-screen bg-white">
       {/* Image gauche */}
@@ -20,10 +23,10 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
         <div className="absolute inset-0 bg-black/30" />
         <div className="relative z-10 flex flex-col justify-end p-12 text-white">
           <Text size="xl" fw={600}>
-            So-mails
+            {t('so_mails')}
           </Text>
           <Text size="sm" c="gray.3" mt={4}>
-            Manage everything from one place.
+            {t('manage_everything')}
           </Text>
         </div>
       </div>

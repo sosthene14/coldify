@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button, Card, Group, Text, CloseButton } from '@mantine/core'
 import { IconDownload } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -8,6 +9,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function PWAInstallPrompt() {
+  const { t } = useTranslation()
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
 
@@ -85,20 +87,20 @@ export function PWAInstallPrompt() {
         <IconDownload size={24} color="var(--mantine-color-blue-6)" />
         <div style={{ flex: 1 }}>
           <Text size="sm" fw={600} mb={4}>
-            Install So-mails
+            {t('install_so_mails')}
           </Text>
           <Text size="xs" c="dimmed">
-            Install our app for a better experience. Access it anytime, even offline!
+            {t('install_app_description')}
           </Text>
         </div>
       </Group>
 
       <Group gap="xs" justify="flex-end">
         <Button variant="subtle" size="xs" onClick={handleDismiss}>
-          Not now
+          {t('not_now')}
         </Button>
         <Button size="xs" onClick={handleInstall} leftSection={<IconDownload size={14} />}>
-          Install
+          {t('install')}
         </Button>
       </Group>
     </Card>

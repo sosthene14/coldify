@@ -1,8 +1,10 @@
-import { Button, Card, Group, Text, CloseButton } from '@mantine/core'
-import { IconRefresh, IconCheck } from '@tabler/icons-react'
+import { Button, Card, Group } from '@mantine/core'
+import { IconRefresh } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 import { usePWA } from '../hooks/usePWA'
 
 export function PWAUpdatePrompt() {
+  const { t } = useTranslation()
   const { needRefresh, offlineReady, updateServiceWorker, close } = usePWA()
 
   if (!needRefresh && !offlineReady) return null
@@ -14,21 +16,18 @@ export function PWAUpdatePrompt() {
       p="md"
    
     >
-    
-      
-   
 
       {needRefresh && (
         <Group gap="xs" justify="flex-end">
           <Button variant="subtle" size="xs" onClick={close}>
-            Later
+            {t('later')}
           </Button>
           <Button
             size="xs"
             onClick={() => updateServiceWorker(true)}
             leftSection={<IconRefresh size={14} />}
           >
-            Reload
+            {t('reload')}
           </Button>
         </Group>
       )}

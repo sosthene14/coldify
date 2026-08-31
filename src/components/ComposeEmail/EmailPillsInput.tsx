@@ -1,5 +1,6 @@
-import { useState, useRef, KeyboardEvent } from 'react'
+import { useState, type KeyboardEvent } from 'react'
 import { PillsInput, Pill, Combobox, useCombobox, Text } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 
 interface EmailPillsInputProps {
   label: string
@@ -12,12 +13,13 @@ interface EmailPillsInputProps {
 
 export function EmailPillsInput({
   label,
-  placeholder = 'Enter email address',
+  placeholder,
   value,
   onChange,
   required = false,
   error,
 }: EmailPillsInputProps) {
+  const { t } = useTranslation()
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
     onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
@@ -136,7 +138,6 @@ export function EmailPillsInput({
       <Combobox.Target>
         <PillsInput
           label={label}
-          placeholder={value.length === 0 ? placeholder : undefined}
           required={required}
           error={error}
           onClick={() => combobox.openDropdown()}
@@ -172,7 +173,7 @@ export function EmailPillsInput({
                 onKeyDown={handleKeyDown}
                 onBlur={handleBlur}
                 onPaste={handlePaste}
-                placeholder={value.length === 0 ? placeholder : undefined}
+                placeholder={value.length === 0 ? placeholder || t('enter_email_address') : undefined}
               />
             </Combobox.EventsTarget>
           </Pill.Group>
@@ -181,7 +182,7 @@ export function EmailPillsInput({
       
       {invalidEmails.size > 0 && (
         <Text size="xs" c="red" mt={4}>
-          Invalid email format: {Array.from(invalidEmails).join(', ')}
+          {t('invalid_email_format', { emails: Array.from(invalidEmails).join(', ') })}
         </Text>
       )}
     </Combobox>

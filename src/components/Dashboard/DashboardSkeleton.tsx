@@ -1,4 +1,4 @@
-import { Skeleton, Card, Group, Stack, Grid } from '@mantine/core'
+import { Skeleton, Card, Group, Stack } from '@mantine/core'
 
 export function DashboardSkeleton() {
   return (

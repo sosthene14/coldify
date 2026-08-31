@@ -4,6 +4,7 @@ import { LineChart } from '@mantine/charts'
 import { IconMail, IconEye, IconTrendingUp } from '@tabler/icons-react'
 import axios from 'axios'
 import { format, subDays, startOfDay, endOfDay } from 'date-fns'
+import { useTranslation } from 'react-i18next'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -21,8 +22,8 @@ interface EmailStats {
 }
 
 const series = [
-  { name: 'sent', label: 'Emails sent', color: 'blue.6' },
-  { name: 'opened', label: 'Emails opened', color: 'green.6' },
+  { name: 'sent', label: 'emails_sent', color: 'blue.6' },
+  { name: 'opened', label: 'emails_opened', color: 'green.6' },
 ]
 
 interface DateRange {
@@ -132,14 +133,15 @@ function useEmailActivity(days: number, dateRange?: DateRange): EmailStats & { l
 }
 
 export function EmailActivityOverview({ dateRange }: EmailActivityOverviewProps) {
+  const { t } = useTranslation()
   const [selectedPeriod, setSelectedPeriod] = useState('7')
   const days = parseInt(selectedPeriod)
   const { totalSent, totalOpened, openRate, chartData, loading } = useEmailActivity(days, dateRange)
 
   const periodOptions = [
-    { value: '7', label: 'Last 7 days' },
-    { value: '14', label: 'Last 14 days' },
-    { value: '30', label: 'Last 30 days' }
+    { value: '7', label: t('last_7_days') },
+    { value: '14', label: t('last_14_days') },
+    { value: '30', label: t('last_30_days') }
   ]
 
   if (loading) {
@@ -147,7 +149,7 @@ export function EmailActivityOverview({ dateRange }: EmailActivityOverviewProps)
       <Card withBorder radius="md" p="lg" bg="white" className="w-full">
         <Group justify="center" py="xl">
           <Loader size="sm" />
-          <Text size="sm" c="dimmed">Loading email activity...</Text>
+          <Text size="sm" c="dimmed">{t('loading_email_activity')}</Text>
         </Group>
       </Card>
     )
@@ -157,7 +159,7 @@ export function EmailActivityOverview({ dateRange }: EmailActivityOverviewProps)
     <Card withBorder radius="md" p={{ base: 'sm', sm: 'md', md: 'lg' }} bg="white" className="w-full">
       <Group justify="space-between" align="center" mb={{ base: 'sm', sm: 'md' }}>
         <Text fw={600} size="sm" c="dark.7">
-          Email activity overview
+          {t('email_activity_overview')}
         </Text>
 
         <Select
@@ -171,23 +173,23 @@ export function EmailActivityOverview({ dateRange }: EmailActivityOverviewProps)
       </Group>
 
       {/* Stats rapides */}
-      <Group gap={{ base: 'sm', sm: 'lg' }} mb={{ base: 'sm', sm: 'md' }} wrap="wrap">
+      <Group  mb={{ base: 'sm', sm: 'md' }} wrap="wrap">
         <Group gap={6}>
           <IconMail size={14} color="var(--mantine-color-blue-6)" />
           <Text size="xs" c="dimmed">
-            {totalSent} sent
+            {t('sent_count', { count: totalSent })}
           </Text>
         </Group>
         <Group gap={6}>
           <IconEye size={14} color="var(--mantine-color-green-6)" />
           <Text size="xs" c="dimmed">
-            {totalOpened} opened ({openRate}%)
+            {t('opened_count', { count: totalOpened, rate: openRate })}
           </Text>
         </Group>
       </Group>
 
       {/* Légende du graphique */}
-      <Group gap={{ base: 'sm', sm: 'lg' }} mb="sm">
+      <Group  mb="sm">
         {series.map((s) => (
           <Group key={s.name} gap={6}>
             <Box
@@ -199,7 +201,7 @@ export function EmailActivityOverview({ dateRange }: EmailActivityOverviewProps)
               }}
             />
             <Text size="xs" c="dimmed">
-              {s.label}
+              {t(s.label)}
             </Text>
           </Group>
         ))}
@@ -245,7 +247,7 @@ export function EmailActivityOverview({ dateRange }: EmailActivityOverviewProps)
                           }}
                         />
                         <Text size="xs" c="dimmed">
-                          {series.find(s => s.name === item.dataKey)?.label}: {item.value}
+                          {t(series.find(s => s.name === item.dataKey)?.label || '')}: {item.value}
                         </Text>
                       </Group>
                     ))}
@@ -259,8 +261,8 @@ export function EmailActivityOverview({ dateRange }: EmailActivityOverviewProps)
         <Group justify="center" py={{ base: 'md', sm: 'xl' }}>
           <Stack align="center" gap="xs">
             <IconTrendingUp size={32} color="var(--mantine-color-gray-5)" />
-            <Text size="sm" c="dimmed">No email activity data available</Text>
-            <Text size="xs" c="dimmed">Start sending emails to see your activity</Text>
+            <Text size="sm" c="dimmed">{t('no_email_activity')}</Text>
+            <Text size="xs" c="dimmed">{t('start_sending_emails')}</Text>
           </Stack>
         </Group>
       )}

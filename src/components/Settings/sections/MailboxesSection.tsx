@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import {
   Card, Stack, Group, Button, Text, Badge, Menu, ActionIcon,
-  Loader, Alert, SimpleGrid, List, ThemeIcon, Table, Modal, TextInput, Anchor,
+  Loader, Alert, SimpleGrid, List, ThemeIcon, Table, Modal, TextInput,
 } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 import {
   IconDots, IconEdit, IconRefresh, IconTrash,
   IconAlertCircle, IconMail, IconCheck, IconInfoCircle, IconSend,
@@ -31,16 +32,16 @@ const PROVIDERS: {
   {
     key: 'gmail',
     label: 'Gmail',
-    description: 'Connectez votre compte Gmail ou Google Workspace.',
-    features: ['OAuth2 sécurisé', 'Envoi d\'emails', 'Suivi des ouvertures', 'Limite : 2 000 emails/jour'],
+    description: 'gmail_description',
+    features: ['secure_oauth2', 'send_emails', 'open_tracking', 'limit_2000_day'],
     icon: SiGmail,
     available: true,
   },
   {
     key: 'smtp',
-    label: 'SMTP personnalisé',
-    description: 'Utilisez votre propre serveur SMTP pour envoyer des emails.',
-    features: ['Connexion SMTP', 'TLS/SSL supporté', 'Ports 465, 587, 25', 'Configuration avancée'],
+    label: 'custom_smtp',
+    description: 'smtp_description',
+    features: ['smtp_connection', 'tls_ssl_supported', 'ports_465_587_25', 'advanced_config'],
     available: true,
   },
 ]
@@ -59,6 +60,7 @@ function ProviderLogo({ provider, size = 20 }: { provider: string; size?: number
 }
 
 export function MailboxesSection() {
+  const { t } = useTranslation()
   const { mailboxes, loading, error, fetchMailboxes, connectGmail, disconnect, testConnection } =
     useMailboxStore()
   const { stats: quotaStats, fetchStats: fetchQuotaStats } = useQuotaStore()
@@ -85,7 +87,7 @@ export function MailboxesSection() {
       try {
         await connectGmail()
       } catch (error: any) {
-        notifications.show({ title: 'Error', message: error.message || 'Failed to connect Gmail', color: 'red' })
+        notifications.show({ title: t('error_occurred'), message: error.message || t('failed_connect_gmail'), color: 'red' })
       }
     }
   }
@@ -102,26 +104,26 @@ export function MailboxesSection() {
 
   const handleDisconnect = (id: string, email: string) => {
     modals.openConfirmModal({
-      title: 'Déconnecter la boîte mail',
+      title: t('disconnect_mailbox_title'),
       children: (
         <Text size="sm">
-          Êtes-vous sûr de vouloir déconnecter <strong>{email}</strong> ? Cette action est irréversible.
+          {t('disconnect_mailbox_confirm', { email })}
         </Text>
       ),
-      labels: { confirm: 'Déconnecter', cancel: 'Annuler' },
+      labels: { confirm: t('disconnect_confirm'), cancel: t('cancel_confirm') },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
         try {
           await disconnect(id)
           notifications.show({ 
-            title: 'Succès', 
-            message: 'Boîte mail déconnectée avec succès', 
+            title: t('success'), 
+            message: t('disconnect_success'), 
             color: 'green' 
           })
         } catch (error: any) {
           notifications.show({ 
-            title: 'Erreur', 
-            message: error.message || 'Échec de la déconnexion', 
+            title: t('error_occurred'), 
+            message: error.message || t('disconnect_failed'), 
             color: 'red' 
           })
         }
@@ -133,12 +135,12 @@ export function MailboxesSection() {
     try {
       const success = await testConnection(id)
       notifications.show({
-        title: success ? 'Success' : 'Error',
-        message: success ? 'Connection test passed' : 'Connection test failed',
+        title: success ? t('success') : t('error_occurred'),
+        message: success ? t('connection_test_passed') : t('connection_test_failed'),
         color: success ? 'green' : 'red',
       })
     } catch (error: any) {
-      notifications.show({ title: 'Error', message: error.message || 'Failed to test connection', color: 'red' })
+      notifications.show({ title: t('error_occurred'), message: error.message || t('failed_test_connection'), color: 'red' })
     }
   }
 
@@ -173,19 +175,19 @@ export function MailboxesSection() {
 
       if (data.success) {
         notifications.show({
-          title: 'Test email sent!',
-          message: `Check your inbox at ${testEmailAddress}`,
+          title: t('test_email_sent'),
+          message: t('check_inbox_at', { email: testEmailAddress }),
           color: 'green',
         })
         setTestEmailModal(null)
         setTestEmailAddress('')
       } else {
-        throw new Error(data.error || 'Failed to send test email')
+        throw new Error(data.error || t('failed_send_test'))
       }
     } catch (error: any) {
       notifications.show({
-        title: 'Error',
-        message: error.message || 'Failed to send test email',
+        title: t('error_occurred'),
+        message: error.message || t('failed_send_test'),
         color: 'red',
       })
     } finally {
@@ -197,8 +199,8 @@ export function MailboxesSection() {
     <Stack gap="lg">
       <Group justify="space-between" align="flex-start">
         <SectionHeader
-          title="Connecteurs de mail"
-          description="Connectez vos fournisseurs de messagerie pour envoyer des emails via le service de votre choix."
+          title={t('mail_connectors')}
+          description={t('mail_connectors_description')}
         />
       </Group>
 
@@ -218,8 +220,8 @@ export function MailboxesSection() {
               <ProviderLogo provider={p.key} size={28} />
 
               <div>
-                <Text size="sm" fw={600}>{p.label}</Text>
-                <Text size="xs" c="dimmed" mt={2}>{p.description}</Text>
+                <Text size="sm" fw={600}>{t(p.label)}</Text>
+                <Text size="xs" c="dimmed" mt={2}>{t(p.description)}</Text>
               </div>
 
 
@@ -230,7 +232,7 @@ export function MailboxesSection() {
                 </ThemeIcon>
               }>
                 {p.features.map((f) => (
-                  <List.Item key={f} style={{fontWeight:'400'}}>{f}</List.Item>
+                  <List.Item key={f} style={{fontWeight:'400'}}>{t(f)}</List.Item>
                 ))}
               </List>
 
@@ -243,7 +245,7 @@ export function MailboxesSection() {
                   disabled={!p.available}
                   onClick={() => handleConnect(p.key)}
                 >
-                  {p.available ? `Connecter ${p.label}` : 'Bientôt disponible'}
+                  {p.available ? `${t('connect')} ${t(p.label)}` : t('coming_soon')}
                 </Button>
               </div>
             </Stack>
@@ -254,8 +256,8 @@ export function MailboxesSection() {
       <Card withBorder radius="md" p="lg" bg="white" mb='lg'>
         <Stack gap="md">
           <div>
-            <Text size="md" fw={600}>Fournisseurs connectés</Text>
-            <Text size="xs" c="dimmed">Gérez vos connexions actives et vos paramètres.</Text>
+            <Text size="md" fw={600}>{t('connected_providers')}</Text>
+            <Text size="xs" c="dimmed">{t('manage_connections')}</Text>
           </div>
 
           {loading ? (
@@ -274,16 +276,16 @@ export function MailboxesSection() {
                 <IconMail size={26} color="var(--mantine-color-blue-6)" stroke={1.5} />
               </div>
               <Text size="sm" c="dimmed" ta="center">
-                No mailboxes connected yet. Connect an account above to start sending emails.
+                {t('no_mailboxes_connected')}
               </Text>
             </Stack>
           ) : (
             <Table verticalSpacing="sm" horizontalSpacing="xs">
               <Table.Thead visibleFrom="sm">
                 <Table.Tr>
-                  <Table.Th>Fournisseur</Table.Th>
-                  <Table.Th>Statut</Table.Th>
-                  <Table.Th ta="right">Actions</Table.Th>
+                  <Table.Th>{t('provider')}</Table.Th>
+                  <Table.Th>{t('status')}</Table.Th>
+                  <Table.Th ta="right">{t('actions')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -313,7 +315,7 @@ export function MailboxesSection() {
                             color={mb.status === 'connected' ? 'green' : 'red'}
                             variant="light"
                           >
-                            {mb.status === 'connected' ? 'Connecté' : 'Erreur'}
+                            {mb.status === 'connected' ? t('connected') : t('error')}
                           </Badge>
                           <Text size="xs" c="dimmed">{mb.provider.toUpperCase()}</Text>
                         </Group>
@@ -322,7 +324,7 @@ export function MailboxesSection() {
                     
                     <Table.Td visibleFrom="sm">
                       <Badge color={mb.status === 'connected' ? 'green' : 'red'} variant="light">
-                        {mb.status === 'connected' ? 'Connecté' : 'Erreur auth'}
+                        {mb.status === 'connected' ? t('connected') : t('auth_error')}
                       </Badge>
                     </Table.Td>
                     
@@ -338,7 +340,7 @@ export function MailboxesSection() {
                             {mb.provider === 'smtp' && (
                               <>
                                 <Menu.Item leftSection={<IconEdit size={14} />} onClick={() => handleEditSmtp(mb)}>
-                                  Edit SMTP config
+                                  {t('edit_smtp_config')}
                                 </Menu.Item>
                                 <Menu.Divider />
                               </>
@@ -350,25 +352,25 @@ export function MailboxesSection() {
                                 setTestEmailAddress('')
                               }}
                             >
-                              Send test email
+                              {t('send_test_email')}
                             </Menu.Item>
                             <Menu.Item leftSection={<IconEdit size={14} />} onClick={() => {
                               notifications.show({
-                                title: 'Edit Signature',
-                                message: 'Signature editor will be available soon',
+                                title: t('edit_signature'),
+                                message: t('signature_soon'),
                                 color: 'blue',
                               })
                             }}>
-                              Edit signature
+                              {t('edit_signature')}
                             </Menu.Item>
                             {mb.provider === 'gmail' && (
                               <Menu.Item leftSection={<IconRefresh size={14} />} onClick={() => handleTestConnection(mb.id)}>
-                                Test connection
+                                {t('test_connection')}
                               </Menu.Item>
                             )}
                             <Menu.Divider />
                             <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDisconnect(mb.id, mb.email)}>
-                              Disconnect
+                              {t('disconnect')}
                             </Menu.Item>
                           </Menu.Dropdown>
                         </Menu>
@@ -406,24 +408,24 @@ export function MailboxesSection() {
           setTestEmailModal(null)
           setTestEmailAddress('')
         }}
-        title="Send test email"
+        title={t('send_test_email')}
         size="md"
       >
         <Stack gap="md">
           <Alert icon={<IconInfoCircle size={16} />} color="blue" variant="light">
             <Text size="sm">
-              Send a test email from <strong>{testEmailModal?.email}</strong> to verify your mailbox configuration.
+              {t('send_test_email_from', { email: testEmailModal?.email })}
             </Text>
           </Alert>
 
           <TextInput
-            label="Recipient email"
+            label={t('recipient_email')}
             placeholder="your@email.com"
             value={testEmailAddress}
             onChange={(e) => setTestEmailAddress(e.target.value)}
             type="email"
             required
-            description="Enter the email address where you want to receive the test"
+            description={t('enter_recipient_email')}
           />
 
           <Group justify="flex-end" mt="md">
@@ -435,7 +437,7 @@ export function MailboxesSection() {
               }}
               disabled={sendingTest}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button 
               onClick={handleSendTestEmail}
@@ -444,7 +446,7 @@ export function MailboxesSection() {
               disabled={!testEmailAddress || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testEmailAddress)}
               leftSection={<IconSend size={16} />}
             >
-              Send test email
+              {t('send_test_email')}
             </Button>
           </Group>
         </Stack>

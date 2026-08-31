@@ -2,6 +2,7 @@ import { type PreviewDevice } from '#/types/template.ts'
 import { Card, Group, Text, SegmentedControl, Paper, Skeleton } from '@mantine/core'
 import { IconDeviceDesktop, IconDeviceMobile } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { replaceMinIOWithSignedUrls } from '#/lib/image-upload.ts'
 
 interface PreviewCardProps {
@@ -13,6 +14,7 @@ interface PreviewCardProps {
 }
 
 export function PreviewCard({ previewDevice, setPreviewDevice, subjectLine, htmlContent, isLoading }: PreviewCardProps) {
+  const { t } = useTranslation()
   const [processedContent, setProcessedContent] = useState(htmlContent)
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -47,7 +49,7 @@ export function PreviewCard({ previewDevice, setPreviewDevice, subjectLine, html
           img { max-width: 100%; height: auto; }
         </style>
       </head>
-      <body>${processedContent || '<p style="color:#adb5bd">Nothing to preview yet</p>'}</body>
+      <body>${processedContent || `<p style="color:#adb5bd">${t('nothing_to_preview')}</p>`}</body>
     </html>
   `
 
@@ -56,7 +58,7 @@ export function PreviewCard({ previewDevice, setPreviewDevice, subjectLine, html
     
     withBorder radius="md" p="lg" bg="white" className="h-auto">
       <Group justify="space-between" mb="sm">
-        <Text size="sm" fw={600}>Preview</Text>
+        <Text size="sm" fw={600}>{t('preview')}</Text>
         <SegmentedControl
           size="xs"
           value={previewDevice}
@@ -70,9 +72,9 @@ export function PreviewCard({ previewDevice, setPreviewDevice, subjectLine, html
 
       <Paper withBorder radius="md" bg="gray.0" p={0} style={{ overflow: 'hidden' }}>
         <div style={{ padding: '10px 12px', borderBottom: '1px solid #E9ECEF', backgroundColor: '#fff' }}>
-          <Text size="xs" c="dimmed">Subject</Text>
+          <Text size="xs" c="dimmed">{t('subject')}</Text>
           <Text size="sm" fw={500} truncate>
-            {subjectLine || <span style={{ color: '#adb5bd' }}>No subject</span>}
+            {subjectLine || <span style={{ color: '#adb5bd' }}>{t('no_subject')}</span>}
           </Text>
         </div>
 
@@ -86,7 +88,7 @@ export function PreviewCard({ previewDevice, setPreviewDevice, subjectLine, html
           }}
         >
           <iframe
-            title="Email preview"
+            title={t('preview')}
             sandbox="allow-same-origin"
             srcDoc={srcDoc}
             style={{
