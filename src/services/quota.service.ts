@@ -6,6 +6,7 @@ export interface QuotaStats {
   dailyUsed: number
   dailyLimit: number
   dailyRemaining: number
+  dailyResetAt: string
   monthlyUsed: number
   monthlyLimit: number | null
   monthlyRemaining: number | null

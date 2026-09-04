@@ -32,7 +32,7 @@ export function set2FAInProgress(value: boolean) {
 }
 
 export const authClient = createAuthClient({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: `${import.meta.env.VITE_API_URL}/auth`,
   sessionOptions: {
     refetchInterval: 0,
     refetchOnWindowFocus: false,

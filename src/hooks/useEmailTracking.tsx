@@ -1,9 +1,8 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
-import { useSession } from '#/lib/auth-client';
 
-const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace('http', 'ws');
+const WS_URL = (import.meta.env.VITE_SOCKET_API_URL || 'http://localhost:3001').replace('http', 'ws');
 
 interface EmailOpenedEvent {
   emailHistoryId: string;

@@ -5,7 +5,6 @@ import { PageHeader } from "../PageHeader";
 import { EmailActivityOverview } from "./email-activity-overview";
 import { RecentCampaigns } from "./recent-campaigns";
 import { Sidebar } from "./Sidebar";
-import { useEmailTracking } from "#/hooks/useEmailTracking";
 import { subDays, startOfDay, endOfDay } from 'date-fns'
 import axios from 'axios'
 import { Grid, Container, Card, Stack, Group, Text, Progress, Badge, Button } from '@mantine/core'
@@ -119,7 +118,8 @@ export const Dashboard = () => {
   // Handler pour le changement de date range
   const handleDateRangeChange = useCallback((startDate: Date, endDate: Date) => {
     setDateRange({ startDate, endDate })
-   }, [])
+    console.log('Date range changed:', { startDate, endDate })
+  }, [])
 
   // Calculate usage percentage
   const usagePercent = totalLimit > 0 ? (totalSent / totalLimit) * 100 : 0
@@ -208,7 +208,15 @@ export const Dashboard = () => {
       
       <Grid mt="md">
         {/* Sidebar - Hidden on mobile, shown on md+ screens */}
-   
+        <Grid.Col span={{ base: 12, md: 3, lg: 2.5 }} visibleFrom="md">
+          <Sidebar
+            mailboxes={mailboxes.map(mb => ({
+              email: mb.email,
+              score: mb.score
+            }))}
+            onQuickAction={(key) => console.log('Quick action:', key)}
+          />
+        </Grid.Col>
 
         {/* Main content - Full width on mobile, adjusted on larger screens */}
         <Grid.Col span={{ base: 12, md: 9, lg: 9.5 }}>

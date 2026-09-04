@@ -98,9 +98,18 @@ export function EmailLimitCard() {
       )}
 
       {percent >= 100 && (
-        <Text size="xs" c="red" ta="center" mt="xs">
-          {t('daily_limit_reached')}
-        </Text>
+        <>
+          <Text size="xs" c="red" ta="center" mt="xs">
+            {t('daily_limit_reached')}
+          </Text>
+          {stats?.dailyResetAt && new Date(stats.dailyResetAt) > new Date() && (
+            <Text size="xs" c="dimmed" ta="center" mt={4}>
+              {t('daily_limit_reset_at', {
+                date: new Date(stats.dailyResetAt).toLocaleString(),
+              })}
+            </Text>
+          )}
+        </>
       )}
 
       {percent >= 90 && percent < 100 && (

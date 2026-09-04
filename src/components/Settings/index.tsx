@@ -15,14 +15,13 @@ import {
   IconMail,
   IconBell,
   IconLock,
-  IconDeviceMobile,
-  IconCreditCard,
+  IconDeviceMobile
 } from '@tabler/icons-react'
 
 const navItems: { section: Section; label: string; icon: any }[] = [
   { section: 'profile', label: 'profile_account', icon: IconUser },
   { section: 'mailboxes', label: 'mailboxes', icon: IconMail },
-  { section: 'subscription', label: 'subscription', icon: IconCreditCard },
+  // { section: 'subscription', label: 'subscription', icon: IconCreditCard },
   { section: 'notifications', label: 'notifications', icon: IconBell },
   { section: 'security', label: 'security', icon: IconLock },
   { section: 'app', label: 'app_pwa', icon: IconDeviceMobile },

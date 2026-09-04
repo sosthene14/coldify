@@ -753,6 +753,7 @@
   "track_current_usage": "Track your current usage",
   "connected_providers_count": "Connected Providers",
   "history_retention": "History Retention",
+  
   "priority_support": "Priority Support",
   "integration_api": "Integration API",
   "included": "Included",
@@ -761,10 +762,13 @@
   "provider_limit_reached_message": "You've reached your provider limit. Upgrade to add more email accounts.",
   "available_plans": "Available Plans",
   "compare_plans_upgrade": "Compare plans and upgrade",
+  "daily_limit_reached": "Daily limit reached",
+  "daily_limit_reset_at": "Resets on {{date}}",
   "upgrade": "Upgrade",
   "unlimited": "Unlimited",
   "per_month": "/month",
   "days_history": "days history",
   "emails_per_day_label": "Emails per day",
-  "upgrade_failed": "Failed to create checkout. Please try again."
+  "upgrade_failed": "Failed to create checkout. Please try again.",
+   "incorrect_email_password": "Incorrect email or password."
 }

@@ -765,5 +765,8 @@
   "per_month": "/mois",
   "days_history": "jours d'historique",
   "emails_per_day_label": "Emails par jour",
-  "upgrade_failed": "Échec de la création du checkout. Veuillez réessayer."
+  "upgrade_failed": "Échec de la création du checkout. Veuillez réessayer.",
+   "incorrect_email_password": "Adresse e-mail ou mot de passe incorrect.",
+  "daily_limit_reached": "Limite quotidienne atteinte",
+  "daily_limit_reset_at": "Réinitialisation le {{date}}"
 }
