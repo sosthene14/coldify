@@ -13,33 +13,16 @@ export function RegisterPage() {
   const { t } = useTranslation()
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [organizationName, setOrganizationName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [acceptedTerms, setAcceptedTerms] = useState(false)
 
-  const { register, registerWithGoogle, loading, error } = useRegister()
-
-  // Toast pour les erreurs du hook
-  useEffect(() => {
-    if (error) {
-      toast.error(error, {
-        duration: 4000,
-        position: 'top-center',
-      })
-    }
-  }, [error])
+  const { register, registerWithGoogle, loading } = useRegister()
 
   // Toast pour le chargement
   useEffect(() => {
     let toastId: string | undefined;
-    
-    if (loading) {
-      toastId = toast.loading(t('account_creation_loading'), {
-        position: 'top-center',
-      })
-    }
 
     return () => {
       if (toastId) {
@@ -54,13 +37,6 @@ export function RegisterPage() {
     // Validations avec toasts
     if (!firstName || !lastName) {
       toast.error(t('enter_name'), {
-        position: 'top-center',
-      })
-      return
-    }
-
-    if (!organizationName) {
-      toast.error(t('enter_organization'), {
         position: 'top-center',
       })
       return
@@ -98,7 +74,7 @@ export function RegisterPage() {
 
     // Appel à la fonction register avec promesse pour les toasts
     toast.promise(
-      register({ firstName, lastName, organizationName, email, password }),
+      register({ firstName, lastName, email, password }),
       {
         loading: t('creating_account'),
         success: t('account_created'),
@@ -152,24 +128,14 @@ export function RegisterPage() {
               />
             </Group>
 
-            <Group grow>
-              <TextInput
-                label={t('organization_name')}
-                placeholder={t('acme_inc')}
-                value={organizationName}
-                onChange={(e) => setOrganizationName(e.currentTarget.value)}
-                radius="md"
-                required
-              />
-              <TextInput
-                label={t('email')}
-                placeholder={t('you_company_com')}
-                value={email}
-                onChange={(e) => setEmail(e.currentTarget.value)}
-                radius="md"
-                required
-              />
-            </Group>
+            <TextInput
+              label={t('email')}
+              placeholder={t('you_company_com')}
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
+              radius="md"
+              required
+            />
 
             <Group grow>
               <PasswordInput
@@ -209,7 +175,7 @@ export function RegisterPage() {
               required
             />
 
-            <Button type="submit" color="blue" radius="md" fullWidth mt="xs" loading={loading}>
+            <Button type="submit" color="blue" radius="md" fullWidth mt="sm" loading={loading}>
               {t('create_account_button')}
             </Button>
           </Stack>

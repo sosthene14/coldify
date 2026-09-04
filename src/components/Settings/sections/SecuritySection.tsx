@@ -32,6 +32,7 @@ import { notifications } from '@mantine/notifications'
 import { SectionHeader } from '../components/SectionHeader'
 import { api } from '#/lib/api'
 import { useSession, twoFactor } from '#/lib/auth-client'
+import toast from 'react-hot-toast'
 
 interface Session {
   id: string
@@ -78,28 +79,7 @@ export function SecuritySection() {
     loadSessions()
   }, [])
 
-  // Révoquer une session
-  // const revokeSession = async (sessionId: string) => {
-  //   setRevoking(sessionId)
-  //   try {
-  //     await api.delete(`/user/sessions/${sessionId}`)
-  //     setSessions(prev => prev.filter(s => s.id !== sessionId))
-  //     notifications.show({
-  //       title: t('session_revoked'),
-  //       message: t('session_revoked_success'),
-  //       color: 'green'
-  //     })
-  //   } catch (error) {
-  //     console.error('Failed to revoke session:', error)
-  //     notifications.show({
-  //       title: t('error_occurred'),
-  //       message: t('unable_revoke_session'),
-  //       color: 'red'
-  //     })
-  //   } finally {
-  //     setRevoking(null)
-  //   }
-  // }
+ 
 
   // Ouvrir le modal d'activation
   const handleOpenEnableModal = () => {
@@ -148,7 +128,7 @@ export function SecuritySection() {
   }
 
   // Démarrer la configuration Email OTP
-  const handleStartEmailOTPSetup = async () => {
+const handleStartEmailOTPSetup = async () => {
     if (!password) {
       setErrorMessage(t('enter_password_continue'))
       return
@@ -169,11 +149,7 @@ export function SecuritySection() {
         return
       }
 
-      notifications.show({
-        title: t('code_sent'),
-        message: t('verification_code_sent_email'),
-        color: 'blue'
-      })
+      toast.success(t('verification_code_sent_email'))
       setSetupStep('email')
     } catch (err: any) {
       setErrorMessage(err.message || t('error_sending_otp'))
@@ -198,11 +174,7 @@ export function SecuritySection() {
         return
       }
 
-      notifications.show({
-        title: t('2fa_activated'),
-        message: t('google_auth_activated'),
-        color: 'green'
-      })
+      toast.success(t('google_auth_activated'))
       if (backupCodes.length > 0) {
         setSetupStep('backup')
       } else {
@@ -232,11 +204,7 @@ export function SecuritySection() {
         return
       }
 
-      notifications.show({
-        title: t('2fa_activated'),
-        message: t('email_2fa_activated'),
-        color: 'green'
-      })
+      toast.success(t('email_2fa_activated'))
       setIsModalOpen(false)
       refetch?.()
     } catch (err: any) {
@@ -262,11 +230,7 @@ export function SecuritySection() {
         return
       }
 
-      notifications.show({
-        title: t('2fa_disabled'),
-        message: t('two_factor_disabled'),
-        color: 'gray'
-      })
+      toast.success(t('two_factor_disabled'))
       setIsModalOpen(false)
       refetch?.()
     } catch (err: any) {
@@ -275,7 +239,6 @@ export function SecuritySection() {
       setActionLoading(false)
     }
   }
-
   const getDeviceIcon = (device: string) => {
     if (device.toLowerCase().includes('iphone') || device.toLowerCase().includes('android')) {
       return <IconDeviceMobile size={16} color="#868E96" />

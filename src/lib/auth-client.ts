@@ -59,6 +59,9 @@ export const authClient = createAuthClient({
         isSuperAdmin: { type: "boolean", required: false },
         twoFactorEnabled: { type: "boolean", required: false },
       },
+      session: {
+        activeOrganizationId: { type: "string", required: false },
+      },
     }),
   ] satisfies BetterAuthClientPlugin[],
 })

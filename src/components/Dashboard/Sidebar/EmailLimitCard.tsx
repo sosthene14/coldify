@@ -97,7 +97,13 @@ export function EmailLimitCard() {
         </Text>
       )}
 
-      {percent >= 90 && (
+      {percent >= 100 && (
+        <Text size="xs" c="red" ta="center" mt="xs">
+          {t('daily_limit_reached')}
+        </Text>
+      )}
+
+      {percent >= 90 && percent < 100 && (
         <Text size="xs" c="red" ta="center" mt="xs">
           {t('approaching_daily_limit')}
         </Text>

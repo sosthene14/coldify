@@ -37,9 +37,10 @@ export function Header({ user,  onLogout }: HeaderProps) {
     <>
       <Group
         h={54}
-        px={{ base: 'sm', sm: 'md', md: 'lg' }}
+        px={{ base: 'xs', sm: 'md', md: 'lg' }}
         justify="space-between"
         wrap="nowrap"
+        gap="xs"
         className='border border-gray-200'
       >
         {/* Left side - Logo + Nav (desktop) */}
@@ -49,7 +50,7 @@ export function Header({ user,  onLogout }: HeaderProps) {
         </Group>
 
         {/* Right side - Search + User Menu (desktop) + Burger (mobile) */}
-        <Group   wrap="nowrap">
+        <Group g wrap="nowrap">
           <SearchBar />
 
           <Menu shadow="md" width={160} position="bottom-end">

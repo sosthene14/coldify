@@ -1,6 +1,5 @@
 import axios from 'axios'
-import { notifications } from '@mantine/notifications'
-import { IconCheck, IconClock } from '@tabler/icons-react'
+import toast from 'react-hot-toast'
 import { authClient } from '#/lib/auth-client'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -60,12 +59,21 @@ export const emailService = {
     totalSent?: number
     error?: string
   }> {
-    const response = await axios.post(
-      `${API_URL}/mailboxes/send`,
-      params,
-      { withCredentials: true }
-    )
-    return response.data
+    try {
+      const response = await axios.post(
+        `${API_URL}/mailboxes/send`,
+        params,
+        { withCredentials: true }
+      )
+      return response.data
+    } catch (error: any) {
+      // Extract error message from backend response
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to send email'
+      return {
+        success: false,
+        error: errorMessage
+      }
+    }
   },
 
   /**
@@ -78,12 +86,21 @@ export const emailService = {
     scheduledId?: string
     error?: string
   }> {
-    const response = await axios.post(
-      `${API_URL}/mailboxes/schedule`,
-      params,
-      { withCredentials: true }
-    )
-    return response.data
+    try {
+      const response = await axios.post(
+        `${API_URL}/mailboxes/schedule`,
+        params,
+        { withCredentials: true }
+      )
+      return response.data
+    } catch (error: any) {
+      // Extract error message from backend response
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to schedule email'
+      return {
+        success: false,
+        error: errorMessage
+      }
+    }
   },
 
   /**
@@ -132,21 +149,12 @@ export class EmailSenderService {
       throw new Error(result.error || 'Failed to send email')
     }
 
-    if (result.totalSent && result.totalSent > 1) {
-      notifications.show({
-        title: 'Success',
-        message: `${result.totalSent} emails sent successfully (one to each recipient)`,
-        color: 'green',
-        icon: <IconCheck size={16} />,
-      })
-    } else {
-      notifications.show({
-        title: 'Success',
-        message: 'Email sent successfully',
-        color: 'green',
-        icon: <IconCheck size={16} />,
-      })
-    }
+    // Don't show toast here - let the caller handle success messages
+    // if (result.totalSent && result.totalSent > 1) {
+    //   toast.success(`${result.totalSent} emails sent successfully (one to each recipient)`)
+    // } else {
+    //   toast.success('Email sent successfully')
+    // }
   }
 
   static async scheduleEmail(emailParams: EmailParams, scheduledAt: Date) {
@@ -162,12 +170,7 @@ export class EmailSenderService {
       throw new Error(result.error || 'Failed to schedule email')
     }
 
-    notifications.show({
-      title: 'Scheduled!',
-      message: `Email scheduled for ${scheduledAt.toLocaleString()}`,
-      color: 'blue',
-      icon: <IconClock size={16} />,
-    })
+    toast.success(`Email scheduled for ${scheduledAt.toLocaleString()}`)
   }
 
   static async updateScheduledEmail(
@@ -191,11 +194,6 @@ export class EmailSenderService {
       throw new Error(result.data.error || 'Failed to update scheduled email')
     }
 
-    notifications.show({
-      title: 'Updated!',
-      message: `Scheduled email updated for ${scheduledAt.toLocaleString()}`,
-      color: 'green',
-      icon: <IconCheck size={16} />,
-    })
+    toast.success(`Scheduled email updated for ${scheduledAt.toLocaleString()}`)
   }
 }

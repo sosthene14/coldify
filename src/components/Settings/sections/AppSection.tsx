@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Card, Stack, Text, Button, Group, Badge, Divider } from '@mantine/core'
 import { IconDownload, IconRefresh, IconCheck, IconDeviceMobile } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 import { usePWA } from '../../../hooks/usePWA'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -33,7 +34,7 @@ export function AppSection() {
 
   const handleInstall = async () => {
     if (!deferredPrompt) {
-      alert(t('use_compatible_browser'))
+      toast.error(t('use_compatible_browser'))
       return
     }
 

@@ -190,16 +190,23 @@ export function SearchBar({ placeholder }: SearchBarProps) {
     <>
       {/* Desktop SearchBar - clickable to open modal */}
       <TextInput
-        placeholder={placeholder || t('search_templates_emails_contacts')}
+        placeholder={placeholder || t('search')}
         radius="sm"
         leftSection={<IconSearch size={16} />}
         rightSection={<Kbd size="xs">⌘K</Kbd>}
         rightSectionWidth={42}
-        w={280}
+        w={{ base: 140, sm: 200, md: 280 }}
         visibleFrom="sm"
         onClick={() => setOpened(true)}
         readOnly
         style={{ cursor: 'pointer' }}
+        styles={{
+          input: {
+            '@media (max-width: 768px)': {
+              fontSize: '13px',
+            }
+          }
+        }}
       />
 
       {/* Mobile SearchBar - button to open modal */}

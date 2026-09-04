@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { authClient, twoFactor, setTwoFactorRedirectCallback, set2FAInProgress, is2FAInProgress } from '#/lib/auth-client.ts'
+import toast from 'react-hot-toast'
 
 export type LoginFormValues = {
   email: string
@@ -70,14 +71,17 @@ export function useLogin() {
       })
 
       if (signInError) {
-        setError(signInError.message ?? t('incorrect_email_password'))
-        return
+        const errorMessage = signInError.message ?? t('incorrect_email_password')
+        setError(errorMessage)
+        throw new Error(errorMessage) // Lancer une exception
       }
 
       // Si on arrive ici sans 2FA redirect, login réussi
       // La redirection est gérée par __root.tsx useEffect
-    } catch (err) {
-      setError(t('unexpected_error'))
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : t('unexpected_error')
+      setError(errorMessage)
+      throw error // Relancer l'exception
     } finally {
       // Le loading sera mis à false par handle2FARedirect si 2FA requis
       if (!requires2FA) {
@@ -94,8 +98,9 @@ export function useLogin() {
     try {
       const res = await twoFactor.verifyTotp({ code })
       if (res.error) {
-        setError(res.error.message ?? t('invalid_code_retry'))
-        return
+        const errorMessage = res.error.message ?? t('invalid_code_retry')
+        setError(errorMessage)
+        throw new Error(errorMessage)
       }
       // Login réussi, la session est maintenant active
       // Marquer que 2FA est terminé
@@ -103,8 +108,10 @@ export function useLogin() {
       sessionStorage.removeItem('_2fa_methods')
       setRequires2FA(false)
       // La redirection est gérée par __root.tsx
-    } catch {
-      setError(t('totp_verification_failed'))
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : t('totp_verification_failed')
+      setError(errorMessage)
+      throw error
     } finally {
       setTwoFactorLoading(false)
     }
@@ -118,15 +125,18 @@ export function useLogin() {
     try {
       const res = await twoFactor.verifyOtp({ code })
       if (res.error) {
-        setError(res.error.message ?? t('invalid_email_code_retry'))
-        return
+        const errorMessage = res.error.message ?? t('invalid_email_code_retry')
+        setError(errorMessage)
+        throw new Error(errorMessage)
       }
       // Login réussi
       set2FAInProgress(false)
       sessionStorage.removeItem('_2fa_methods')
       setRequires2FA(false)
-    } catch {
-      setError(t('email_otp_verification_failed'))
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : t('email_otp_verification_failed')
+      setError(errorMessage)
+      throw error
     } finally {
       setTwoFactorLoading(false)
     }
@@ -141,13 +151,8 @@ export function useLogin() {
         setError(res.error.message ?? t('unable_send_code'))
         return
       }
-      // Succès - afficher une notification
-      const { notifications } = await import('@mantine/notifications')
-      notifications.show({
-        title: t('code_sent'),
-        message: t('new_verification_code_sent'),
-        color: 'green',
-      })
+   
+      toast.success(t('new_verification_code_sent'))
     } catch {
       setError(t('error_sending_code'))
     }

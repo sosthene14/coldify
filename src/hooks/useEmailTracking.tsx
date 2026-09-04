@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { notifications } from '@mantine/notifications';
-import { IconEye } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
+import { useSession } from '#/lib/auth-client';
 
 const WS_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace('http', 'ws');
 
@@ -26,6 +26,7 @@ const listeners = new Set<(data: EmailOpenedEvent) => void>();
 export function useEmailTracking(organizationId: string | undefined, onEmailOpened?: (data: EmailOpenedEvent) => void) {
   const { t } = useTranslation();
   const listenerRef = useRef(onEmailOpened);
+  
 
   // Keep listener ref up to date
   useEffect(() => {
@@ -33,6 +34,7 @@ export function useEmailTracking(organizationId: string | undefined, onEmailOpen
   }, [onEmailOpened]);
 
   useEffect(() => {
+    console.log(organizationId)
     if (!organizationId) return;
 
     connectionCount++;
@@ -55,32 +57,27 @@ export function useEmailTracking(organizationId: string | undefined, onEmailOpen
       globalWs = ws;
 
       ws.onopen = () => {
-        console.log('[WebSocket] Connected to server');
+        console.log('[WebSocket] ✅ Connected to server');
+        console.log('[WebSocket] Joining organization:', organizationId);
         
-        // Join organization room
+        // Join user room
         ws.send(JSON.stringify({
-          type: 'join:organization',
-          organizationId,
+          type: 'join:user',
+          userId: organizationId, // organizationId is actually userId here
         }));
       };
 
       ws.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
+          console.log('[WebSocket] Message received:', message);
           
           if (message.type === 'email:opened') {
             const data: EmailOpenedEvent = message.data;
             console.log('[WebSocket] Email opened:', data);
 
             // Show notification
-            notifications.show({
-              title: t('email_opened_title'),
-              message: t('email_opened_message', { recipient: data.recipient, count: data.totalOpens }),
-              color: 'blue',
-              icon: <IconEye size={16} />,
-              autoClose: 5000,
-            });
-
+            toast.success(t('email_opened_message', { recipient: data.recipient, count: data.totalOpens }))
             // Notify all listeners
             listeners.forEach(cb => cb(data));
           }

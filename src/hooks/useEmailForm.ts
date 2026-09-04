@@ -5,7 +5,7 @@ import { useTemplateStore } from '../stores/template.store'
 import type { EmailFormData } from '#/components/ComposeEmail/ComposeEmailPage'
 
 export const useEmailForm = () => {
-  const { mailboxes, fetchMailboxes } = useMailboxStore()
+  const { mailboxes, loading: mailboxLoading, fetchMailboxes } = useMailboxStore()
   const { templates, fetchTemplates } = useTemplateStore()
 
   const [formData, setFormData] = useState<EmailFormData>({
@@ -75,6 +75,7 @@ export const useEmailForm = () => {
     uiState,
     mailboxes,
     templates,
+    mailboxLoading,
     updateField,
     updateUiState,
     resetForm,

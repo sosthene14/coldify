@@ -19,6 +19,9 @@ const config = defineConfig({
     viteReact(),
     VitePWA({
       registerType: 'autoUpdate',
+      strategies: 'injectManifest', // Use our custom SW
+      srcDir: 'public',
+      filename: 'sw.js',
       includeAssets: ['favicon.ico', 'logo.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'So-mails - Email Marketing Platform',

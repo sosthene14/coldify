@@ -1,7 +1,7 @@
 import { Outlet, createRootRoute, useLocation, useNavigate } from '@tanstack/react-router'
 import {  Center, Loader, MantineProvider, createTheme } from '@mantine/core'
-import { Notifications } from '@mantine/notifications'
 import { ModalsProvider } from '@mantine/modals'
+import { useEmailTracking } from "#/hooks/useEmailTracking";
 
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
@@ -25,70 +25,20 @@ const theme = createTheme({
   primaryColor: 'brand',
 
   components: {
-    Text: {
-      styles: {
-        root: {
-          fontWeight: 500,
-        },
-      },
-    },
-
-    Input: {
-      styles: {
-        input: { fontWeight: 500 },
-      },
-    },
-
-    Alert: {
-      styles: {
-        message: { fontWeight: 500 },
-      },
-    },
-
     Checkbox: {
       styles: {
         label: { fontWeight: 400 },
       },
     },
 
-    Menu: {
-      styles: {
-        item: {
-          fontSize: '14px',
-          fontWeight: 500,
-        },
-      },
-    },
-
-    Select: {
-      styles: {
-        input: { fontWeight: 500 },
-        option: { fontWeight: 500 },
-      },
-    },
-
-    Tabs: {
-      styles: {
-        tab: {
-          fontWeight: 500,
-        },
-        tabLabel: {
-          fontWeight: 500,
-        },
-      },
-    },
-
     RichTextEditor: {
       styles: {
-        content: {
-          fontWeight: 300,
-        },
+        content: { fontWeight: 400 },
       },
     },
 
     Switch: {
       styles: {
-        label: { fontWeight: 500 },
         description: { fontWeight: 400 },
       },
     },
@@ -119,6 +69,9 @@ function RootComponent() {
   const isPublicRoute = PUBLIC_ROUTES.some(route => location.pathname.startsWith(route))
   const { i18n } = useTranslation();
 
+  const {data} = useSession()
+  
+
   // null = pas encore vérifié, true/false = résultat connu
   const [hasOrganization, setHasOrganization] = useState<boolean | null>(null)
   
@@ -138,6 +91,8 @@ function RootComponent() {
     return () => window.removeEventListener('2fa-status-changed', handleStatusChange)
   }, [])
 
+  useEmailTracking(data?.user?.id as string);
+
   // Vérifie si l'utilisateur a une organisation, dès qu'une session existe
   useEffect(() => {
     const checkOrganization = async () => {
@@ -154,6 +109,26 @@ function RootComponent() {
       checkOrganization()
     }
   }, [isPending, session])
+
+  // Assurer qu'une subscription par défaut existe (fallback)
+  useEffect(() => {
+    const ensureSubscription = async () => {
+      if (!session?.user || !hasOrganization) return
+
+      try {
+        await fetch(`${import.meta.env.VITE_API_URL}/subscriptions/ensure-default`, {
+          method: 'POST',
+          credentials: 'include',
+        })
+      } catch (error) {
+        console.error('[Root] Failed to ensure default subscription:', error)
+      }
+    }
+
+    if (hasOrganization === true) {
+      ensureSubscription()
+    }
+  }, [session, hasOrganization])
 
   useEffect(() => {
     if (isPending && !isPublicRoute) return // attendre que la session soit résolue pour les routes protégées
@@ -190,7 +165,6 @@ function RootComponent() {
     return (
       <MantineProvider theme={theme}>
         <ModalsProvider>
-          <Notifications position="top-right" />
           <Center h="100vh">
             <Loader size="sm" />
           </Center>
@@ -205,22 +179,21 @@ function RootComponent() {
 
       <MantineProvider theme={theme}>
      <Toaster
-  position="top-right"
+  position="top-center"
   toastOptions={{
     duration: 3000,
     style: {
       color: '#1f2937',
       border: '1px solid #e5e7eb',
-      borderRadius: '8px',
+      borderRadius: '6px',
      
-      fontSize: '14px',
-      fontWeight: 500,
+      fontSize: '13px',
+      fontWeight: 400,
     },
   }}
 />
         <ModalsProvider>
-          <Notifications position='top-right' />
-          {showHeader && (
+           {showHeader && (
             <Header
               user={{
                 name: `${session.user.firstName || ''} ${session.user.lastName || ''}`.trim() || session.user.email,

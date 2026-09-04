@@ -18,7 +18,6 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardMailsIndexRouteImport } from './routes/dashboard/mails/index'
-import { Route as DashboardMailsMailIdRouteImport } from './routes/dashboard/mails/$mailId'
 import { Route as DashboardMailsNewRouteImport } from './routes/dashboard/mails/new'
 import { Route as DashboardSettingsIndexRouteImport } from './routes/dashboard/settings/index'
 import { Route as DashboardTemplatesIndexRouteImport } from './routes/dashboard/templates/index'
@@ -72,11 +71,6 @@ const DashboardMailsIndexRoute = DashboardMailsIndexRouteImport.update({
   path: '/mails/',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardMailsMailIdRoute = DashboardMailsMailIdRouteImport.update({
-  id: '/mails/$mailId',
-  path: '/mails/$mailId',
-  getParentRoute: () => DashboardRoute,
-} as any)
 const DashboardMailsNewRoute = DashboardMailsNewRouteImport.update({
   id: '/mails/new',
   path: '/mails/new',
@@ -125,7 +119,6 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/dashboard/mails/$mailId': typeof DashboardMailsMailIdRoute
   '/dashboard/mails/new': typeof DashboardMailsNewRoute
   '/dashboard/templates/new': typeof DashboardTemplatesNewRoute
   '/dashboard/mails/': typeof DashboardMailsIndexRoute
@@ -143,7 +136,6 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
   '/dashboard': typeof DashboardIndexRoute
-  '/dashboard/mails/$mailId': typeof DashboardMailsMailIdRoute
   '/dashboard/mails/new': typeof DashboardMailsNewRoute
   '/dashboard/templates/new': typeof DashboardTemplatesNewRoute
   '/dashboard/mails': typeof DashboardMailsIndexRoute
@@ -163,7 +155,6 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/verify-email': typeof VerifyEmailRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/dashboard/mails/$mailId': typeof DashboardMailsMailIdRoute
   '/dashboard/mails/new': typeof DashboardMailsNewRoute
   '/dashboard/templates/new': typeof DashboardTemplatesNewRoute
   '/dashboard/mails/': typeof DashboardMailsIndexRoute
@@ -184,7 +175,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/verify-email'
     | '/dashboard/'
-    | '/dashboard/mails/$mailId'
     | '/dashboard/mails/new'
     | '/dashboard/templates/new'
     | '/dashboard/mails/'
@@ -202,7 +192,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/verify-email'
     | '/dashboard'
-    | '/dashboard/mails/$mailId'
     | '/dashboard/mails/new'
     | '/dashboard/templates/new'
     | '/dashboard/mails'
@@ -221,7 +210,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/verify-email'
     | '/dashboard/'
-    | '/dashboard/mails/$mailId'
     | '/dashboard/mails/new'
     | '/dashboard/templates/new'
     | '/dashboard/mails/'
@@ -307,13 +295,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardMailsIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/mails/$mailId': {
-      id: '/dashboard/mails/$mailId'
-      path: '/mails/$mailId'
-      fullPath: '/dashboard/mails/$mailId'
-      preLoaderRoute: typeof DashboardMailsMailIdRouteImport
-      parentRoute: typeof DashboardRoute
-    }
     '/dashboard/mails/new': {
       id: '/dashboard/mails/new'
       path: '/mails/new'
@@ -368,7 +349,6 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardMailsMailIdRoute: typeof DashboardMailsMailIdRoute
   DashboardMailsNewRoute: typeof DashboardMailsNewRoute
   DashboardTemplatesNewRoute: typeof DashboardTemplatesNewRoute
   DashboardMailsIndexRoute: typeof DashboardMailsIndexRoute
@@ -381,7 +361,6 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
-  DashboardMailsMailIdRoute: DashboardMailsMailIdRoute,
   DashboardMailsNewRoute: DashboardMailsNewRoute,
   DashboardTemplatesNewRoute: DashboardTemplatesNewRoute,
   DashboardMailsIndexRoute: DashboardMailsIndexRoute,

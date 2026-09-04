@@ -16,7 +16,7 @@ import { useMailboxStore } from '../../../stores/mailbox.store'
 import { useQuotaStore } from '../../../stores/quota.store'
 import type { Mailbox } from '../../../services/mailbox.service'
 import { modals } from '@mantine/modals'
-import { notifications } from '@mantine/notifications'
+import toast from 'react-hot-toast'
 
 type ProviderKey = 'gmail' | 'smtp'
 
@@ -87,7 +87,7 @@ export function MailboxesSection() {
       try {
         await connectGmail()
       } catch (error: any) {
-        notifications.show({ title: t('error_occurred'), message: error.message || t('failed_connect_gmail'), color: 'red' })
+        toast.error(error.message || t('failed_connect_gmail'))
       }
     }
   }
@@ -115,17 +115,9 @@ export function MailboxesSection() {
       onConfirm: async () => {
         try {
           await disconnect(id)
-          notifications.show({ 
-            title: t('success'), 
-            message: t('disconnect_success'), 
-            color: 'green' 
-          })
+          toast.success(t('success'))
         } catch (error: any) {
-          notifications.show({ 
-            title: t('error_occurred'), 
-            message: error.message || t('disconnect_failed'), 
-            color: 'red' 
-          })
+          toast.error(t('error_occurred'))
         }
       },
     })
@@ -134,13 +126,13 @@ export function MailboxesSection() {
   const handleTestConnection = async (id: string) => {
     try {
       const success = await testConnection(id)
-      notifications.show({
-        title: success ? t('success') : t('error_occurred'),
-        message: success ? t('connection_test_passed') : t('connection_test_failed'),
-        color: success ? 'green' : 'red',
-      })
+      if (success) {
+        toast.success(t('connection_test_passed'))
+      } else {
+        toast.error(t('connection_test_failed'))
+      }
     } catch (error: any) {
-      notifications.show({ title: t('error_occurred'), message: error.message || t('failed_test_connection'), color: 'red' })
+      toast.error(error.message || t('failed_test_connection'))
     }
   }
 
@@ -173,23 +165,15 @@ export function MailboxesSection() {
 
       const data = await response.json()
 
-      if (data.success) {
-        notifications.show({
-          title: t('test_email_sent'),
-          message: t('check_inbox_at', { email: testEmailAddress }),
-          color: 'green',
-        })
+     if (data.success) {
+        toast.success(t('check_inbox_at', { email: testEmailAddress }))
         setTestEmailModal(null)
         setTestEmailAddress('')
       } else {
         throw new Error(data.error || t('failed_send_test'))
       }
     } catch (error: any) {
-      notifications.show({
-        title: t('error_occurred'),
-        message: error.message || t('failed_send_test'),
-        color: 'red',
-      })
+      toast.error(error.message || t('failed_send_test'))
     } finally {
       setSendingTest(false)
     }
@@ -355,11 +339,7 @@ export function MailboxesSection() {
                               {t('send_test_email')}
                             </Menu.Item>
                             <Menu.Item leftSection={<IconEdit size={14} />} onClick={() => {
-                              notifications.show({
-                                title: t('edit_signature'),
-                                message: t('signature_soon'),
-                                color: 'blue',
-                              })
+                            toast(t('signature_soon'))
                             }}>
                               {t('edit_signature')}
                             </Menu.Item>

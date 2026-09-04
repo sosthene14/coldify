@@ -43,9 +43,10 @@ import { useEmailTracking } from "../../hooks/useEmailTracking";
 import { useSession } from '#/lib/auth-client';
 import DOMPurify from 'dompurify'
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast'
 
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const API_URL = import.meta.env.VITE_API_URL || 'http://172.18.191.18:3001'
 const ITEMS_PER_PAGE = 12
 
 interface EmailHistoryItem {
@@ -201,7 +202,6 @@ export function EmailHistoryPage() {
     const [emailContent, setEmailContent] = useState<string | null>(null)
   const { t } = useTranslation()
 
-  const {data} = useSession()
 
   // Use the custom hook for pagination and data fetching
   const { emails: filteredEmails, pagination, fetchEmails, refetchEmails } = useEmailHistory(searchQuery, statusFilter)
@@ -237,7 +237,6 @@ export function EmailHistoryPage() {
     refetchEmails()
   }, [ ]);
 
-  useEmailTracking(data?.session?.activeOrganizationId as string, handleEmailOpened);
 
   useEffect(() => {
     fetchEmails(1)
@@ -285,18 +284,10 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
       await refetchEmails()
       setModalOpened(false)
 
-      notifications.show({
-        title: t('cancelled_title'),
-        message: t('scheduled_email_cancelled'),
-        color: 'blue',
-      })
+      toast.success(t('cancelled_title'))
     } catch (error: any) {
       console.error('Failed to cancel scheduled email:', error)
-      notifications.show({
-        title: t('error_occurred'),
-        message: t('failed_cancel_scheduled'),
-        color: 'red',
-      })
+      toast.error(t('error_occurred'))
     }
   }
 
@@ -321,18 +312,10 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
       await refetchEmails()
       setModalOpened(false)
 
-      notifications.show({
-        title: t('deleted_title'),
-        message: t('email_deleted_success'),
-        color: 'green',
-      })
+      toast.success(t('deleted_title'))
     } catch (error: any) {
       console.error('Failed to delete email:', error)
-      notifications.show({
-        title: t('error_occurred'),
-        message: t('failed_delete_email'),
-        color: 'red',
-      })
+      toast.error(t('error_occurred'))
     }
   }
 

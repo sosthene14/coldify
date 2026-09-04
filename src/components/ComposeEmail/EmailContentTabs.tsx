@@ -1,9 +1,10 @@
 // components/EmailContentTabs.tsx
 import { Tabs } from '@mantine/core'
-import { IconTemplate, IconCode } from '@tabler/icons-react'
+import { IconTemplate, IconCode, IconSparkles } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { EmailEditor } from './EmailEditor'
 import { TemplateSelector } from './TemplateSelector'
+import { AIGenerateSection } from './AIGenerateSection'
 
 interface EmailContentTabsProps {
   mode: 'compose' | 'template'

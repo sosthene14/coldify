@@ -1,5 +1,6 @@
 import { Tabs } from '@mantine/core'
 import { IconEdit, IconCode, IconWand } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
  
 import { ManualEditor } from './ManualEditor'
 import { HtmlImport } from './HtmlImport'
@@ -33,6 +34,7 @@ interface CreationModeTabsProps {
 }
 
 export function CreationModeTabs(props: CreationModeTabsProps) {
+  const { t } = useTranslation()
   const {
     creationMode,
     setCreationMode,
@@ -59,9 +61,9 @@ export function CreationModeTabs(props: CreationModeTabsProps) {
   return (
     <Tabs value={creationMode} onChange={(v) => setCreationMode(v as CreationMode)}>
       <Tabs.List grow>
-        <Tabs.Tab value="manual" leftSection={<IconEdit className='hidden md:block' size={14} />}>Manual Editor</Tabs.Tab>
-        <Tabs.Tab value="html" leftSection={<IconCode className='hidden md:block' size={14} />}>Import HTML</Tabs.Tab>
-        <Tabs.Tab value="ai" leftSection={<IconWand className='hidden md:block' size={14} />}>Generate with AI</Tabs.Tab>
+        <Tabs.Tab value="manual" leftSection={<IconEdit className='hidden md:block' size={14} />}>{t('manual_editor')}</Tabs.Tab>
+        <Tabs.Tab value="html" leftSection={<IconCode className='hidden md:block' size={14} />}>{t('import_html')}</Tabs.Tab>
+        <Tabs.Tab value="ai" leftSection={<IconWand className='hidden md:block' size={14} />}>{t('generate_with_ai')}</Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel value="manual" pt="lg">

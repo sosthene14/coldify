@@ -7,7 +7,6 @@ import { authClient } from '#/lib/auth-client.ts'
 export type RegisterFormValues = {
   firstName: string
   lastName: string
-  organizationName: string
   email: string
   password: string
 }
@@ -35,16 +34,20 @@ export function useRegister() {
       })
 
       if (signUpError) {
-        setError(signUpError.message ?? t('account_creation_error'))
-        return
+        const errorMessage = signUpError.message ?? t('account_creation_error')
+        setError(errorMessage)
+        throw new Error(errorMessage)
       }
+      
       sessionStorage.setItem('pendingVerificationEmail', email)
       navigate({ 
         to: '/verify-email', 
         search: { email, error: false } 
       })
-    } catch {
-      setError(t('unexpected_error'))
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : t('unexpected_error')
+      setError(errorMessage)
+      throw error
     } finally {
       setLoading(false)
     }

@@ -2,6 +2,7 @@ import { Group, Button, Badge } from '@mantine/core'
 import { IconArrowLeft,IconChartArcs } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 import { templateService } from '#/services/template.service.ts'
 import { replaceBase64WithMinIO } from '#/lib/image-upload.ts'
 import { useState } from 'react'
@@ -46,15 +47,15 @@ export function TemplateHeader({
 
   const validateTemplate = () => {
     if (!templateName.trim()) {
-      alert(t('template_name_required'))
+      toast.error(t('template_name_required'))
       return false
     }
     if (!subjectLine.trim()) {
-      alert(t('subject_line_required'))
+      toast.error(t('subject_line_required'))
       return false
     }
     if (!activeContent.trim()) {
-      alert(t('email_body_required'))
+      toast.error(t('email_body_required'))
       return false
     }
     return true
@@ -99,12 +100,12 @@ export function TemplateHeader({
       if (isEditMode && templateId) {
         // Update existing template
         const result = await templateService.updateTemplate(templateId, payload)
-        alert(t('template_updated_success'))
+        toast.success(t('template_updated_success'))
         console.log('Template updated →', result)
       } else {
         // Create new template
         const result = await templateService.createTemplate(payload)
-        alert(t('template_published_success'))
+        toast.success(t('template_published_success'))
         console.log('Template published →', result)
       }
       
@@ -114,7 +115,7 @@ export function TemplateHeader({
       }, 1000)
     } catch (error) {
       console.error('Publish error:', error)
-      alert(t('failed_publish_template') + ': ' + (error instanceof Error ? error.message : t('unexpected_error')))
+      toast.error(t('failed_publish_template') + ': ' + (error instanceof Error ? error.message : t('unexpected_error')))
     } finally {
       setIsPublishing(false)
     }

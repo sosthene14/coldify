@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Stack, Text, Button, Group, Card, Grid, Badge, ActionIcon, Menu, TextInput, Select, Tabs, Divider } from '@mantine/core'
+import { Stack, Text, Button, Group, Card, Grid, Badge, ActionIcon, Menu, TextInput, Select, Tabs, Divider, Modal } from '@mantine/core'
 import { IconPlus, IconSearch, IconDots, IconEdit, IconCopy, IconTrash, IconStar, IconStarFilled, IconMail, IconClock, IconChartLine, IconMailOff, IconTemplate, IconEye } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
+import { useDisclosure } from '@mantine/hooks'
+import toast from 'react-hot-toast'
 import { TemplatesSkeleton } from '#/components/Templates/TemplatesSkeleton'
 import { useTemplateStore } from '#/stores/template.store.ts';
 import { useEffect, useState, useMemo } from 'react'
@@ -22,6 +24,8 @@ function TemplatesPage() {
   const navigate = useNavigate()
   const { templates, isLoading, fetchTemplates, starTemplate, unstarTemplate, deleteTemplate, duplicateTemplate } = useTemplateStore()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] = useDisclosure(false)
+  const [templateToDelete, setTemplateToDelete] = useState<string | null>(null)
   
   // Filters state
   const [activeTab, setActiveTab] = useState<TabValue>('all')
@@ -122,23 +126,31 @@ function TemplatesPage() {
     e.stopPropagation()
     try {
       await duplicateTemplate(id)
-      alert(t('template_duplicated'))
+      toast.success(t('template_duplicated'))
     } catch (error) {
-      alert(t('failed_duplicate_template'))
+      toast.error(t('failed_duplicate_template'))
     }
   }
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation()
-    if (!confirm(t('delete_template_confirm'))) return
+    setTemplateToDelete(id)
+    openDeleteModal()
+  }
 
-    setDeletingId(id)
+  const confirmDelete = async () => {
+    if (!templateToDelete) return
+
+    setDeletingId(templateToDelete)
     try {
-      await deleteTemplate(id)
+      await deleteTemplate(templateToDelete)
+      toast.success(t('template_deleted'))
+      closeDeleteModal()
     } catch (error) {
-      alert(t('failed_delete_template'))
+      toast.error(t('failed_delete_template'))
     } finally {
       setDeletingId(null)
+      setTemplateToDelete(null)
     }
   }
 
@@ -430,6 +442,30 @@ function TemplatesPage() {
           </Grid>
         )}
       </Stack>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        opened={deleteModalOpened}
+        onClose={closeDeleteModal}
+        title={t('delete_template')}
+        centered
+      >
+        <Stack gap="md">
+          <Text size="sm">{t('delete_template_confirm')}</Text>
+          <Group justify="flex-end" gap="xs">
+            <Button variant="subtle" onClick={closeDeleteModal}>
+              {t('cancel')}
+            </Button>
+            <Button
+              color="red"
+              onClick={confirmDelete}
+              loading={deletingId !== null}
+            >
+              {t('delete')}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </div>
   )
 }

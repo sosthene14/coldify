@@ -1,11 +1,10 @@
 // hooks/useAttachmentManager.ts
 import { useState } from 'react'
-import { notifications } from '@mantine/notifications'
+import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { emailService } from '../services/email.service'
 import { useEmailValidation } from './useEmailValidation'
 import type { Attachment } from '#/components/ComposeEmail/ComposeEmailPage.tsx';
-import { IconCheck } from '@tabler/icons-react';
 
 export const useAttachmentManager = () => {
   const { t } = useTranslation()
@@ -27,11 +26,7 @@ export const useAttachmentManager = () => {
     const validationErrors = validateAttachments([...attachments, ...newAttachments])
     
     if (validationErrors.length > 0) {
-      notifications.show({
-        title: t('some_files_not_added'),
-        message: validationErrors.join('\n'),
-        color: 'red',
-      })
+      toast.error(validationErrors.join('\n'))
       return
     }
 
@@ -51,13 +46,7 @@ export const useAttachmentManager = () => {
     const uploadedAttachments = []
 
     for (const attachment of attachments) {
-      notifications.show({
-        id: `upload-${attachment.name}`,
-        title: t('uploading'),
-        message: t('uploading_file', { name: attachment.name }),
-        loading: true,
-        autoClose: false,
-      })
+      const toastId = toast.loading(t('uploading_file', { name: attachment.name }))
 
       try {
         const base64Content = await emailService.fileToBase64(attachment.file)
@@ -74,23 +63,12 @@ export const useAttachmentManager = () => {
           size: attachment.size,
         })
 
-        notifications.update({
-          id: `upload-${attachment.name}`,
-          title: t('success'),
-          message: t('file_uploaded', { name: attachment.name }),
-          color: 'green',
-          icon: <IconCheck size={16} />,
-          autoClose: 2000,
-          loading: false,
+        toast.success(t('file_uploaded', { name: attachment.name }), {
+          id: toastId,
         })
       } catch (error: any) {
-        notifications.update({
-          id: `upload-${attachment.name}`,
-          title: t('upload_failed'),
-          message: t('failed_upload_file', { name: attachment.name, error: error.message }),
-          color: 'red',
-          autoClose: 5000,
-          loading: false,
+        toast.error(t('failed_upload_file', { name: attachment.name, error: error.message }), {
+          id: toastId,
         })
         throw new Error(t('failed_upload_file_throw', { name: attachment.name }))
       }

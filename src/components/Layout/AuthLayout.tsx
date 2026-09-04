@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Stack, Text } from '@mantine/core'
 import { useTranslation } from 'react-i18next'
+import { LanguageSwitcher } from './LanguageSwitcher'
 
 type AuthLayoutProps = {
   title: string
@@ -12,7 +13,7 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
   const { t } = useTranslation()
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen max-h-screen bg-white overflow-hidden">
       {/* Image gauche */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-gray-100">
         <img
@@ -32,18 +33,23 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
       </div>
 
       {/* Formulaire droite */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md">
+      <div className="flex w-full lg:w-1/2 items-center justify-center px-6 py-12 relative overflow-y-auto">
+        {/* Language Switcher - Top Right */}
+        <div className="absolute top-6 right-6 z-10">
+          <LanguageSwitcher />
+        </div>
+
+        <div className="w-full max-w-md my-auto">
           {/* Logo */}
           <div className="flex justify-center mb-8">
             <img 
               src="/logo.png" 
               alt="So-mails" 
-              className="h-18 w-auto"
+              className="h-12 w-auto"
             />
           </div>
 
-          <Stack gap={4} mb="xl">
+          <Stack gap={4} mb="lg">
             <Text size="xl" fw={600} c="dark.7">
               {title}
             </Text>

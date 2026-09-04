@@ -10,14 +10,14 @@ import {
   PasswordInput,
   Loader,
 } from '@mantine/core'
-import { notifications } from '@mantine/notifications'
 import { useTranslation } from 'react-i18next'
 import { SectionHeader } from '../components/SectionHeader'
 import { useSession, updateUser } from '#/lib/auth-client'
 import { api } from '#/lib/api'
+import toast from 'react-hot-toast'
 
 export function ProfileSection() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { data } = useSession()
   
   // États pour les données du profil
@@ -25,7 +25,7 @@ export function ProfileSection() {
     firstName: '',
     lastName: '',
     timezone: 'UTC',
-    language: 'English'
+    language: 'en'
   })
   const [isLoadingProfile, setIsLoadingProfile] = useState(false)
   const [isLoadingPassword, setIsLoadingPassword] = useState(false)
@@ -47,10 +47,10 @@ export function ProfileSection() {
         firstName: data.user.firstName || data.user.name?.split(' ')[0] || '',
         lastName: data.user.lastName || data.user.name?.split(' ')[1] || '',
         timezone: data.user.timezone || detectedTimezone || 'UTC',
-        language: data.user.language || 'English'
+        language: data.user.language || i18n.language || 'en'
       })
     }
-  }, [data?.user])
+  }, [data?.user, i18n.language])
 
   // Générer la liste des timezones avec des infos utiles (Memoized pour performance)
 const timezoneOptions = useMemo(() => {
@@ -122,13 +122,7 @@ const timezoneOptions = useMemo(() => {
   const handleSaveProfile = async () => {
     setIsLoadingProfile(true)
     try {
-      console.log('Sending profile update request:', {
-        firstName: profileData.firstName,
-        lastName: profileData.lastName,
-        timezone: profileData.timezone,
-        language: profileData.language,
-      })
-
+      
       const fullName = `${profileData.firstName} ${profileData.lastName}`.trim()
 
       // Utilisation d'updateUser de Better Auth pour mettre à jour la BDD ET rafraîchir le cookieCache / la session
@@ -154,19 +148,12 @@ const timezoneOptions = useMemo(() => {
         // Optionnel : ingnorer les erreurs si /api/auth/update-user a déjà mis à jour
       })
 
-      notifications.show({
-        title: t('profile_updated'),
-        message: t('profile_saved_success'),
-        color: 'green'
-      })
+     
+      toast.success(t('profile_saved_success'))
     } catch (error: any) {
       console.error('Erreur lors de la mise à jour du profil:', error)
       const errorMessage = error.response?.data?.error || error.message || t('unable_update_profile')
-      notifications.show({
-        title: t('error_occurred'),
-        message: errorMessage,
-        color: 'red'
-      })
+      toast.error(errorMessage)
     } finally {
       setIsLoadingProfile(false)
     }
@@ -175,26 +162,18 @@ const timezoneOptions = useMemo(() => {
   // Handler pour changer le mot de passe
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      notifications.show({
-        title: t('error_occurred'),
-        message: t('password_mismatch'),
-        color: 'red'
-      })
+      toast.error(t('password_mismatch'))
       return
     }
 
     if (passwordData.newPassword.length < 8) {
-      notifications.show({
-        title: t('error_occurred'),
-        message: t('password_min_length'),
-        color: 'red'
-      })
+      toast.error(t('password_min_length'))
       return
     }
 
     setIsLoadingPassword(true)
     try {
-      await api.post('/api/auth/change-password', {
+      await api.post('/auth/change-password', {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       })
@@ -205,19 +184,11 @@ const timezoneOptions = useMemo(() => {
         confirmPassword: ''
       })
       
-      notifications.show({
-        title: t('password_changed'),
-        message: t('password_changed_success'),
-        color: 'green'
-      })
+      toast.success(t('password_changed_success'))
     } catch (error: any) {
       console.error('Erreur lors du changement de mot de passe:', error)
       const errorMessage = error.response?.data?.message || error.message || t('unable_change_password')
-      notifications.show({
-        title: t('error_occurred'),
-        message: errorMessage,
-        color: 'red'
-      })
+      toast.error(errorMessage)
     } finally {
       setIsLoadingPassword(false)
     }
@@ -293,15 +264,18 @@ const timezoneOptions = useMemo(() => {
               <Select 
                 label={t('interface_language')} 
                 value={profileData.language}
-                onChange={(value) => setProfileData(prev => ({
-                  ...prev,
-                  language: value || 'English'
-                }))}
+                onChange={(value) => {
+                  const newLang = value || 'en'
+                  setProfileData(prev => ({
+                    ...prev,
+                    language: newLang
+                  }))
+                  // Changer la langue immédiatement dans l'interface
+                  i18n.changeLanguage(newLang)
+                }}
                 data={[
-                  { value: 'English', label: '🇺🇸 English' },
-                  { value: 'Français', label: '🇫🇷 Français' },
-                  { value: 'Español', label: '🇪🇸 Español' },
-                  { value: 'Deutsch', label: '🇩🇪 Deutsch' },
+                  { value: 'en', label: '🇺🇸 English' },
+                  { value: 'fr', label: '🇫🇷 Français' },
                 ]} 
               />
             </Group>

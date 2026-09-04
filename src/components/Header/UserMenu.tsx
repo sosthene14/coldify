@@ -22,7 +22,8 @@ export function UserMenu({ name, role, avatarUrl, onLogout }: UserMenuProps) {
             <Avatar src={avatarUrl} radius="xl" size={28} color="blue">
               {name.charAt(0)}
             </Avatar>
-            <div style={{ lineHeight: 1.1 }}>
+            {/* Hide user info on very small screens */}
+            <div style={{ lineHeight: 1.1 }} className="hidden sm:block">
               <Text size="xs" fw={600}>
                 {name}
               </Text>
@@ -30,7 +31,11 @@ export function UserMenu({ name, role, avatarUrl, onLogout }: UserMenuProps) {
                 {role}
               </Text>
             </div>
-            <IconChevronDown size={14} color="var(--mantine-color-gray-6)" />
+            <IconChevronDown 
+              size={14} 
+              color="var(--mantine-color-gray-6)" 
+              className="hidden sm:block"
+            />
           </Group>
         </UnstyledButton>
       </Menu.Target>

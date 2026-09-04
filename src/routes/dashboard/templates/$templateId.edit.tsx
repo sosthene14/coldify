@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 import { TemplateCreatePage } from '#/components/Templates/index.tsx'
 import { templateService } from '#/services/template.service.ts'
 import { useEffect, useState } from 'react'
@@ -23,7 +24,7 @@ function EditTemplatePage() {
         setTemplate(data)
       } catch (error) {
         console.error('Failed to load template:', error)
-        alert(t('failed_load_template'))
+        toast.error(t('failed_load_template'))
         navigate({ to: '/dashboard/templates' })
       } finally {
         setIsLoading(false)

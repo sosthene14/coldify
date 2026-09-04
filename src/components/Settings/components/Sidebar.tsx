@@ -58,6 +58,7 @@ export function Sidebar({ active, onSectionChange }: SidebarProps) {
                   size="sm"
                   fw={isActive ? 600 : 400}
                   c={isActive ? 'dark.9' : 'dark.7'}
+                  style={{ whiteSpace: 'nowrap' }}
                 >
                   {t(item.label)}
                 </Text>

@@ -42,7 +42,7 @@ export function ManualEditor({ subjectLine, setSubjectLine, emailBody, setEmailB
     Color,
     TextAlign.configure({ types: ['heading', 'paragraph'] }),
     ResizableImage, // remplace Image
-    Placeholder.configure({ placeholder: 'Hi {{firstName}}, I noticed {{companyName}} is...' }),
+    Placeholder.configure({ placeholder: t('email_body_placeholder') }),
   ],
   content: emailBody,
   onUpdate: ({ editor }) => setEmailBody(editor.getHTML()),
@@ -64,13 +64,12 @@ export function ManualEditor({ subjectLine, setSubjectLine, emailBody, setEmailB
     setTagMenuOpen(false)
   }
 
-  const wordCount = editor?.getText().trim().split(/\s+/).filter(Boolean).length ?? 0
-
+ 
   return (
     <Stack gap="sm">
       <TextInput
         label={t('subject_line')}
-        placeholder="Il me faut un taff"
+        placeholder={t('subject_line_placeholder')}
         value={subjectLine}
         onChange={(e) => setSubjectLine(e.currentTarget.value)}
       />
@@ -170,8 +169,7 @@ export function ManualEditor({ subjectLine, setSubjectLine, emailBody, setEmailB
         <RichTextEditor.Content />
       </RichTextEditor>
 
-      <Text size="xs" c="dimmed">{t('words_spam_score', { count: wordCount })}</Text>
-
+ 
       <ImageInsertModal
   opened={imageModalOpen}
   onClose={() => setImageModalOpen(false)}

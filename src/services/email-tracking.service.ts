@@ -21,7 +21,7 @@ export const emailTrackingService = {
    * Get open statistics for an email
    */
   async getOpenStats(emailHistoryId: string): Promise<OpenStats> {
-    const response = await axios.get(`${API_URL}/api/track/stats/${emailHistoryId}`, {
+    const response = await axios.get(`${API_URL}/track/stats/${emailHistoryId}`, {
       withCredentials: true,
     });
     return response.data;
@@ -31,7 +31,7 @@ export const emailTrackingService = {
    * Get detailed open events for an email
    */
   async getOpenDetails(emailHistoryId: string): Promise<OpenDetail[]> {
-    const response = await axios.get(`${API_URL}/api/track/details/${emailHistoryId}`, {
+    const response = await axios.get(`${API_URL}/track/details/${emailHistoryId}`, {
       withCredentials: true,
     });
     return response.data;

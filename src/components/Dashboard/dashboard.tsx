@@ -5,6 +5,7 @@ import { PageHeader } from "../PageHeader";
 import { EmailActivityOverview } from "./email-activity-overview";
 import { RecentCampaigns } from "./recent-campaigns";
 import { Sidebar } from "./Sidebar";
+import { useEmailTracking } from "#/hooks/useEmailTracking";
 import { subDays, startOfDay, endOfDay } from 'date-fns'
 import axios from 'axios'
 import { Grid, Container, Card, Stack, Group, Text, Progress, Badge, Button } from '@mantine/core'
@@ -39,11 +40,18 @@ function useEmailLimitData(): EmailLimitData & { loading: boolean } {
   useEffect(() => {
     const fetchEmailLimits = async () => {
       try {
-        const response = await axios.get(`${API_URL}/mailboxes`, {
+        // Récupérer le quota de l'organisation (vraie limite)
+        const quotaResponse = await axios.get(`${API_URL}/quota`, {
+          withCredentials: true
+        })
+        
+        // Récupérer les mailboxes pour les stats individuelles
+        const mailboxResponse = await axios.get(`${API_URL}/mailboxes`, {
           withCredentials: true
         })
 
-        const mailboxes = response.data || []
+        const quota = quotaResponse.data || {}
+        const mailboxes = mailboxResponse.data || []
         
         const mailboxData: MailboxData[] = mailboxes
           .filter((mb: any) => mb.status === 'connected')
@@ -55,12 +63,9 @@ function useEmailLimitData(): EmailLimitData & { loading: boolean } {
             status: mb.status
           }))
 
-        const totalSent = mailboxData.reduce((sum, mb) => sum + mb.dailySent, 0)
-        const totalLimit = mailboxData.reduce((sum, mb) => sum + mb.dailyLimit, 0)
-
         setData({
-          totalSent,
-          totalLimit,
+          totalSent: quota.dailyUsed || 0, // Utiliser dailyUsed comme la card qui fonctionne
+          totalLimit: quota.dailyLimit || 5, // Limite de l'organisation
           mailboxes: mailboxData
         })
       } catch (error) {
@@ -68,7 +73,7 @@ function useEmailLimitData(): EmailLimitData & { loading: boolean } {
         // Fallback data en cas d'erreur
         setData({
           totalSent: 0,
-          totalLimit: 100, // Limite par défaut
+          totalLimit: 5, // Limite par défaut pour free
           mailboxes: []
         })
       } finally {
@@ -102,6 +107,8 @@ export const Dashboard = () => {
   const {data: session} = useSession()
   const { totalSent, totalLimit, mailboxes } = useEmailLimitData()
   const navigate = useNavigate()
+  
+   
   
   // State pour la plage de dates
   const [dateRange, setDateRange] = useState<{startDate: Date, endDate: Date}>({

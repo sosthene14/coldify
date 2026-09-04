@@ -4,10 +4,10 @@ import { useEmailValidation } from "#/hooks/useEmailValidation"
 import { useScheduledEmailLoader } from "#/hooks/useScheduledEmailLoader"
 import { EmailSenderService } from "#/services/email.service"
 import { Alert, Anchor, Paper, Stack, TextInput } from "@mantine/core"
-import { notifications } from "@mantine/notifications"
 import { IconAlertCircle } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router"
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 import { EmailActions } from "./EmailActions";
 import { ScheduleSection } from "./ScheduleSection";
 import { AttachmentsSection } from "./AttachmentsSection";
@@ -64,6 +64,7 @@ export function ComposeEmailPage() {
     formData, 
     uiState, 
     mailboxes, 
+    mailboxLoading,
     updateField, 
     updateUiState,
     resetForm,
@@ -97,11 +98,7 @@ export function ComposeEmailPage() {
 
     const error = validateForm(validationPayload)
     if (error) {
-      notifications.show({
-        title: t('validation_error'),
-        message: error,
-        color: 'red',
-      })
+      toast.error(error)
       return
     }
 
@@ -135,18 +132,18 @@ export function ComposeEmailPage() {
         } else {
           await EmailSenderService.scheduleEmail(emailParams, scheduledDate)
         }
+        
+        toast.success(t('email_scheduled_success'))
       } else {
         await EmailSenderService.sendEmail(emailParams)
+        
+        toast.success(t('email_sent_success'))
       }
 
       resetForm()
       navigate({ to: '/dashboard/mails' })
     } catch (error: any) {
-      notifications.show({
-        title: t('error_occurred'),
-        message: error.message || t('failed_send_test'),
-        color: 'red',
-      })
+      toast.error(error.message || t('failed_send_test'))
     } finally {
       updateUiState({ sending: false })
     }
@@ -168,7 +165,7 @@ export function ComposeEmailPage() {
       <Stack gap="md">
         <EmailHeader editingId={uiState.editingScheduledId} />
 
-        {connectedMailboxes.length === 0 && (
+        {!mailboxLoading && connectedMailboxes.length === 0 && (
           <Alert icon={<IconAlertCircle size={16} />} color="yellow">
             {t('no_connected_mailboxes')}{' '}
             <Anchor 

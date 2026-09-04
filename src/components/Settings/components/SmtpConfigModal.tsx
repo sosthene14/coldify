@@ -13,7 +13,7 @@ import {
   Text,
 } from '@mantine/core'
 import { IconInfoCircle } from '@tabler/icons-react'
-import { notifications } from '@mantine/notifications'
+import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { useMailboxStore } from '../../../stores/mailbox.store'
 import type { Mailbox } from '../../../services/mailbox.service'
@@ -69,21 +69,13 @@ export function SmtpConfigModal({ opened, onClose, editingMailbox }: SmtpConfigM
     if (editingMailbox) {
       // When editing, only password is optional
       if (!config.host || !config.username) {
-        notifications.show({
-          title: t('validation_error'),
-          message: t('fill_required_fields'),
-          color: 'red',
-        })
+        toast.error(t('fill_required_fields'))
         return
       }
     } else {
       // When creating, all fields are required
       if (!config.email || !config.host || !config.username || !config.password) {
-        notifications.show({
-          title: t('validation_error'),
-          message: t('fill_required_fields'),
-          color: 'red',
-        })
+        toast.error(t('fill_required_fields'))
         return
       }
     }
@@ -107,11 +99,7 @@ export function SmtpConfigModal({ opened, onClose, editingMailbox }: SmtpConfigM
 
         await updateSmtp(editingMailbox.id, updateData)
 
-        notifications.show({
-          title: t('success'),
-          message: t('smtp_updated'),
-          color: 'green',
-        })
+        toast.success(t('smtp_updated'))
       } else {
         // Create new mailbox
         await connectSmtp({
@@ -124,20 +112,12 @@ export function SmtpConfigModal({ opened, onClose, editingMailbox }: SmtpConfigM
           smtpSecure: config.secure,
         })
 
-        notifications.show({
-          title: t('success'),
-          message: t('smtp_connected'),
-          color: 'green',
-        })
+        toast.success(t('smtp_connected'))
       }
 
       onClose()
     } catch (error: any) {
-      notifications.show({
-        title: t('error_occurred'),
-        message: error.message || t('failed_send_test'),
-        color: 'red',
-      })
+      toast.error(error.message || t('failed_send_test'))
     } finally {
       setLoading(false)
     }

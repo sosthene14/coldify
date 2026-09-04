@@ -10,6 +10,8 @@ import {
   Loader,
   Alert,
   Table,
+  Modal,
+  Radio,
 } from '@mantine/core'
 import {
   IconCheck,
@@ -18,6 +20,7 @@ import {
   IconInfoCircle,
 } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 import { useSubscriptionStore } from '../../../stores/subscription.store'
 import { subscriptionService } from '../../../services/subscription.service'
 import { SectionHeader } from '../components/SectionHeader'
@@ -47,6 +50,8 @@ export function SubscriptionSection() {
   const [upgrading, setUpgrading] = useState<string | null>(null)
   const [paddleReady, setPaddleReady] = useState(false)
   const [paddleConfig, setPaddleConfig] = useState<any>(null)
+  const [planModalOpen, setPlanModalOpen] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
 
   useEffect(() => {
     fetchStats()
@@ -81,7 +86,7 @@ export function SubscriptionSection() {
 
   const handleUpgrade = async (planId: string) => {
     if (!paddleReady || !window.Paddle || !paddleConfig) {
-      alert(t('upgrade_failed'))
+      toast.error(t('upgrade_failed'))
       return
     }
 
@@ -92,7 +97,7 @@ export function SubscriptionSection() {
       console.log('Upgrading to plan:', planId, 'with priceId:', plan?.priceId)
       
       if (!plan || !plan.priceId) {
-        alert(t('upgrade_failed'))
+        toast.error(t('upgrade_failed'))
         return
       }
 
@@ -103,9 +108,23 @@ export function SubscriptionSection() {
       })
     } catch (err) {
       console.error('Failed to open Paddle checkout:', err)
-      alert(t('upgrade_failed'))
+      toast.error(t('upgrade_failed'))
     } finally {
       setUpgrading(null)
+    }
+  }
+
+  const openPlanModal = () => {
+    // Pré-sélectionner le plan suivant par défaut
+    const defaultPlan = stats?.plan.id === 'free' ? 'pro' : 'unlimited'
+    setSelectedPlan(defaultPlan)
+    setPlanModalOpen(true)
+  }
+
+  const confirmUpgrade = () => {
+    if (selectedPlan) {
+      setPlanModalOpen(false)
+      handleUpgrade(selectedPlan)
     }
   }
 
@@ -128,7 +147,7 @@ export function SubscriptionSection() {
     return (
       <Card withBorder radius="md" p="lg" bg="white">
         <Alert color="red" icon={<IconInfoCircle />}>
-          {error || 'Unable to load subscription data. Please make sure the backend is running and migrations are applied.'}
+          {error || 'Unable to load subscription data.'}
         </Alert>
       </Card>
     )
@@ -188,10 +207,7 @@ export function SubscriptionSection() {
               color="blue" 
               radius="sm"
               loading={upgrading !== null}
-              onClick={() => {
-                const nextPlan = stats.plan.id === 'free' ? 'pro' : 'unlimited'
-                handleUpgrade(nextPlan)
-              }}
+              onClick={openPlanModal}
             >
               {t('upgrade_plan')}
             </Button>
@@ -352,6 +368,77 @@ export function SubscriptionSection() {
           </Stack>
         </Card>
       )}
+
+      {/* Plan Selection Modal */}
+      <Modal
+        opened={planModalOpen}
+        onClose={() => setPlanModalOpen(false)}
+        title={t('choose_plan')}
+        size="lg"
+        centered
+      >
+        <Stack gap="md">
+          <Text size="sm" c="dimmed">
+            {t('select_plan_to_upgrade')}
+          </Text>
+
+          <Radio.Group value={selectedPlan} onChange={setSelectedPlan}>
+            <Stack gap="sm">
+              {plans
+                .filter((plan) => plan.id !== stats.plan.id && plan.id !== 'free')
+                .map((plan) => (
+                  <Card
+                    key={plan.id}
+                    withBorder
+                    p="md"
+                    radius="sm"
+                    style={{
+                      cursor: 'pointer',
+                      borderColor: selectedPlan === plan.id ? '#4C6EF5' : undefined,
+                      borderWidth: selectedPlan === plan.id ? 2 : 1,
+                    }}
+                    onClick={() => setSelectedPlan(plan.id)}
+                  >
+                    <Group justify="space-between" wrap="nowrap">
+                      <Radio value={plan.id} label="" styles={{ root: { marginRight: 8 } }} />
+                      <div style={{ flex: 1 }}>
+                        <Group gap="xs" mb={4}>
+                          <Text size="md" fw={600}>{plan.name}</Text>
+                          <Text size="lg" fw={700} c="blue">
+                            {formatPrice(plan.priceCents)}
+                            <Text span size="sm" c="dimmed" fw={400}>
+                              {t('per_month')}
+                            </Text>
+                          </Text>
+                        </Group>
+                        <Text size="xs" c="dimmed">
+                          {plan.emailsPerDay ?? t('unlimited')} emails/day · {' '}
+                          {plan.maxConnectedProviders ?? t('unlimited')} providers · {' '}
+                          {plan.historyDays ?? t('unlimited')} {t('days_history')}
+                          {plan.hasPrioritySupport && ` · ${t('priority_support')}`}
+                          {plan.hasIntegrationApi && ` · ${t('integration_api')}`}
+                        </Text>
+                      </div>
+                    </Group>
+                  </Card>
+                ))}
+            </Stack>
+          </Radio.Group>
+
+          <Group justify="flex-end" mt="md">
+            <Button variant="subtle" onClick={() => setPlanModalOpen(false)}>
+              {t('cancel')}
+            </Button>
+            <Button
+              onClick={confirmUpgrade}
+              disabled={!selectedPlan}
+              loading={upgrading !== null}
+            >
+              {t('continue_to_payment')}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Stack>
   )
 }

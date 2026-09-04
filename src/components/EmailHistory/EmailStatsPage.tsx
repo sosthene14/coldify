@@ -85,7 +85,7 @@ export function EmailStatsPage() {
         withCredentials: true,
       })
 
-      const opensResponse = await axios.get(`${API_URL}/api/track/details/${emailId}`, {
+      const opensResponse = await axios.get(`${API_URL}/track/details/${emailId}`, {
         withCredentials: true,
       })
 
