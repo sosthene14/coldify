@@ -102,8 +102,7 @@ export async function replaceBase64WithMinIO(html: string): Promise<string> {
     return html // Pas d'images, retourner tel quel
   }
 
-  console.log(`🖼️  Found ${images.length} Base64 image(s), uploading to MinIO...`)
-
+ 
   let transformedHtml = html
 
   // Upload chaque image et remplacer dans le HTML
@@ -122,15 +121,13 @@ export async function replaceBase64WithMinIO(html: string): Promise<string> {
       
       transformedHtml = transformedHtml.replace(fullMatch, newImgTag)
       
-      console.log(`✅ Image ${i + 1}/${images.length} uploaded: ${objectKey}`)
-    } catch (error) {
+     } catch (error) {
       console.error(`❌ Failed to upload image ${i + 1}:`, error)
       throw new Error(`Failed to upload image ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
-  console.log(`✅ All ${images.length} image(s) uploaded successfully`)
-  
+   
   return transformedHtml
 }
 

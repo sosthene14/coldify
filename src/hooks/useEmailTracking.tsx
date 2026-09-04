@@ -34,12 +34,10 @@ export function useEmailTracking(organizationId: string | undefined, onEmailOpen
   }, [onEmailOpened]);
 
   useEffect(() => {
-    console.log(organizationId)
-    if (!organizationId) return;
+     if (!organizationId) return;
 
     connectionCount++;
-    console.log(`[WebSocket] Hook mounted (${connectionCount} instances)`);
-
+ 
     // Add listener
     const listener = (data: EmailOpenedEvent) => {
       if (listenerRef.current) {
@@ -50,15 +48,13 @@ export function useEmailTracking(organizationId: string | undefined, onEmailOpen
 
     // Create or reuse connection
     if (!globalWs || globalWs.readyState === WebSocket.CLOSED || globalWs.readyState === WebSocket.CLOSING) {
-      console.log('[WebSocket] Creating new connection');
-      globalOrgId = organizationId;
+       globalOrgId = organizationId;
       
       const ws = new WebSocket(`${WS_URL}/ws`);
       globalWs = ws;
 
       ws.onopen = () => {
-        console.log('[WebSocket] ✅ Connected to server');
-        console.log('[WebSocket] Joining organization:', organizationId);
+     
         
         // Join user room
         ws.send(JSON.stringify({
@@ -70,12 +66,10 @@ export function useEmailTracking(organizationId: string | undefined, onEmailOpen
       ws.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
-          console.log('[WebSocket] Message received:', message);
-          
+           
           if (message.type === 'email:opened') {
             const data: EmailOpenedEvent = message.data;
-            console.log('[WebSocket] Email opened:', data);
-
+ 
             // Show notification
             toast.success(t('email_opened_message', { recipient: data.recipient, count: data.totalOpens }))
             // Notify all listeners
@@ -91,14 +85,12 @@ export function useEmailTracking(organizationId: string | undefined, onEmailOpen
       };
 
       ws.onclose = (event) => {
-        console.log('[WebSocket] Disconnected from server', event.code, event.reason);
-        globalWs = null;
+         globalWs = null;
         
         // Only reconnect if we still have listeners and it wasn't a normal closure
         if (listeners.size > 0 && event.code !== 1000 && globalOrgId) {
           setTimeout(() => {
-            console.log('[WebSocket] Attempting to reconnect...');
-            // Trigger reconnection by creating new connection
+             // Trigger reconnection by creating new connection
             if (listeners.size > 0 && globalOrgId) {
               const newWs = new WebSocket(`${WS_URL}/ws`);
               globalWs = newWs;
@@ -113,8 +105,7 @@ export function useEmailTracking(organizationId: string | undefined, onEmailOpen
       };
     } else if (globalOrgId !== organizationId) {
       // Organization changed, rejoin
-      console.log('[WebSocket] Organization changed, rejoining');
-      globalOrgId = organizationId;
+       globalOrgId = organizationId;
       globalWs.send(JSON.stringify({
         type: 'join:organization',
         organizationId,
@@ -124,13 +115,11 @@ export function useEmailTracking(organizationId: string | undefined, onEmailOpen
     // Cleanup
     return () => {
       connectionCount--;
-      console.log(`[WebSocket] Hook unmounted (${connectionCount} instances remaining)`);
-      listeners.delete(listener);
+       listeners.delete(listener);
       
       // Close connection only if no more listeners
       if (listeners.size === 0 && globalWs) {
-        console.log('[WebSocket] No more listeners, closing connection');
-        globalWs.close(1000, 'No more listeners');
+         globalWs.close(1000, 'No more listeners');
         globalWs = null;
         globalOrgId = null;
       }

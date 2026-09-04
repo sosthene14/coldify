@@ -41,8 +41,7 @@ export const authClient = createAuthClient({
   plugins: [
     twoFactorClient({
       onTwoFactorRedirect({ twoFactorMethods }) {
-        console.log('[authClient] 2FA redirect triggered:', twoFactorMethods)
-        set2FAInProgress(true)
+         set2FAInProgress(true)
         if (_twoFactorRedirectCallback) {
           _twoFactorRedirectCallback(twoFactorMethods || ['totp'])
         }

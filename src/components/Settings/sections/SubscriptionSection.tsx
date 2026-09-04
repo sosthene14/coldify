@@ -94,8 +94,7 @@ export function SubscriptionSection() {
       setUpgrading(planId)
       
       const plan = paddleConfig.plans.find((p: any) => p.id === planId)
-      console.log('Upgrading to plan:', planId, 'with priceId:', plan?.priceId)
-      
+       
       if (!plan || !plan.priceId) {
         toast.error(t('upgrade_failed'))
         return

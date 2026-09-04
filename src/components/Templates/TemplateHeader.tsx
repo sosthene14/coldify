@@ -66,8 +66,7 @@ export function TemplateHeader({
     let processedBody = activeContent
     
     if (activeContent.includes('data:image/')) {
-      console.log('🔄 Processing Base64 images...')
-      processedBody = await replaceBase64WithMinIO(activeContent)
+       processedBody = await replaceBase64WithMinIO(activeContent)
     }
 
     // Generate preview from content (first 100 chars)
@@ -99,15 +98,13 @@ export function TemplateHeader({
       
       if (isEditMode && templateId) {
         // Update existing template
-        const result = await templateService.updateTemplate(templateId, payload)
+         await templateService.updateTemplate(templateId, payload)
         toast.success(t('template_updated_success'))
-        console.log('Template updated →', result)
-      } else {
+       } else {
         // Create new template
-        const result = await templateService.createTemplate(payload)
+         await templateService.createTemplate(payload)
         toast.success(t('template_published_success'))
-        console.log('Template published →', result)
-      }
+       }
       
       // Navigate back to templates list after successful publish
       setTimeout(() => {

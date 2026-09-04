@@ -64,13 +64,11 @@ export function usePushNotifications() {
       const registration = await navigator.serviceWorker.register('/sw.js');
       await navigator.serviceWorker.ready;
 
-      console.log('[Push] Service Worker registered');
-
+ 
       // Check for existing subscription and unsubscribe if it exists
       const existingSubscription = await registration.pushManager.getSubscription();
       if (existingSubscription) {
-        console.log('[Push] Unsubscribing from old subscription');
-        await existingSubscription.unsubscribe();
+         await existingSubscription.unsubscribe();
       }
 
       // Get VAPID public key from backend
@@ -89,8 +87,7 @@ export function usePushNotifications() {
         applicationServerKey: urlBase64ToUint8Array(vapidData.publicKey) as BufferSource,
       });
 
-      console.log('[Push] Subscribed:', subscription);
-
+ 
       // Send subscription to backend
       await axios.post(
         `${API_URL}/user/push-subscription`,
@@ -115,8 +112,7 @@ export function usePushNotifications() {
 
       if (subscription) {
         await subscription.unsubscribe();
-        console.log('[Push] Unsubscribed');
-      }
+       }
 
       setIsSubscribed(false);
       setError(null);
