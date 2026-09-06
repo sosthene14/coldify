@@ -12,6 +12,7 @@ interface EmailActivityData {
   date: string
   sent: number
   opened: number
+  opened_unique: number
 }
 
 interface EmailStats {
@@ -21,11 +22,6 @@ interface EmailStats {
   openRate: number
   chartData: EmailActivityData[]
 }
-
-const series = [
-  { name: 'sent', label: 'emails_sent', color: 'blue.6' },
-  { name: 'opened', label: 'emails_opened', color: 'green.6' },
-]
 
 interface DateRange {
   startDate: Date
@@ -97,10 +93,17 @@ function useEmailActivity(days: number, dateRange?: DateRange, refreshKey?: numb
             return sum + (email.totalOpens || 0)
           }, 0)
 
+          // Compter les ouvertures uniques (nombre de recipients qui ont ouvert au moins une fois ce jour)
+          const openedUniqueThisDay = filteredEmails.filter((email: any) => {
+            const openDate = email.firstOpenedAt ? new Date(email.firstOpenedAt) : null
+            return openDate && openDate >= dayStart && openDate <= dayEnd && (email.uniqueOpens || 0) > 0
+          }).length
+
           chartData.push({
             date: dateKey,
             sent: sentThisDay,
-            opened: openedThisDay
+            opened: openedThisDay,
+            opened_unique: openedUniqueThisDay
           })
         }
 
@@ -165,6 +168,17 @@ export function EmailActivityOverview({ dateRange, refreshKey }: EmailActivityOv
   const activeOpenRate = openMode === 'total'
     ? (totalSent > 0 ? Math.round((totalOpened / totalSent) * 100) : 0)
     : (totalSent > 0 ? Math.round((totalUniqueOpened / totalSent) * 100) : 0)
+
+  // Série dynamique en fonction du mode
+  const activeSeries = openMode === 'total'
+    ? [
+        { name: 'sent', label: 'emails_sent', color: 'blue.6' },
+        { name: 'opened', label: 'emails_opened', color: 'green.6' },
+      ]
+    : [
+        { name: 'sent', label: 'emails_sent', color: 'blue.6' },
+        { name: 'opened_unique', label: 'unique_opens', color: 'green.6' },
+      ]
 
   if (loading) {
     return (
@@ -233,7 +247,7 @@ export function EmailActivityOverview({ dateRange, refreshKey }: EmailActivityOv
 
       {/* Légende du graphique */}
       <Group  mb="sm">
-        {series.map((s) => (
+        {activeSeries.map((s) => (
           <Group key={s.name} gap={6}>
             <Box
               w={8}
@@ -256,7 +270,7 @@ export function EmailActivityOverview({ dateRange, refreshKey }: EmailActivityOv
           h={{ base: 180, sm: 220 }}
           data={chartData}
           dataKey="date"
-          series={series}
+          series={activeSeries}
           curveType="monotone"
           withDots
           dotProps={{ r: 3, strokeWidth: 0 }}
@@ -290,7 +304,7 @@ export function EmailActivityOverview({ dateRange, refreshKey }: EmailActivityOv
                           }}
                         />
                         <Text size="xs" c="dimmed">
-                          {t(series.find(s => s.name === item.dataKey)?.label || '')}: {item.value}
+                          {t(activeSeries.find(s => s.name === item.dataKey)?.label || '')}: {item.value}
                         </Text>
                       </Group>
                     ))}

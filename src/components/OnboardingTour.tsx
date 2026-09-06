@@ -198,7 +198,6 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
         tooltipContent: {
           fontSize: 14,
           fontWeight: 500,
-         
           lineHeight: 1.5,
         },
       }}

@@ -31,6 +31,19 @@ export function DateRangeButton({ onDateRangeChange, defaultRange }: DateRangeBu
 
   const [value, setValue] = useState<[Date | null, Date | null]>(getParsedDefaultRange())
 
+  const handleChange = (newValue: any) => {
+    if (Array.isArray(newValue)) {
+      // Convertir les strings en objets Date
+      const converted: [Date | null, Date | null] = [
+        newValue[0] ? (newValue[0] instanceof Date ? newValue[0] : new Date(newValue[0])) : null,
+        newValue[1] ? (newValue[1] instanceof Date ? newValue[1] : new Date(newValue[1])) : null,
+      ]
+      setValue(converted)
+    } else {
+      setValue(newValue)
+    }
+  }
+
 
   useEffect(() => {
     if (value[0] && value[1] && onDateRangeChange) {
@@ -38,15 +51,18 @@ export function DateRangeButton({ onDateRangeChange, defaultRange }: DateRangeBu
       const endDate = endOfDay(value[1])
       onDateRangeChange(startDate, endDate)
     }
-  }, [value[0] ? value[0].getTime() : null, value[1] ? value[1].getTime() : null, onDateRangeChange])
+  }, [
+    value[0] instanceof Date ? value[0].getTime() : null,
+    value[1] instanceof Date ? value[1].getTime() : null,
+    onDateRangeChange
+  ])
 
   return (
     <DatePickerInput<'range'>
       type="range"
       locale={i18n.language}
       value={value}
-      //@ts-ignore mismatch type
-      onChange={setValue}
+      onChange={handleChange}
       valueFormat="MMM D"
       leftSectionPointerEvents="none"
       rightSection={<IconCalendar size={16} color="var(--mantine-color-gray-6)" />}

@@ -284,6 +284,7 @@
   "industries": "Industries",
   "schedule_settings": "Planification et paramètres",
   "start_date": "Date de début",
+  "select_date_range": "Sélectionner une plage de dates",
   "daily_limit": "Limite quotidienne",
   "emails_per_day": "{{count}} emails/jour",
   "selected": "{{count}} sélectionnée(s)",

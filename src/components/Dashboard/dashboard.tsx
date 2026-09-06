@@ -180,10 +180,12 @@ export const Dashboard = () => {
       style={{ touchAction: 'pan-y' }}
     >
       <div
+      className='-mt-8'
         style={{
           height: 28,
           display: 'flex',
           alignItems: 'center',
+          visibility:'hidden',
           justifyContent: 'center',
           fontSize: 12,
           color: 'var(--mantine-color-dimmed)',
