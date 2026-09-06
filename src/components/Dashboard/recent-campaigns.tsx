@@ -19,8 +19,7 @@ import {
   IconDots, 
   IconMail, 
   IconEye, 
-  IconExternalLink,
-  IconChartBar
+  IconExternalLink
 } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
 import axios from 'axios'
@@ -337,16 +336,16 @@ export function RecentCampaigns({ dateRange, refreshKey }: RecentCampaignsProps)
                     >
                       {email.status === 'sent' ? t('sent') : email.status === 'failed' ? t('failed') : email.status === 'pending' ? t('scheduled') : t('sending')}
                     </Badge>
-                    <Text size="xs" c="dimmed">
+                    <Text size="sm" c="dimmed">
                       {email.to.length} {email.to.length > 1 ? t('recipients') : t('recipient')}
                     </Text>
                     {email.totalOpens && email.totalOpens > 0 && (
                       <Group gap={2}>
                         <IconEye size={12} color="var(--mantine-color-green-6)" />
-                        <Text size="xs" c="dimmed">{email.totalOpens}</Text>
+                        <Text size="sm" c="dimmed">{email.totalOpens}</Text>
                       </Group>
                     )}
-                    <Text size="xs" c="dimmed">
+                    <Text size="sm" c="dimmed">
                       • {getLastActivity(email)}
                     </Text>
                   </Group>

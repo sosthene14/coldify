@@ -19,6 +19,10 @@ export function NotificationsSection() {
   const [loading, setLoading] = useState(false)
   const { isSupported, permission, isSubscribed, isLoading: isPushLoading, error, subscribe, unsubscribe } = usePushNotifications()
 
+  const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+  const showIOSInstallGuide = isIOSDevice && isSafariBrowser
+
   const handlePushToggle = async () => {
     console.info('[Notifications] Push button clicked', {
       isSubscribed,
@@ -114,6 +118,16 @@ const updatePreference = async (key: keyof NotificationPreferences, value: boole
         {permission === 'denied' && (
           <Alert icon={<IconInfoCircle size={16} />} color="orange">
             {t('push_notifications_blocked')}
+          </Alert>
+        )}
+
+        {showIOSInstallGuide && (
+          <Alert icon={<IconInfoCircle size={16} />} color="blue">
+            <Stack gap={4}>
+              <strong>{t('ios_install_home_screen_title')}</strong>
+              <div>{t('ios_install_home_screen_steps')}</div>
+              <div>{t('ios_install_home_screen_note')}</div>
+            </Stack>
           </Alert>
         )}
       </Stack>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSession } from "#/lib/auth-client.ts";
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from "../PageHeader";
@@ -108,14 +108,51 @@ export const Dashboard = () => {
   const { totalSent, totalLimit, mailboxes } = useEmailLimitData()
   const navigate = useNavigate()
   const [trackingRefreshKey, setTrackingRefreshKey] = useState(0)
+  const [pullDistance, setPullDistance] = useState(0)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const touchStartY = useRef<number | null>(null)
+
+  const refreshDashboardData = useCallback(() => {
+    setIsRefreshing(true)
+    setTrackingRefreshKey((key) => key + 1)
+    window.setTimeout(() => setIsRefreshing(false), 500)
+  }, [])
 
   const handleEmailOpened = useCallback(() => {
     setTrackingRefreshKey((key) => key + 1)
   }, [])
 
   useEmailTracking(session?.user?.id, handleEmailOpened)
-  
-   
+
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (window.scrollY > 0 || isRefreshing) return
+    touchStartY.current = event.touches[0].clientY
+    setPullDistance(0)
+  }
+
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartY.current === null || window.scrollY > 0 || isRefreshing) return
+
+    const currentY = event.touches[0].clientY
+    const delta = currentY - touchStartY.current
+
+    if (delta > 0) {
+      const nextPull = Math.min(delta * 0.8, 120)
+      setPullDistance(nextPull)
+      if (nextPull > 80) {
+        event.preventDefault()
+      }
+    }
+  }
+
+  const handleTouchEnd = () => {
+    if (pullDistance >= 80 && !isRefreshing) {
+      refreshDashboardData()
+    }
+
+    touchStartY.current = null
+    setPullDistance(0)
+  }
   
   // State pour la plage de dates
   const [dateRange, setDateRange] = useState<{startDate: Date, endDate: Date}>({
@@ -132,7 +169,33 @@ export const Dashboard = () => {
   const usagePercent = totalLimit > 0 ? (totalSent / totalLimit) * 100 : 0
 
   return (
-    <Container size="full" px="md" py="md" className="bg-slate-50/10">
+    <Container
+      size="full"
+      px="md"
+      py="md"
+      className="bg-slate-50/10"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={{ touchAction: 'pan-y' }}
+    >
+      <div
+        style={{
+          height: 28,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 12,
+          color: 'var(--mantine-color-dimmed)',
+          opacity: pullDistance > 0 ? 1 : 0,
+          transform: `translateY(${Math.min(pullDistance / 2, 12)}px)`,
+          transition: 'opacity 0.15s ease, transform 0.15s ease',
+          userSelect: 'none',
+        }}
+      >
+        {isRefreshing ? t('refreshing') : pullDistance >= 80 ? t('release_to_refresh') : t('pull_to_refresh')}
+      </div>
+
       <PageHeader
         title={`${t('welcome_back')}, ${session?.user?.firstName || session?.user?.name?.split(' ')[0] || 'there'}`}
         subtitle={t('ready_to_send_emails')}

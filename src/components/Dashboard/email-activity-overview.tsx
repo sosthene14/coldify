@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Card, Group, Text, Select, Box, Skeleton, Stack } from '@mantine/core'
+import { Card, Group, Text, Select, Box, Skeleton, Stack, SegmentedControl } from '@mantine/core'
 import { LineChart } from '@mantine/charts'
 import { IconMail, IconEye, IconTrendingUp } from '@tabler/icons-react'
 import axios from 'axios'
@@ -17,6 +17,7 @@ interface EmailActivityData {
 interface EmailStats {
   totalSent: number
   totalOpened: number
+  totalUniqueOpened: number
   openRate: number
   chartData: EmailActivityData[]
 }
@@ -41,6 +42,7 @@ function useEmailActivity(days: number, dateRange?: DateRange, refreshKey?: numb
   const [data, setData] = useState<EmailStats>({
     totalSent: 0,
     totalOpened: 0,
+    totalUniqueOpened: 0,
     openRate: 0,
     chartData: []
   })
@@ -85,11 +87,15 @@ function useEmailActivity(days: number, dateRange?: DateRange, refreshKey?: numb
             return emailDate && emailDate >= dayStart && emailDate <= dayEnd && email.status === 'sent'
           }).length
 
-          // Compter les emails ouverts ce jour (basé sur firstOpenedAt ou lastOpenedAt)
-          const openedThisDay = filteredEmails.filter((email: any) => {
+          // Compter toutes les ouvertures totales de la journée, y compris les réouvertures
+          const openedThisDay = filteredEmails.reduce((sum: number, email: any) => {
             const openDate = email.firstOpenedAt ? new Date(email.firstOpenedAt) : null
-            return openDate && openDate >= dayStart && openDate <= dayEnd && (email.totalOpens || 0) > 0
-          }).length
+            if (!openDate || openDate < dayStart || openDate > dayEnd) {
+              return sum
+            }
+
+            return sum + (email.totalOpens || 0)
+          }, 0)
 
           chartData.push({
             date: dateKey,
@@ -98,14 +104,16 @@ function useEmailActivity(days: number, dateRange?: DateRange, refreshKey?: numb
           })
         }
 
-        // Calculer les totaux pour la période sélectionnée
+        // Calculer les totaux pour la période sélectionnée : total de toutes les ouvertures réelles
         const totalSent = filteredEmails.filter((e: any) => e.status === 'sent').length
-        const totalOpened = filteredEmails.filter((e: any) => (e.totalOpens || 0) > 0).length
+        const totalOpened = filteredEmails.reduce((sum: number, email: any) => sum + (email.totalOpens || 0), 0)
+        const totalUniqueOpened = filteredEmails.filter((e: any) => (e.uniqueOpens || 0) > 0).length
         const openRate = totalSent > 0 ? Math.round((totalOpened / totalSent) * 100) : 0
 
         setData({
           totalSent,
           totalOpened,
+          totalUniqueOpened,
           openRate,
           chartData
         })
@@ -115,6 +123,7 @@ function useEmailActivity(days: number, dateRange?: DateRange, refreshKey?: numb
         setData({
           totalSent: 0,
           totalOpened: 0,
+          totalUniqueOpened: 0,
           openRate: 0,
           chartData: []
         })
@@ -137,8 +146,9 @@ function useEmailActivity(days: number, dateRange?: DateRange, refreshKey?: numb
 export function EmailActivityOverview({ dateRange, refreshKey }: EmailActivityOverviewProps) {
   const { t } = useTranslation()
   const [selectedPeriod, setSelectedPeriod] = useState('7')
+  const [openMode, setOpenMode] = useState<'total' | 'unique'>('total')
   const days = parseInt(selectedPeriod)
-  const { totalSent, totalOpened, openRate, chartData, loading } = useEmailActivity(days, dateRange, refreshKey)
+  const { totalSent, totalOpened, totalUniqueOpened, chartData, loading } = useEmailActivity(days, dateRange, refreshKey)
 
   const periodOptions = [
     { value: '7', label: t('last_7_days') },
@@ -146,12 +156,22 @@ export function EmailActivityOverview({ dateRange, refreshKey }: EmailActivityOv
     { value: '30', label: t('last_30_days') }
   ]
 
+  const openModeOptions = [
+    { value: 'total', label: t('total_opens') },
+    { value: 'unique', label: t('unique_opens') }
+  ]
+
+  const activeOpenedCount = openMode === 'total' ? totalOpened : totalUniqueOpened
+  const activeOpenRate = openMode === 'total'
+    ? (totalSent > 0 ? Math.round((totalOpened / totalSent) * 100) : 0)
+    : (totalSent > 0 ? Math.round((totalUniqueOpened / totalSent) * 100) : 0)
+
   if (loading) {
     return (
       <Card withBorder radius="md" p={{ base: 'sm', sm: 'md', md: 'lg' }} bg="white" className="w-full">
         <Group justify="space-between" align="center" mb={{ base: 'sm', sm: 'md' }}>
           <Skeleton height={16} width={150} radius="sm" />
-          <Skeleton height={28} width={{ base: 120, sm: 140 }} radius="sm" />
+          <Skeleton height={28}  radius="sm" />
         </Group>
 
         <Group mb={{ base: 'sm', sm: 'md' }} gap="lg">
@@ -164,7 +184,7 @@ export function EmailActivityOverview({ dateRange, refreshKey }: EmailActivityOv
           <Skeleton height={12} width={92} radius="sm" />
         </Group>
 
-        <Skeleton height={{ base: 180, sm: 220 }} radius="sm" />
+        <Skeleton   radius="sm" />
       </Card>
     )
   }
@@ -176,14 +196,23 @@ export function EmailActivityOverview({ dateRange, refreshKey }: EmailActivityOv
           {t('email_activity_overview')}
         </Text>
 
-        <Select
-          size="xs"
-          data={periodOptions}
-          value={selectedPeriod}
-          onChange={(value) => setSelectedPeriod(value || '7')}
-          w={{ base: 120, sm: 140 }}
-          radius="sm"
-        />
+        <Group gap="xs">
+          <SegmentedControl
+            size="xs"
+            value={openMode}
+            onChange={(value) => setOpenMode((value as 'total' | 'unique') || 'total')}
+            data={openModeOptions}
+            radius="md"
+          />
+          <Select
+            size="xs"
+            data={periodOptions}
+            value={selectedPeriod}
+            onChange={(value) => setSelectedPeriod(value || '7')}
+            w={{ base: 120, sm: 140 }}
+            radius="sm"
+          />
+        </Group>
       </Group>
 
       {/* Stats rapides */}
@@ -197,7 +226,7 @@ export function EmailActivityOverview({ dateRange, refreshKey }: EmailActivityOv
         <Group gap={6}>
           <IconEye size={14} color="var(--mantine-color-green-6)" />
           <Text size="xs" c="dimmed">
-            {t('opened_count', { count: totalOpened, rate: openRate })}
+            {t('opened_count', { count: activeOpenedCount, rate: activeOpenRate })}
           </Text>
         </Group>
       </Group>
