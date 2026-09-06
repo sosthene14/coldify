@@ -166,17 +166,22 @@ export function ComposeEmailPage() {
         <EmailHeader editingId={uiState.editingScheduledId} />
 
         {!mailboxLoading && connectedMailboxes.length === 0 && (
-          <Alert icon={<IconAlertCircle size={16} />} color="yellow">
-            {t('no_connected_mailboxes')}{' '}
-            <Anchor 
-              component="button"
-              onClick={() => navigate({ to: '/dashboard/settings' })}
-              fw={600}
-              c="yellow.9"
-            >
-              {t('connect_mailbox_settings')}
-            </Anchor>{' '}
-            {t('first')}
+          <Alert className="compose-mailbox-alert" icon={<IconAlertCircle size={16} />} color="yellow">
+            <span className="compose-mailbox-alert-message">
+              {t('no_connected_mailboxes')}{' '}
+              <Anchor
+                component="button"
+                onClick={() => navigate({
+                  to: '/dashboard/settings',
+                  search: { section: 'mailboxes' },
+                })}
+                fw={600}
+                c="yellow.9"
+              >
+                {t('connect_mailbox_settings')}
+              </Anchor>{' '}
+              
+            </span>
           </Alert>
         )}
 

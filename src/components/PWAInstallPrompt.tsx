@@ -69,8 +69,7 @@ export function PWAInstallPrompt() {
   return (
     <Card
       withBorder
-      shadow="lg"
-      p="md"
+       p="md"
       style={{
         position: 'fixed',
         bottom: 20,
@@ -78,8 +77,7 @@ export function PWAInstallPrompt() {
         maxWidth: 350,
         zIndex: 1000,
       }}
-      hiddenFrom="md" // Only show on mobile/tablet
-    >
+     >
       <CloseButton
         onClick={handleDismiss}
         style={{ position: 'absolute', top: 8, right: 8 }}

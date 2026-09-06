@@ -23,6 +23,7 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const [run, setRun] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [stepIndex, setStepIndex] = useState(() => {
     if (!userId) return 0
     const storedStep = Number.parseInt(localStorage.getItem(`${ONBOARDING_STEP_KEY}:${userId}`) || '0', 10)
@@ -32,34 +33,49 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
     Boolean(userId) && localStorage.getItem(ONBOARDING_COMPLETED_KEY) === userId
   ))
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)')
+    const updateMobileState = () => setIsMobile(mediaQuery.matches)
+    updateMobileState()
+    mediaQuery.addEventListener('change', updateMobileState)
+    return () => mediaQuery.removeEventListener('change', updateMobileState)
+  }, [])
+
+  const getTarget = (index: number) => {
+    if (isMobile && (index === 1 || index === 2)) {
+      return '[data-onboarding="settings-mobile-section"]'
+    }
+    return targetByStep[index]
+  }
+
   const steps = useMemo<Step[]>(() => [
     {
-      target: targetByStep[0],
+      target: getTarget(0),
       content: t('onboarding_language_content'),
       disableBeacon: true,
     },
     {
-      target: targetByStep[1],
+      target: getTarget(1),
       content: t('onboarding_mailboxes_content'),
       disableBeacon: true,
     },
     {
-      target: targetByStep[2],
+      target: getTarget(2),
       content: t('onboarding_notifications_content'),
       disableBeacon: true,
     },
     {
-      target: targetByStep[3],
+      target: getTarget(3),
       content: t('onboarding_templates_content'),
       disableBeacon: true,
     },
     {
-      target: targetByStep[4],
+      target: getTarget(4),
       content: t('onboarding_compose_content'),
       disableBeacon: true,
       placement: 'bottom',
     },
-  ], [t])
+  ], [isMobile, t])
 
   const isExpectedRoute = (index: number) => {
     if (index === 0) {
@@ -117,7 +133,7 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
 
     let frameId = 0
     const waitForTarget = () => {
-      if (document.querySelector(targetByStep[stepIndex])) {
+      if (document.querySelector(getTarget(stepIndex))) {
         localStorage.setItem(`${ONBOARDING_STEP_KEY}:${userId}`, String(stepIndex))
         setRun(true)
         return
@@ -167,11 +183,20 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
   return (
     <Joyride
       steps={steps}
+ 
       run={run}
       stepIndex={stepIndex}
       onEvent={handleCallback}
       continuous
       scrollToFirstStep
+      styles={{
+        tooltipContent: {
+          fontSize: 14,
+          fontWeight: 500,
+         
+          lineHeight: 1.5,
+        },
+      }}
       locale={{
         back: t('back'),
         close: t('close'),

@@ -137,7 +137,7 @@ export function RegisterPage() {
               required
             />
 
-            <Group grow>
+            <Group grow gap="xs" wrap="nowrap">
               <PasswordInput
                 label={t('password')}
                 placeholder={t('create_password')}
@@ -145,14 +145,16 @@ export function RegisterPage() {
                 onChange={(e) => setPassword(e.currentTarget.value)}
                 radius="md"
                 required
+                style={{ minWidth: 0 }}
               />
               <PasswordInput
-                label={t('confirm_password')}
+                label={t('confirm_password_short')}
                 placeholder={t('confirm_your_password')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.currentTarget.value)}
                 radius="md"
                 required
+                style={{ minWidth: 0 }}
               />
             </Group>
 

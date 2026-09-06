@@ -6,6 +6,28 @@
 @import '@mantine/tiptap/styles.css';
 @import "tailwindcss";
 
+@media (max-width: 767px) {
+  .compose-mailbox-alert {
+    font-size: 12px;
+    line-height: 1.35;
+    padding: 8px 10px;
+  }
+
+  .compose-mailbox-alert .mantine-Alert-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .compose-mailbox-alert-message {
+    display: block;
+    text-align: left;
+  }
+
+  .compose-mailbox-alert .mantine-Alert-message {
+    text-align: left;
+  }
+}
+
 :where([class*='mantine-']) {
   font-weight: 500;
 }

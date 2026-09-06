@@ -68,6 +68,7 @@ export function SettingsPage() {
 
         {/* Mobile: Dropdown menu for navigation */}
         <Select
+          data-onboarding="settings-mobile-section"
           hiddenFrom="sm"
           value={active}
           onChange={(value) => setActive(value as Section)}

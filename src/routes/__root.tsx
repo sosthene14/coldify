@@ -61,7 +61,7 @@ const theme = createTheme({
   },
 });
 
-const PUBLIC_ROUTES = ['/login', '/register', '/verify-email', '/forgot-password', '/reset-password']
+const PUBLIC_ROUTES = ['/login', '/register', '/verify-email', '/forgot-password', '/reset-password', '/privacy', '/terms']
 
 function RootComponent() {
   const location = useLocation()
