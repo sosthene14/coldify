@@ -55,7 +55,12 @@ export function Header({ user,  onLogout }: HeaderProps) {
 
           <Menu shadow="md" width={160} position="bottom-end">
             <Menu.Target>
-              <ActionIcon variant="subtle" color="gray" size="lg">
+              <ActionIcon
+                data-onboarding="language-selector"
+                variant="subtle"
+                color="gray"
+                size="lg"
+              >
                 <IconLanguage size={18} />
               </ActionIcon>
             </Menu.Target>

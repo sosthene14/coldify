@@ -43,6 +43,7 @@ export function Sidebar({ active, onSectionChange }: SidebarProps) {
           return (
             <UnstyledButton
               key={item.section}
+              data-onboarding={`settings-${item.section}`}
               onClick={() => onSectionChange(item.section)}
               py={8}
               px={10}

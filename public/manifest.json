@@ -1,7 +1,7 @@
 {
-  "name": "So-mails - Email Marketing Platform",
+  "name": "So-mails - Email Tracking Platform",
   "short_name": "So-mails",
-  "description": "Professional email marketing and cold email platform",
+  "description": "Professional email Tracking platform",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

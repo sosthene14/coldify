@@ -24,7 +24,7 @@ export function EmailHeader({ editingId }: EmailHeaderProps) {
         </Button>
       </Group>
 
-      <div>
+      <div data-onboarding="compose-header">
         <Text size="xl" fw={700}>
           {editingId ? t('edit_scheduled_email') : t('compose_email')}
         </Text>

@@ -12,6 +12,7 @@ import { useSession, signOut, authClient, is2FAInProgress } from '#/lib/auth-cli
 import { useEffect, useState } from 'react';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt'
 import { PWAUpdatePrompt } from '../components/PWAUpdatePrompt'
+import { OnboardingTour } from '../components/OnboardingTour'
 import {Toaster} from 'react-hot-toast';
 import { DatesProvider } from '@mantine/dates';
 import { useTranslation } from 'react-i18next';
@@ -210,6 +211,7 @@ function RootComponent() {
           {/* PWA Components */}
           <PWAInstallPrompt />
           <PWAUpdatePrompt />
+          {showHeader && <OnboardingTour userId={session.user.id} />}
           
           <TanStackDevtools
             config={{ position: 'bottom-right' }}

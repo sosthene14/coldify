@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -21,6 +21,8 @@ export function usePushNotifications() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const operationInProgress = useRef(false);
 
   useEffect(() => {
     // Check if push notifications are supported
@@ -29,6 +31,13 @@ export function usePushNotifications() {
 
     if (supported) {
       setPermission(Notification.permission);
+
+      navigator.serviceWorker.ready
+        .then((registration) => registration.pushManager.getSubscription())
+        .then((subscription) => {
+          setIsSubscribed(Boolean(subscription));
+        })
+        .catch(() => undefined);
     }
   }, []);
 
@@ -38,13 +47,19 @@ export function usePushNotifications() {
       setPermission(result);
       return result === 'granted';
     } catch (err) {
-      console.error('[Push] Error requesting permission:', err);
       setError('Failed to request notification permission');
       return false;
     }
   };
 
   const subscribe = async (): Promise<boolean> => {
+    if (operationInProgress.current) {
+      return false;
+    }
+
+    operationInProgress.current = true;
+    setIsLoading(true);
+    setError(null);
     try {
       if (!isSupported) {
         setError('Push notifications are not supported in this browser');
@@ -61,7 +76,15 @@ export function usePushNotifications() {
       }
 
       // Register service worker
-      const registration = await navigator.serviceWorker.register('/sw.js');
+      const serviceWorkerUrl = import.meta.env.DEV ? '/dev-sw.js?dev-sw' : '/sw.js';
+      const registration = await Promise.race([
+        navigator.serviceWorker.register(serviceWorkerUrl, { type: 'module' }),
+        new Promise<never>((_, reject) => {
+          window.setTimeout(() => {
+            reject(new Error('Service worker registration timed out after 10 seconds'));
+          }, 10000);
+        }),
+      ]);
       await navigator.serviceWorker.ready;
 
  
@@ -99,13 +122,22 @@ export function usePushNotifications() {
       setError(null);
       return true;
     } catch (err: any) {
-      console.error('[Push] Error subscribing:', err);
       setError(err.message || 'Failed to subscribe to push notifications');
       return false;
+    } finally {
+      operationInProgress.current = false;
+      setIsLoading(false);
     }
   };
 
   const unsubscribe = async (): Promise<boolean> => {
+    if (operationInProgress.current) {
+      return false;
+    }
+
+    operationInProgress.current = true;
+    setIsLoading(true);
+    setError(null);
     try {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
@@ -118,9 +150,11 @@ export function usePushNotifications() {
       setError(null);
       return true;
     } catch (err: any) {
-      console.error('[Push] Error unsubscribing:', err);
       setError(err.message || 'Failed to unsubscribe from push notifications');
       return false;
+    } finally {
+      operationInProgress.current = false;
+      setIsLoading(false);
     }
   };
 
@@ -128,6 +162,7 @@ export function usePushNotifications() {
     isSupported,
     permission,
     isSubscribed,
+    isLoading,
     error,
     subscribe,
     unsubscribe,

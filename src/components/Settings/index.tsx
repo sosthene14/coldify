@@ -27,17 +27,37 @@ const navItems: { section: Section; label: string; icon: any }[] = [
   { section: 'app', label: 'app_pwa', icon: IconDeviceMobile },
 ]
 
+const SETTINGS_SECTION_STORAGE_KEY = 'settings-active-section'
+const validSections: Section[] = ['profile', 'mailboxes', 'subscription', 'notifications', 'security', 'app']
+
 export function SettingsPage() {
   const { t } = useTranslation()
   const search = useSearch({ from: '/dashboard/settings/' })
-  const [active, setActive] = useState<Section>('profile')
+  const [active, setActive] = useState<Section>(() => {
+    if (search.section && validSections.includes(search.section)) {
+      return search.section
+    }
+
+    if (typeof window !== 'undefined') {
+      const storedSection = window.localStorage.getItem(SETTINGS_SECTION_STORAGE_KEY)
+      if (storedSection && validSections.includes(storedSection as Section)) {
+        return storedSection as Section
+      }
+    }
+
+    return 'profile'
+  })
 
   // Set initial section from URL search params
   useEffect(() => {
-    if (search.section && ['profile', 'mailboxes', 'subscription', 'notifications', 'security', 'app'].includes(search.section)) {
-      setActive(search.section as Section)
+    if (search.section && validSections.includes(search.section)) {
+      setActive(search.section)
     }
   }, [search.section])
+
+  useEffect(() => {
+    window.localStorage.setItem(SETTINGS_SECTION_STORAGE_KEY, active)
+  }, [active])
 
   return (
     <div className="min-h-screen mx-2 md:mx-6">

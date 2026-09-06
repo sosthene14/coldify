@@ -29,6 +29,8 @@ import {
 } from '@tabler/icons-react'
 import axios from 'axios'
 import { format, formatDistance } from 'date-fns'
+import { useEmailTracking } from '../../hooks/useEmailTracking'
+import { useSession } from '#/lib/auth-client'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -74,10 +76,17 @@ export function EmailStatsPage() {
   const navigate = useNavigate()
   const [stats, setStats] = useState<EmailStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const { data: session } = useSession()
 
   useEffect(() => {
     fetchStats()
   }, [emailId])
+
+  useEmailTracking(session?.user?.id, (data) => {
+    if (data.emailHistoryId === emailId) {
+      void fetchStats()
+    }
+  })
 
   const fetchStats = async () => {
     try {

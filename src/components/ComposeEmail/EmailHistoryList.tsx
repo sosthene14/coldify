@@ -209,7 +209,7 @@ export function EmailHistoryList() {
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
         title={t('email_details')}
-        size="lg"
+        size="xl"
       >
         {selectedEmail && (
           <Stack gap="md">

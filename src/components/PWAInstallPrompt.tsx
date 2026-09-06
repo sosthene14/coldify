@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Button, Card, Group, Text, CloseButton } from '@mantine/core'
 import { IconDownload } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
+import { usePWA } from '../hooks/usePWA'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -10,10 +11,12 @@ interface BeforeInstallPromptEvent extends Event {
 
 export function PWAInstallPrompt() {
   const { t } = useTranslation()
+  usePWA()
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
 
   useEffect(() => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
     const handler = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
@@ -26,7 +29,7 @@ export function PWAInstallPrompt() {
       // Show prompt if not dismissed or if dismissed more than 1 day ago
       if (!dismissed || dismissedAt < oneDayAgo) {
         // Show after 30 seconds to not interrupt user
-        setTimeout(() => {
+        window.setTimeout(() => {
           setShowPrompt(true)
         }, 30000)
       }
@@ -35,7 +38,7 @@ export function PWAInstallPrompt() {
     window.addEventListener('beforeinstallprompt', handler)
 
     // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    if (isStandalone) {
       setShowPrompt(false)
     }
 
@@ -43,10 +46,12 @@ export function PWAInstallPrompt() {
   }, [])
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return
+    if (!deferredPrompt) {
+      return
+    }
 
     deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
+    await deferredPrompt.userChoice
     
  
     

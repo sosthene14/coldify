@@ -17,6 +17,7 @@ export function AppSection() {
   const [isInstalled, setIsInstalled] = useState(false)
 
   useEffect(() => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
     const handler = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
@@ -25,7 +26,7 @@ export function AppSection() {
     window.addEventListener('beforeinstallprompt', handler)
 
     // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    if (isStandalone) {
       setIsInstalled(true)
     }
 
@@ -34,7 +35,7 @@ export function AppSection() {
 
   const handleInstall = async () => {
     if (!deferredPrompt) {
-      toast.error(t('use_compatible_browser'))
+      toast(t('install_from_browser_menu'))
       return
     }
 
@@ -110,15 +111,14 @@ export function AppSection() {
               <Button
                 leftSection={<IconDownload size={16} />}
                 onClick={handleInstall}
-                disabled={!deferredPrompt && !isInstalled}
                 fullWidth
               >
-                {deferredPrompt ? t('install_app') : t('installation_not_available')}
+                {deferredPrompt ? t('install_app') : t('install_from_browser_menu')}
               </Button>
               
               {!deferredPrompt && !isInstalled && (
                 <Text size="xs" c="dimmed" ta="center">
-                  {t('use_compatible_browser')}
+                  {t('install_from_browser_menu_hint')}
                 </Text>
               )}
             </>

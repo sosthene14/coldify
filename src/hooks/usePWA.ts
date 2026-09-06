@@ -13,7 +13,6 @@ export function usePWA() {
     onRegistered(r) {
     },
     onRegisterError(error) {
-      console.log('SW registration error', error)
     },
   })
 

@@ -178,6 +178,7 @@ function TemplatesPage() {
             </Group>
           </div>
           <Button
+            data-onboarding="templates-create"
             leftSection={<IconPlus size={16} />}
             color="blue"
             radius='sm'

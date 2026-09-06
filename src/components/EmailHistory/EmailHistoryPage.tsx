@@ -201,6 +201,7 @@ export function EmailHistoryPage() {
   const [isFetchingContent, setIsFetchingContent] = useState(false)
     const [emailContent, setEmailContent] = useState<string | null>(null)
   const { t } = useTranslation()
+  const { data: session } = useSession()
 
 
   // Use the custom hook for pagination and data fetching
@@ -236,6 +237,8 @@ export function EmailHistoryPage() {
     // Force refresh to get updated stats
     refetchEmails()
   }, [ ]);
+
+  useEmailTracking(session?.user?.id, handleEmailOpened)
 
 
   useEffect(() => {
@@ -712,7 +715,7 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
         title={t('email_details')}
-        size="lg"
+        size="xl"
       >
         {selectedEmail && (
           <Stack gap="md">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Card, Group, Text, Select, Box, Loader, Stack } from '@mantine/core'
+import { Card, Group, Text, Select, Box, Skeleton, Stack } from '@mantine/core'
 import { LineChart } from '@mantine/charts'
 import { IconMail, IconEye, IconTrendingUp } from '@tabler/icons-react'
 import axios from 'axios'
@@ -33,10 +33,11 @@ interface DateRange {
 
 interface EmailActivityOverviewProps {
   dateRange?: DateRange
+  refreshKey?: number
 }
 
 // Hook pour récupérer les données d'activité email
-function useEmailActivity(days: number, dateRange?: DateRange): EmailStats & { loading: boolean } {
+function useEmailActivity(days: number, dateRange?: DateRange, refreshKey?: number): EmailStats & { loading: boolean } {
   const [data, setData] = useState<EmailStats>({
     totalSent: 0,
     totalOpened: 0,
@@ -126,17 +127,18 @@ function useEmailActivity(days: number, dateRange?: DateRange): EmailStats & { l
   }, [
     days, 
     dateRange?.startDate ? dateRange.startDate.getTime() : null, 
-    dateRange?.endDate ? dateRange.endDate.getTime() : null
+    dateRange?.endDate ? dateRange.endDate.getTime() : null,
+    refreshKey
   ])
 
   return { ...data, loading }
 }
 
-export function EmailActivityOverview({ dateRange }: EmailActivityOverviewProps) {
+export function EmailActivityOverview({ dateRange, refreshKey }: EmailActivityOverviewProps) {
   const { t } = useTranslation()
   const [selectedPeriod, setSelectedPeriod] = useState('7')
   const days = parseInt(selectedPeriod)
-  const { totalSent, totalOpened, openRate, chartData, loading } = useEmailActivity(days, dateRange)
+  const { totalSent, totalOpened, openRate, chartData, loading } = useEmailActivity(days, dateRange, refreshKey)
 
   const periodOptions = [
     { value: '7', label: t('last_7_days') },
@@ -146,11 +148,23 @@ export function EmailActivityOverview({ dateRange }: EmailActivityOverviewProps)
 
   if (loading) {
     return (
-      <Card withBorder radius="md" p="lg" bg="white" className="w-full">
-        <Group justify="center" py="xl">
-          <Loader size="sm" />
-          <Text size="sm" c="dimmed">{t('loading_email_activity')}</Text>
+      <Card withBorder radius="md" p={{ base: 'sm', sm: 'md', md: 'lg' }} bg="white" className="w-full">
+        <Group justify="space-between" align="center" mb={{ base: 'sm', sm: 'md' }}>
+          <Skeleton height={16} width={150} radius="sm" />
+          <Skeleton height={28} width={{ base: 120, sm: 140 }} radius="sm" />
         </Group>
+
+        <Group mb={{ base: 'sm', sm: 'md' }} gap="lg">
+          <Skeleton height={14} width={72} radius="sm" />
+          <Skeleton height={14} width={112} radius="sm" />
+        </Group>
+
+        <Group mb="sm" gap="md">
+          <Skeleton height={12} width={82} radius="sm" />
+          <Skeleton height={12} width={92} radius="sm" />
+        </Group>
+
+        <Skeleton height={{ base: 180, sm: 220 }} radius="sm" />
       </Card>
     )
   }

@@ -5,6 +5,8 @@ import {
   Table, 
   Anchor, 
   Badge, 
+  Modal,
+  Button,
   ActionIcon, 
   Group, 
   Loader,
@@ -17,11 +19,14 @@ import {
   IconDots, 
   IconMail, 
   IconEye, 
-  IconExternalLink
+  IconExternalLink,
+  IconChartBar
 } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
 import axios from 'axios'
 import { format, formatDistanceToNow } from 'date-fns'
+import DOMPurify from 'dompurify'
+import { EmailOpenDetailsModal } from '../EmailHistory/EmailOpenDetailsModal'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -32,15 +37,19 @@ interface DateRange {
 
 interface RecentCampaignsProps {
   dateRange?: DateRange
+  refreshKey?: number
 }
 
 type EmailStatus = 'sent' | 'failed' | 'pending' | 'processing'
 
 interface RecentEmail {
   id: string
+  from?: string
   subject: string
   status: EmailStatus
   to: string[]
+  cc?: string[]
+  bcc?: string[]
   sentAt?: Date
   scheduledAt?: Date
   createdAt?: Date
@@ -48,6 +57,9 @@ interface RecentEmail {
   uniqueOpens?: number
   firstOpenedAt?: Date
   gmailMessageId?: string
+  hasAttachments?: boolean
+  attachmentCount?: number
+  attachmentNames?: string[]
   type: 'sent' | 'scheduled'
 }
 
@@ -59,7 +71,7 @@ const statusColor: Record<EmailStatus, string> = {
 }
 
 // Hook pour récupérer les emails récents
-function useRecentEmails(dateRange?: DateRange) {
+function useRecentEmails(dateRange?: DateRange, refreshKey?: number) {
   const [emails, setEmails] = useState<RecentEmail[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -106,15 +118,21 @@ function useRecentEmails(dateRange?: DateRange) {
         .filter(filterByDateRange)
         .map((email: any) => ({
           id: email.id,
+          from: email.from,
           subject: email.subject,
           status: email.status,
           to: email.to,
+          cc: email.cc,
+          bcc: email.bcc,
           sentAt: email.sentAt ? new Date(email.sentAt) : undefined,
           createdAt: email.createdAt ? new Date(email.createdAt) : undefined,
           totalOpens: email.totalOpens,
           uniqueOpens: email.uniqueOpens,
           firstOpenedAt: email.firstOpenedAt ? new Date(email.firstOpenedAt) : undefined,
           gmailMessageId: email.gmailMessageId,
+          hasAttachments: email.hasAttachments,
+          attachmentCount: email.attachmentCount,
+          attachmentNames: email.attachments?.map((attachment: any) => attachment.filename),
           type: 'sent'
         }))
 
@@ -154,19 +172,41 @@ function useRecentEmails(dateRange?: DateRange) {
     fetchRecentEmails()
   }, [
     dateRange?.startDate ? dateRange.startDate.getTime() : null, 
-    dateRange?.endDate ? dateRange.endDate.getTime() : null
+    dateRange?.endDate ? dateRange.endDate.getTime() : null,
+    refreshKey
   ])
 
   return { emails, loading, refetch: fetchRecentEmails }
 }
 
-export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
+export function RecentCampaigns({ dateRange, refreshKey }: RecentCampaignsProps) {
   const { t } = useTranslation()
-  const { emails, loading } = useRecentEmails(dateRange)
+  const { emails, loading } = useRecentEmails(dateRange, refreshKey)
   const navigate = useNavigate()
+  const [selectedEmail, setSelectedEmail] = useState<RecentEmail | null>(null)
+  const [modalOpened, setModalOpened] = useState(false)
+  const [emailContent, setEmailContent] = useState<string | null>(null)
+  const [contentLoading, setContentLoading] = useState(false)
+  const [contentError, setContentError] = useState<string | null>(null)
+  const [trackingModalEmailId, setTrackingModalEmailId] = useState<string | null>(null)
 
-  const handleViewEmail = () => {
-    navigate({ to: '/dashboard/mails' })
+  const handleViewEmail = async (email: RecentEmail) => {
+    setSelectedEmail(email)
+    setModalOpened(true)
+    setEmailContent(null)
+    setContentError(null)
+    setContentLoading(true)
+
+    try {
+      const response = await axios.get(`${API_URL}/email-history/${email.id}/content`, {
+        withCredentials: true,
+      })
+      setEmailContent(response.data.htmlContent)
+    } catch {
+      setContentError(t('error_sending_email'))
+    } finally {
+      setContentLoading(false)
+    }
   }
 
   const handleOpenInGmail = (email: RecentEmail) => {
@@ -261,7 +301,7 @@ export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
             <Table.Tr 
               key={email.id}
               style={{ cursor: 'pointer' }}
-              onClick={() => handleViewEmail()}
+              onClick={() => handleViewEmail(email)}
             >
               <Table.Td>
                 <Stack gap={4} visibleFrom="sm">
@@ -360,7 +400,7 @@ export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
                     <Menu.Dropdown>
                       <Menu.Item
                         leftSection={<IconEye size={14} />}
-                        onClick={() => handleViewEmail()}
+                        onClick={() => handleViewEmail(email)}
                       >
                         {t('view_details')}
                       </Menu.Item>
@@ -380,6 +420,138 @@ export function RecentCampaigns({ dateRange }: RecentCampaignsProps) {
           ))}
         </Table.Tbody>
       </Table>
+
+      <Modal
+        opened={modalOpened}
+        onClose={() => setModalOpened(false)}
+        title={t('email_details')}
+        size="xl"
+      >
+        {selectedEmail && (
+          <Stack gap="md">
+            <div>
+              <Text size="xs" c="dimmed">{t('from')}</Text>
+              <Text size="sm">{selectedEmail.from || '—'}</Text>
+            </div>
+
+            <div>
+              <Text size="xs" c="dimmed">{t('to')}</Text>
+              <Text size="sm">{selectedEmail.to.join(', ')}</Text>
+            </div>
+
+            {selectedEmail.cc?.length ? (
+              <div>
+                <Text size="xs" c="dimmed">{t('cc')}</Text>
+                <Text size="sm">{selectedEmail.cc.join(', ')}</Text>
+              </div>
+            ) : null}
+
+            {selectedEmail.bcc?.length ? (
+              <div>
+                <Text size="xs" c="dimmed">{t('bcc')}</Text>
+                <Text size="sm">{selectedEmail.bcc.join(', ')}</Text>
+              </div>
+            ) : null}
+
+            <div>
+              <Text size="xs" c="dimmed">{t('subject')}</Text>
+              <Text size="sm" fw={600}>{selectedEmail.subject}</Text>
+            </div>
+
+            <div>
+              <Text size="xs" c="dimmed">{t('sent')}</Text>
+              <Text size="sm">
+                {selectedEmail.sentAt
+                  ? format(selectedEmail.sentAt, 'PPpp')
+                  : selectedEmail.scheduledAt
+                    ? format(selectedEmail.scheduledAt, 'PPpp')
+                    : '—'}
+              </Text>
+            </div>
+
+            {selectedEmail.type === 'sent' && (selectedEmail.totalOpens || 0) > 0 && (
+              <Card withBorder p="md" bg="blue.0">
+                <Stack gap="xs">
+                  <Group justify="space-between">
+                    <Text size="sm" fw={600} c="blue">{t('email_tracking')}</Text>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      onClick={() => setTrackingModalEmailId(selectedEmail.id)}
+                    >
+                      {t('view_details')}
+                    </Button>
+                  </Group>
+
+                  <Group gap="lg">
+                    <div>
+                      <Text size="xl" fw={700} c="blue">{selectedEmail.totalOpens}</Text>
+                      <Text size="xs" c="dimmed">{t('total_opens')}</Text>
+                    </div>
+                    <div>
+                      <Text size="xl" fw={700} c="blue">{selectedEmail.uniqueOpens || 0}</Text>
+                      <Text size="xs" c="dimmed">{t('unique_opens')}</Text>
+                    </div>
+                  </Group>
+
+                  {selectedEmail.firstOpenedAt && (
+                    <Text size="xs" c="dimmed">
+                      {t('first_opened_date', { date: format(selectedEmail.firstOpenedAt, 'PPpp') })}
+                    </Text>
+                  )}
+                </Stack>
+              </Card>
+            )}
+
+            {selectedEmail.hasAttachments && (
+              <div>
+                <Text size="xs" c="dimmed">
+                  {t('attachments_count', { count: selectedEmail.attachmentCount || 0 })}
+                </Text>
+                <Group gap="xs" mt={4}>
+                  {selectedEmail.attachmentNames?.map((name) => (
+                    <Badge key={name} size="sm" variant="light">{name}</Badge>
+                  ))}
+                </Group>
+              </div>
+            )}
+
+            <div>
+              <Text size="xs" c="dimmed" mb="xs">{t('content')}</Text>
+              <Card withBorder p="md">
+                {contentLoading ? (
+                  <Group justify="center" py="md"><Loader size="sm" /></Group>
+                ) : contentError ? (
+                  <Text size="sm" c="red">{contentError}</Text>
+                ) : (
+                  <div
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(emailContent || '') }}
+                    style={{ maxHeight: 300, overflow: 'auto' }}
+                  />
+                )}
+              </Card>
+            </div>
+
+            {selectedEmail.gmailMessageId && (
+              <Button
+                leftSection={<IconExternalLink size={16} />}
+                onClick={() => handleOpenInGmail(selectedEmail)}
+                fullWidth
+              >
+                {t('open_in_gmail')}
+              </Button>
+            )}
+          </Stack>
+        )}
+      </Modal>
+
+      {trackingModalEmailId && (
+        <EmailOpenDetailsModal
+          emailHistoryId={trackingModalEmailId}
+          isOpen={!!trackingModalEmailId}
+          onClose={() => setTrackingModalEmailId(null)}
+        />
+      )}
     </Card>
   )
 }

@@ -24,9 +24,9 @@ const config = defineConfig({
       filename: 'sw.js',
       includeAssets: ['favicon.ico', 'logo.png', 'apple-touch-icon.png'],
       manifest: {
-        name: 'So-mails - Email Marketing Platform',
+        name: 'So-mails - Email Tracking Platform',
         short_name: 'So-mails',
-        description: 'Professional email marketing and cold email platform',
+        description: 'Professional email tracking and cold email platform',
         theme_color: '#228be6',
         background_color: '#ffffff',
         display: 'standalone',

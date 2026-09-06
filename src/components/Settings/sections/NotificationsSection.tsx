@@ -14,17 +14,32 @@ interface NotificationPreferences {
 export function NotificationsSection() {
   const { t } = useTranslation()
   const [preferences, setPreferences] = useState<NotificationPreferences>({
-    emailOpened: false
+    emailOpened: true
   })
   const [loading, setLoading] = useState(false)
-  const { isSupported, permission, isSubscribed, error, subscribe, unsubscribe } = usePushNotifications()
+  const { isSupported, permission, isSubscribed, isLoading: isPushLoading, error, subscribe, unsubscribe } = usePushNotifications()
+
+  const handlePushToggle = async () => {
+    console.info('[Notifications] Push button clicked', {
+      isSubscribed,
+      isSupported,
+      permission,
+    })
+
+    const result = isSubscribed ? await unsubscribe() : await subscribe()
+
+    console.info('[Notifications] Push action completed', {
+      action: isSubscribed ? 'unsubscribe' : 'subscribe',
+      success: result,
+    })
+  }
 
   // Charger les préférences au mount
   useEffect(() => {
     const loadPreferences = async () => {
       try {
         const response = await api.get('/user/notification-preferences')
-        setPreferences(response.data.preferences || { emailOpened: false })
+        setPreferences(response.data.preferences || { emailOpened: true })
       } catch (error) {
         console.error('Failed to load notification preferences:', error)
       }
@@ -70,11 +85,11 @@ const updatePreference = async (key: keyof NotificationPreferences, value: boole
           onChange={(event) => updatePreference('emailOpened', event.currentTarget.checked)}
         />
 
-        <Divider my="sm" label="Push Notifications" />
+        <Divider my="sm" label={t('push_notifications')} />
 
         {!isSupported && (
           <Alert icon={<IconInfoCircle size={16} />} color="yellow">
-            Push notifications are not supported in your browser
+            {t('push_notifications_not_supported')}
           </Alert>
         )}
 
@@ -89,16 +104,16 @@ const updatePreference = async (key: keyof NotificationPreferences, value: boole
             leftSection={<IconBell size={16} />}
             variant={isSubscribed ? 'light' : 'filled'}
             color={isSubscribed ? 'gray' : 'blue'}
-            onClick={isSubscribed ? unsubscribe : subscribe}
-            loading={loading}
+            onClick={handlePushToggle}
+            loading={loading || isPushLoading}
           >
-            {isSubscribed ? 'Disable Push Notifications' : 'Enable Push Notifications'}
+            {isSubscribed ? t('disable_push_notifications') : t('enable_push_notifications')}
           </Button>
         )}
 
         {permission === 'denied' && (
           <Alert icon={<IconInfoCircle size={16} />} color="orange">
-            You have blocked notifications. Please enable them in your browser settings.
+            {t('push_notifications_blocked')}
           </Alert>
         )}
       </Stack>

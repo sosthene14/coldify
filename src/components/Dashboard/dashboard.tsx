@@ -10,6 +10,7 @@ import axios from 'axios'
 import { Grid, Container, Card, Stack, Group, Text, Progress, Badge, Button } from '@mantine/core'
 import { IconMail, IconSend, IconCalendar, IconTemplate } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
+import { useEmailTracking } from '../../hooks/useEmailTracking'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -106,6 +107,13 @@ export const Dashboard = () => {
   const {data: session} = useSession()
   const { totalSent, totalLimit, mailboxes } = useEmailLimitData()
   const navigate = useNavigate()
+  const [trackingRefreshKey, setTrackingRefreshKey] = useState(0)
+
+  const handleEmailOpened = useCallback(() => {
+    setTrackingRefreshKey((key) => key + 1)
+  }, [])
+
+  useEmailTracking(session?.user?.id, handleEmailOpened)
   
    
   
@@ -118,8 +126,7 @@ export const Dashboard = () => {
   // Handler pour le changement de date range
   const handleDateRangeChange = useCallback((startDate: Date, endDate: Date) => {
     setDateRange({ startDate, endDate })
-    console.log('Date range changed:', { startDate, endDate })
-  }, [])
+   }, [])
 
   // Calculate usage percentage
   const usagePercent = totalLimit > 0 ? (totalSent / totalLimit) * 100 : 0
@@ -221,8 +228,8 @@ export const Dashboard = () => {
         {/* Main content - Full width on mobile, adjusted on larger screens */}
         <Grid.Col span={{ base: 12, md: 9, lg: 9.5 }}>
           <div className="flex flex-col gap-2">
-            <EmailActivityOverview dateRange={dateRange} />
-            <RecentCampaigns dateRange={dateRange} />
+            <EmailActivityOverview dateRange={dateRange} refreshKey={trackingRefreshKey} />
+            <RecentCampaigns dateRange={dateRange} refreshKey={trackingRefreshKey} />
           </div>
         </Grid.Col>
       </Grid>

@@ -161,7 +161,7 @@ export function ComposeEmailPage() {
   const connectedMailboxes = mailboxes.filter((mb) => mb.status === 'connected')
 
   return (
-    <div className="mx-4 md:mx-10 py-4">
+    <div className="mx-4 md:mx-10 py-4" data-onboarding="compose-page">
       <Stack gap="md">
         <EmailHeader editingId={uiState.editingScheduledId} />
 
