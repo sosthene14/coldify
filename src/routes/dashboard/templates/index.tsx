@@ -160,11 +160,11 @@ function TemplatesPage() {
 
   return (
     <div className='mx-0 md:mx-10 pt-2 md:pt-4 px-2 md:px-0'>
-      <Stack  >
+      <Stack gap="sm">
         {/* Header */}
-        <Group justify="space-between" align="flex-start" wrap="wrap" gap="xs">
+        <Group justify="space-between" align="center" wrap="wrap" gap="xs">
           <div>
-            <Text size="xl" fw={700}>
+            <Text size="xl" fw={700} c="dark.8">
               {t('email_templates')}
             </Text>
             <Group gap={6} mt={4} visibleFrom="sm">
@@ -181,7 +181,7 @@ function TemplatesPage() {
             data-onboarding="templates-create"
             leftSection={<IconPlus size={16} />}
             color="blue"
-            radius='sm'
+            radius='md'
             onClick={() => navigate({ to: '/dashboard/templates/new' })}
           >
             <span className="hidden sm:inline">{t('new_template')}</span>
@@ -190,7 +190,7 @@ function TemplatesPage() {
         </Group>
 
         {/* KPIs Row - Compact */}
-        <Card withBorder p={{ base: 'xs', sm: 'sm', md: 'md' }} radius="md">
+        <Card withBorder p={{ base: 'xs', sm: 'sm', md: 'md' }} radius="md" bg="gray.0" style={{ borderColor: '#e9ecef' }}>
           <Group grow>
             <div style={{ borderRight: '1px solid var(--mantine-color-gray-3)', paddingRight: 12 }}>
               <Group gap="xs" mb={4}>
@@ -199,7 +199,7 @@ function TemplatesPage() {
                   {t('templates')}
                 </Text>
               </Group>
-              <Text size="lg" fw={700}>
+              <Text size="lg" fw={700} c="dark.8">
                 {kpis.totalTemplates}
               </Text>
             </div>
@@ -211,7 +211,7 @@ function TemplatesPage() {
                   {t('usage')}
                 </Text>
               </Group>
-              <Text size="lg" fw={700}>
+              <Text size="lg" fw={700} c="dark.8">
                 {kpis.totalUsage}
               </Text>
             </div>
@@ -223,13 +223,15 @@ function TemplatesPage() {
                   {t('avg_open')}
                 </Text>
               </Group>
-              <Text size="lg" fw={700} c="green">
+              <Text size="lg" fw={700} c="green.7">
                 {kpis.avgOpenRate}%
               </Text>
             </div>
           </Group>
-        </Card>        {/* Tabs + filtres */}
-        <Card withBorder radius="md" p={{ base: 'xs', sm: 'sm', md: 'md' }} bg="white">
+        </Card>
+
+        {/* Tabs + filtres */}
+        <Card withBorder radius="md" p={{ base: 'xs', sm: 'sm', md: 'md' }} bg="white" style={{ borderColor: '#e9ecef' }}>
           <Stack gap="sm">
             <Tabs value={activeTab} onChange={(value) => setActiveTab(value as TabValue)} variant="pills" color="blue">
               <Tabs.List>
@@ -259,6 +261,8 @@ function TemplatesPage() {
                 leftSection={<IconSearch size={16} />}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                radius="md"
+                styles={{ input: { background: '#fff', borderColor: '#e9ecef' } }}
               />
               <Group gap="xs">
                 <Select
@@ -267,6 +271,7 @@ function TemplatesPage() {
                   style={{ flex: 1 }}
                   value={selectedCategory}
                   onChange={(value) => setSelectedCategory(value || 'all_categories')}
+                  radius="md"
                 />
                 <Select
                   placeholder={t('sort_by')}
@@ -274,6 +279,7 @@ function TemplatesPage() {
                   style={{ flex: 1 }}
                   value={sortBy}
                   onChange={(value) => setSortBy(value as SortOption)}
+                  radius="md"
                 />
               </Group>
             </Stack>
@@ -322,26 +328,28 @@ function TemplatesPage() {
     </Stack>
   </Card>
         ) : (
-          <Grid>
+          <Grid gutter="sm">
             {filteredTemplates.map((template) => (
-              <Grid.Col key={template.id} span={{ base: 12, sm: 6, md: 4 }}>
+              <Grid.Col key={template.id} span={{ base: 12, md: 6 }}>
                 <Card
                   withBorder
                   radius="md"
-                  p={{ base: 'sm', sm: 'md', md: 'lg' }}
+                  p={{ base: 'sm', sm: 'sm', md: 'md' }}
                   bg="white"
                   style={{
                     cursor: 'pointer',
                     height: '100%',
-                    transition: 'border-color 150ms ease',
+                    transition: 'all 150ms ease',
                     opacity: deletingId === template.id ? 0.5 : 1,
+                    borderColor: '#e9ecef',
+                    boxShadow: 'none'
                   }}
-                  className="hover:border-gray-400"
+                  className="hover:border-blue-300 hover:shadow-sm"
                   onClick={() => navigate({ to: `/dashboard/templates/${template.id}/edit` })}
                 >
-                  <Stack gap="sm" h="100%">
+                  <Stack gap="xs" h="100%">
                     <Group justify="space-between" wrap="nowrap" align="flex-start">
-                      <Badge size="sm" variant="light" color="gray" radius="sm">
+                      <Badge size="sm" variant="light" color="gray" radius="sm" style={{ fontWeight: 600 }}>
                         {template.category}
                       </Badge>
 
@@ -405,34 +413,34 @@ function TemplatesPage() {
                     </Group>
 
                     <div>
-                      <Text size="md" fw={600} mb={6} lineClamp={1}>
+                      <Text size="md" fw={600} mb={4} lineClamp={1} c="dark.8">
                         {template.name}
                       </Text>
                       <Group gap={4} mb={6} wrap="nowrap">
                         <IconMail size={13} color="var(--mantine-color-gray-6)" style={{ flexShrink: 0 }} />
-                        <Text size="xs" c="dimmed" lineClamp={1}>
+                        <Text size="xs" c="dimmed" lineClamp={1} style={{ fontWeight: 500 }}>
                           {template.subject}
                         </Text>
                       </Group>
-                      <Text size="sm" c="dimmed" lineClamp={2} style={{ lineHeight: 1.5 }}>
+                      <Text size="sm" c="dimmed" lineClamp={2} style={{ lineHeight: 1.5, color: '#6c757d' }}>
                         {template.preview}
                       </Text>
                     </div>
 
                     <div style={{ marginTop: 'auto' }}>
-                      <Divider mb={10} />
+                      <Divider mb={8} />
 
                       <Group justify="space-between" mb={4}>
                         <Group gap={4}>
                           <IconClock size={12} color="var(--mantine-color-gray-5)" />
                           <Text size="xs" c="dimmed">{formatRelativeTime(template.lastUsedAt || undefined)}</Text>
                         </Group>
-                        <Text size="xs" fw={500} c="dimmed">{t('uses', { count: template.usageCount })}</Text>
+                        <Text size="xs" fw={600} c="dimmed">{t('uses', { count: template.usageCount })}</Text>
                       </Group>
 
-                      <Group gap="lg" mt={4}>
+                      <Group gap="xs" mt={2}>
                         <Text size="xs" c="dimmed">
-                          {t('open')} <Text component="span" fw={600} c="dark">{template.openRate || 0}%</Text>
+                          {t('open')} <Text component="span" fw={700} c="dark.8">{template.openRate || 0}%</Text>
                         </Text>
                       </Group>
                     </div>

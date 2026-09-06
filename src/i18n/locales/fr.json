@@ -218,6 +218,7 @@
   "q4_saas_outreach": "ex : Prospection SaaS T4",
   "description": "Description",
   "brief_description": "Brève description des objectifs et de l'audience cible de votre campagne",
+  "template_description_placeholder": "Décrivez l'objectif de ce modèle, le public cible et le ton souhaité.",
   "category": "Catégorie",
   "select_category": "Sélectionnez la catégorie de campagne",
   "outbound_sales": "Ventes sortantes",

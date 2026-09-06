@@ -218,6 +218,7 @@
   "q4_saas_outreach": "e.g., Q4 SaaS Outreach",
   "description": "Description",
   "brief_description": "Brief description of your campaign goals and target audience",
+  "template_description_placeholder": "Describe the purpose of this template, the target audience, and the desired tone.",
   "category": "Category",
   "select_category": "Select campaign category",
   "outbound_sales": "Outbound Sales",

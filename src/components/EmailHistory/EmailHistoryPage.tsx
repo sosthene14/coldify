@@ -37,7 +37,6 @@ import {
 import { useNavigate } from '@tanstack/react-router'
 import axios from 'axios'
 import { format } from 'date-fns'
-import { notifications } from '@mantine/notifications'
 import { EmailOpenDetailsModal } from "./EmailOpenDetailsModal";
 import { useEmailTracking } from "../../hooks/useEmailTracking";
 import { useSession } from '#/lib/auth-client';
@@ -347,11 +346,11 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
   return (
    <div className='mx-0 md:mx-6'>
   <Container size="full"  py={{ base: 'xs', sm: 'sm', md: 'md' }} px={{ base: 'xs', sm: 'sm', md: 'md' }} >
-      <Stack >
+      <Stack gap="sm">
         {/* Header */}
-        <Group justify="space-between" wrap="wrap" gap="xs">
+        <Group justify="space-between" wrap="wrap" gap="xs" align="center">
           <div>
-            <Text size="xl" fw={700}>
+            <Text size="xl" fw={700} c="dark.8">
               {t('email_history')}
             </Text>
             <Text size="sm" c="dimmed" visibleFrom="sm">
@@ -360,7 +359,9 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
           </div>
           <Button
             leftSection={<IconPlus size={16} />}
-            radius="sm"
+            radius="md"
+            variant="filled"
+            color="blue"
             onClick={() => navigate({ to: '/dashboard/mails/new' })}
           >
             <span className="hidden sm:inline">{t('send_email')}</span>
@@ -369,7 +370,7 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
         </Group>
 
         {/* KPIs Row - Compact */}
-        <Card withBorder p={{ base: 'xs', sm: 'sm', md: 'md' }} radius="md">
+        <Card withBorder p={{ base: 'xs', sm: 'sm', md: 'md' }} radius="md" bg="gray.0" style={{ borderColor: '#e9ecef' }}>
           <Group grow>
             <div style={{ borderRight: '1px solid var(--mantine-color-gray-3)', paddingRight: 12 }}>
               <Group gap="xs" mb={4}>
@@ -378,7 +379,7 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
                   {t('sent')}
                 </Text>
               </Group>
-              <Text size="lg" fw={700}>
+              <Text size="lg" fw={700} c="dark.8">
                 {kpis.totalSent}
               </Text>
             </div>
@@ -390,7 +391,7 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
                   {t('recipients')}
                 </Text>
               </Group>
-              <Text size="lg" fw={700}>
+              <Text size="lg" fw={700} c="dark.8">
                 {kpis.uniqueRecipients}
               </Text>
             </div>
@@ -402,7 +403,7 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
                   {t('open_rate')}
                 </Text>
               </Group>
-              <Text size="lg" fw={700} c="green">
+              <Text size="lg" fw={700} c="green.7">
                 {kpis.openRate}%
               </Text>
             </div>
@@ -410,13 +411,15 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
         </Card>
 
         {/* Filters */}
-        <Card withBorder p={{ base: 'xs', sm: 'sm', md: 'md' }}>
+        <Card withBorder p={{ base: 'xs', sm: 'sm', md: 'md' }} radius="md" style={{ borderColor: '#e9ecef' }}>
           <Stack gap="xs">
             <TextInput
               placeholder={t('search')}
               leftSection={<IconSearch size={16} />}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              radius="md"
+              styles={{ input: { background: '#fff', borderColor: '#e9ecef' } }}
             />
             <Select
               placeholder={t('status')}
@@ -430,6 +433,7 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
               value={statusFilter}
               onChange={setStatusFilter}
               clearable
+              radius="md"
             />
           </Stack>
         </Card>
@@ -475,24 +479,25 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
             </Stack>
           </Paper>
         ) : (
-          <Card withBorder p="0" radius="md">
-            <Table highlightOnHover verticalSpacing="xs" horizontalSpacing="xs">
+          <Card withBorder p="0" radius="md" style={{ overflow: 'hidden', borderColor: '#e9ecef', background: '#fff' }}>
+            <Table highlightOnHover verticalSpacing="sm" horizontalSpacing="sm" withTableBorder={false} withRowBorders={false}>
               <Table.Thead visibleFrom="sm">
-                <Table.Tr>
-                  <Table.Th>{t('subject')}</Table.Th>
-                  <Table.Th>{t('recipient_singular')}</Table.Th>
-                  <Table.Th>{t('status')}</Table.Th>
-                  <Table.Th>{t('opens')}</Table.Th>
-                  <Table.Th>{t('date')}</Table.Th>
-                  <Table.Th w={60}></Table.Th>
+                <Table.Tr style={{ background: '#f8f9fa' }}>
+                  <Table.Th style={{ color: '#6c757d', fontWeight: 600 }}>{t('subject')}</Table.Th>
+                  <Table.Th style={{ color: '#6c757d', fontWeight: 600 }}>{t('recipient_singular')}</Table.Th>
+                  <Table.Th style={{ color: '#6c757d', fontWeight: 600 }}>{t('status')}</Table.Th>
+                  <Table.Th style={{ color: '#6c757d', fontWeight: 600 }}>{t('opens')}</Table.Th>
+                  <Table.Th style={{ color: '#6c757d', fontWeight: 600 }}>{t('date')}</Table.Th>
+                  <Table.Th w={60} style={{ color: '#6c757d', fontWeight: 600 }}></Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {paginatedEmails?.map((email) => (
                   <Table.Tr 
                     key={email.id} 
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: 'pointer', background: '#fff', borderBottom: '1px solid #f1f3f5' }}
                     onClick={() => handleViewDetails(email)}
+                    className="hover:bg-gray-50"
                   >
                     <Table.Td>
                       {/* Desktop view */}
@@ -503,7 +508,7 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
                               <IconPaperclip size={14} color="var(--mantine-color-gray-6)" />
                             </Tooltip>
                           )}
-                          <Text size="sm" fw={500} lineClamp={1} style={{ flex: 1 }}>
+                          <Text size="sm" fw={600} lineClamp={1} style={{ flex: 1, color: '#1f2937' }}>
                             {email.subject}
                           </Text>
                         </Group>
@@ -511,7 +516,7 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
                           size="xs" 
                           c="dimmed" 
                           lineClamp={1}
-                          style={{ maxWidth: '400px', fontWeight: 300 }}
+                          style={{ maxWidth: '420px', fontWeight: 400 }}
                         >
                           {email?.snippet}
                         </Text>
@@ -582,6 +587,7 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
                       <Badge
                         size="sm"
                         variant="light"
+                        radius="sm"
                         color={
                           email.status === 'sent' ? 'green' :
                           email.status === 'pending' ? 'blue' :
@@ -589,6 +595,7 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
                           email.status === 'failed' ? 'red' :
                           email.status === 'cancelled' ? 'gray' : 'green'
                         }
+                        style={{ fontWeight: 600 }}
                       >
                         {email.status === 'pending' ? t('scheduled') : email.status}
                       </Badge>
@@ -602,7 +609,7 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
                             variant="light"
                             color="blue"
                             leftSection={<IconEye size={12} />}
-                            style={{ cursor: 'pointer' }}
+                            style={{ cursor: 'pointer', fontWeight: 600 }}
                             onClick={(e) => {
                               e.stopPropagation()
                               setTrackingModalEmailId(email.id)
