@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt'
 import { PWAUpdatePrompt } from '../components/PWAUpdatePrompt'
 import { OnboardingTour } from '../components/OnboardingTour'
+import { PushNotificationPrompt } from '../components/PushNotificationPrompt'
 import {Toaster} from 'react-hot-toast';
 import { DatesProvider } from '@mantine/dates';
 import { useTranslation } from 'react-i18next';
@@ -212,6 +213,7 @@ function RootComponent() {
           <PWAInstallPrompt />
           <PWAUpdatePrompt />
           {showHeader && <OnboardingTour userId={session.user.id} />}
+          {showHeader && <PushNotificationPrompt userId={session.user.id} />}
           
           <TanStackDevtools
             config={{ position: 'bottom-right' }}

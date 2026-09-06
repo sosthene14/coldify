@@ -581,6 +581,8 @@
   "enable_push_notifications": "Enable Push Notifications",
   "disable_push_notifications": "Disable Push Notifications",
   "push_notifications_blocked": "You have blocked notifications. Please enable them in your browser settings.",
+  "push_prompt_title": "Enable notifications",
+  "push_prompt_description": "Get notified as soon as a recipient opens one of your emails.",
   "email_opened": "Email Opened",
   "email_opened_description": "Receive notifications when your emails are opened by recipients",
   "security": "Security",
