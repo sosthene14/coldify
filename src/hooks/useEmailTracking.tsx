@@ -45,33 +45,28 @@ export function useEmailTracking(organizationId: string | undefined, onEmailOpen
     };
     listeners.add(listener);
 
-    // Create or reuse connection
-    if (!globalWs || globalWs.readyState === WebSocket.CLOSED || globalWs.readyState === WebSocket.CLOSING) {
-       globalOrgId = organizationId;
-      
+    const connect = () => {
+      if (listeners.size === 0 || !globalOrgId) return;
+
       const ws = new WebSocket(`${WS_URL}/ws`);
       globalWs = ws;
 
       ws.onopen = () => {
-     
-        
-        // Join user room
+        if (ws.readyState !== WebSocket.OPEN || globalWs !== ws) return;
+
         ws.send(JSON.stringify({
           type: 'join:user',
-          userId: organizationId, // organizationId is actually userId here
+          userId: organizationId,
         }));
       };
 
       ws.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
-           
+
           if (message.type === 'email:opened') {
             const data: EmailOpenedEvent = message.data;
- 
-            // Show notification
-            toast.success(t('email_opened_message', { recipient: data.recipient, count: data.totalOpens }))
-            // Notify all listeners
+            toast.success(t('email_opened_message', { recipient: data.recipient, count: data.totalOpens }));
             listeners.forEach(cb => cb(data));
           }
         } catch (error) {
@@ -84,25 +79,21 @@ export function useEmailTracking(organizationId: string | undefined, onEmailOpen
       };
 
       ws.onclose = (event) => {
-         globalWs = null;
-        
-        // Only reconnect if we still have listeners and it wasn't a normal closure
+        if (globalWs === ws) globalWs = null;
+
         if (listeners.size > 0 && event.code !== 1000 && globalOrgId) {
           setTimeout(() => {
-             // Trigger reconnection by creating new connection
-            if (listeners.size > 0 && globalOrgId) {
-              const newWs = new WebSocket(`${WS_URL}/ws`);
-              globalWs = newWs;
-              // Copy handlers
-              newWs.onopen = ws.onopen;
-              newWs.onmessage = ws.onmessage;
-              newWs.onerror = ws.onerror;
-              newWs.onclose = ws.onclose;
-            }
+            if (!globalWs && listeners.size > 0 && globalOrgId) connect();
           }, 3000);
         }
       };
-    } else if (globalOrgId !== organizationId) {
+    };
+
+    // Create or reuse connection
+    if (!globalWs || globalWs.readyState === WebSocket.CLOSED || globalWs.readyState === WebSocket.CLOSING) {
+      globalOrgId = organizationId;
+      connect();
+    } else if (globalOrgId !== organizationId && globalWs.readyState === WebSocket.OPEN) {
       // Organization changed, rejoin
        globalOrgId = organizationId;
       globalWs.send(JSON.stringify({
