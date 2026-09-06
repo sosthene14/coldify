@@ -34,6 +34,11 @@ import { useSession } from '#/lib/auth-client'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
+function isGmailImageProxy(userAgent?: string | null): boolean {
+  const normalizedUserAgent = userAgent?.toLowerCase() || ''
+  return normalizedUserAgent.includes('googleimageproxy') || normalizedUserAgent.includes('ggpht.com')
+}
+
 interface EmailDetail {
   id: string
   from: string
@@ -352,12 +357,17 @@ export function EmailStatsPage() {
                       </Text>
 
                       <Group gap="md" wrap="wrap">
-                        {open.device && (
+                        {isGmailImageProxy(open.userAgent) ? (
+                          <Group gap={6} wrap="nowrap">
+                            <IconDeviceLaptop size={14} color="var(--mantine-color-gray-6)" style={{ flexShrink: 0 }} />
+                            <Text size="xs">{t('gmail_image_proxy')}</Text>
+                          </Group>
+                        ) : open.device ? (
                           <Group gap={6} wrap="nowrap">
                             <IconDeviceLaptop size={14} color="var(--mantine-color-gray-6)" style={{ flexShrink: 0 }} />
                             <Text size="xs">{open.device}</Text>
                           </Group>
-                        )}
+                        ) : null}
 
                         {open.location && (
                           <Group gap={6} wrap="nowrap">

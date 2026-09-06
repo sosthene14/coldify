@@ -64,6 +64,14 @@ export function EmailOpenDetailsModal({
       return { icon: <IconDeviceDesktop size={16} color="#868E96" />, label: t('unknown') };
     }
 
+    const normalizedUserAgent = userAgent.toLowerCase()
+    if (normalizedUserAgent.includes('googleimageproxy') || normalizedUserAgent.includes('ggpht.com')) {
+      return {
+        icon: <IconBrowser size={16} color="#868E96" />,
+        label: t('gmail_image_proxy'),
+      }
+    }
+
     const parser = new UAParser(userAgent);
     const result = parser.getResult();
 
