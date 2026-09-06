@@ -42,8 +42,11 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
   }, [])
 
   const getTarget = (index: number) => {
-    if (isMobile && (index === 1 || index === 2)) {
-      return '[data-onboarding="settings-mobile-section"]'
+    if (isMobile && index === 1) {
+      return '[data-onboarding="settings-mobile-mailboxes"]'
+    }
+    if (isMobile && index === 2) {
+      return '[data-onboarding="settings-mobile-notifications"]'
     }
     return targetByStep[index]
   }
@@ -58,11 +61,13 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
       target: getTarget(1),
       content: t('onboarding_mailboxes_content'),
       disableBeacon: true,
+      placement: 'bottom',
     },
     {
       target: getTarget(2),
       content: t('onboarding_notifications_content'),
       disableBeacon: true,
+      placement: 'bottom',
     },
     {
       target: getTarget(3),
@@ -143,7 +148,7 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
 
     waitForTarget()
     return () => window.cancelAnimationFrame(frameId)
-  }, [location.pathname, location.search, navigate, stepIndex, userId])
+  }, [isMobile, location.pathname, location.search, navigate, stepIndex, userId])
 
  const handleCallback = ({ action, index, status, type }: EventData) => {
   // 1. Capturer TOUTES les conditions d'arrêt possibles de Joyride

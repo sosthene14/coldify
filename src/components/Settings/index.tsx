@@ -75,6 +75,7 @@ export function SettingsPage() {
               return (
                 <UnstyledButton
                   key={item.section}
+                  data-onboarding={`settings-mobile-${item.section}`}
                   onClick={() => setActive(item.section)}
                   className={`settings-mobile-nav-item${isActive ? ' is-active' : ''}`}
                   aria-current={isActive ? 'page' : undefined}
