@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Stack, Text, Group, Select } from '@mantine/core'
+import { Box, Stack, Text, Group, UnstyledButton } from '@mantine/core'
 import { useTranslation } from 'react-i18next'
 import { useSearch } from '@tanstack/react-router'
 import { Sidebar } from './components/Sidebar'
@@ -66,22 +66,28 @@ export function SettingsPage() {
           {t('settings')}
         </Text>
 
-        {/* Mobile: Dropdown menu for navigation */}
-        <Select
-          data-onboarding="settings-mobile-section"
-          hiddenFrom="sm"
-          value={active}
-          onChange={(value) => setActive(value as Section)}
-          data={navItems.map(item => ({
-            value: item.section,
-            label: t(item.label)
-          }))}
-          leftSection={(() => {
-            const item = navItems.find(i => i.section === active)
-            const Icon = item?.icon
-            return Icon ? <Icon size={16} /> : null
-          })()}
-        />
+        <Box className="settings-mobile-nav" data-onboarding="settings-mobile-section" hiddenFrom="sm">
+          <Group gap="xs" wrap="nowrap">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              const isActive = active === item.section
+
+              return (
+                <UnstyledButton
+                  key={item.section}
+                  onClick={() => setActive(item.section)}
+                  className={`settings-mobile-nav-item${isActive ? ' is-active' : ''}`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  <Icon size={16} />
+                  <Text size="xs" fw={isActive ? 700 : 500} lh={1.1}>
+                    {t(item.label)}
+                  </Text>
+                </UnstyledButton>
+              )
+            })}
+          </Group>
+        </Box>
 
         <Group align="flex-start" gap="md" wrap="nowrap">
           <Sidebar active={active} onSectionChange={setActive} />

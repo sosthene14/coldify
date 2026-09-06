@@ -1,7 +1,7 @@
-import { Group, Burger, Drawer, Stack, Menu, ActionIcon } from '@mantine/core'
+import { Group, Burger, Drawer, Stack, Menu, ActionIcon, Divider, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useTranslation } from 'react-i18next'
-import { IconLanguage } from '@tabler/icons-react'
+import { IconLanguage, IconLayoutDashboard, IconMail, IconTemplate, IconSettings, IconChevronRight } from '@tabler/icons-react'
 import { Logo } from './Logo'
 import { NavLinks } from './NavLinks'
 import { SearchBar } from './SearchBar'
@@ -24,6 +24,13 @@ const languages = [
   { code: 'fr', label: 'Français' },
   { code: 'en', label: 'English' },
 ]
+
+const navIcons = {
+  overview: IconLayoutDashboard,
+  emails: IconMail,
+  templates: IconTemplate,
+  settings: IconSettings,
+}
 
 export function Header({ user,  onLogout }: HeaderProps) {
   const { t, i18n } = useTranslation()
@@ -50,7 +57,7 @@ export function Header({ user,  onLogout }: HeaderProps) {
         </Group>
 
         {/* Right side - Search + User Menu (desktop) + Burger (mobile) */}
-        <Group g wrap="nowrap">
+        <Group  wrap="nowrap">
           <SearchBar />
 
           <Menu shadow="md" width={160} position="bottom-end">
@@ -93,40 +100,59 @@ export function Header({ user,  onLogout }: HeaderProps) {
       <Drawer
         opened={drawerOpened}
         onClose={closeDrawer}
-        size="75%"
-        padding="sm"
-        title={t('navigate')}
+        size="82%"
+        padding="md"
+        title={<Text fw={700} size="lg">{t('navigate')}</Text>}
         hiddenFrom="sm"
         zIndex={1000000}
         position="right"
+        overlayProps={{ backgroundOpacity: 0.45, blur: 2 }}
       >
-        <Stack gap="4">
+        <Stack gap="lg">
           {/* Mobile Navigation Links */}
-          <Stack gap="2">
+          <Stack gap={6}>
             {navItems?.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={classes.mainLink}
-                activeProps={{ 'data-active': true }}
-                activeOptions={{ exact: true }}
-                onClick={closeDrawer}
-                style={{
-                  display: 'block',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  textDecoration: 'none',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                }}
-              >
-                {t(item.label)}
-              </Link>
+              (() => {
+                const Icon = navIcons[item.label as keyof typeof navIcons] || IconChevronRight
+                return (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className={classes.mainLink}
+                    activeProps={{ 'data-active': true }}
+                    activeOptions={{ exact: true }}
+                    onClick={closeDrawer}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 12,
+                      minHeight: 52,
+                      padding: '12px 14px',
+                      borderRadius: 10,
+                      textDecoration: 'none',
+                      fontSize: '15px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    <Group gap="sm" wrap="nowrap">
+                      <Icon size={19} stroke={1.8} />
+                      <span>{t(item.label)}</span>
+                    </Group>
+                    <IconChevronRight size={17} stroke={1.8} />
+                  </Link>
+                )
+              })()
             ))}
           </Stack>
 
           {/* Mobile language switcher */}
-          <Stack gap="2" mt="md">
+          <>
+            <Divider />
+            <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+              {t('interface_language')}
+            </Text>
+            <Stack gap={6}>
             {languages.map((lang) => (
               <button
                 key={lang.code}
@@ -135,11 +161,15 @@ export function Header({ user,  onLogout }: HeaderProps) {
                   closeDrawer()
                 }}
                 style={{
+                  display: 'flex',
+                  alignItems: 'center',
                   textAlign: 'left',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: 'transparent',
+                  width: '100%',
+                  minHeight: 46,
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  border: i18n.language === lang.code ? '1px solid var(--mantine-color-blue-3)' : '1px solid transparent',
+                  background: i18n.language === lang.code ? 'var(--mantine-color-blue-0)' : 'transparent',
                   fontSize: '14px',
                   fontWeight: i18n.language === lang.code ? 700 : 400,
                   cursor: 'pointer',
@@ -148,7 +178,8 @@ export function Header({ user,  onLogout }: HeaderProps) {
                 {lang.label}
               </button>
             ))}
-          </Stack>
+            </Stack>
+          </>
         </Stack>
       </Drawer>
     </>

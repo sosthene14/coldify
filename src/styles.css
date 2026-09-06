@@ -26,6 +26,40 @@
   .compose-mailbox-alert .mantine-Alert-message {
     text-align: left;
   }
+
+  .settings-mobile-nav {
+    overflow-x: auto;
+    margin: 0 -4px;
+    padding: 0 4px 4px;
+    scrollbar-width: none;
+  }
+
+  .settings-mobile-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .settings-mobile-nav-item {
+    display: inline-flex;
+    flex: 0 0 auto;
+    min-height: 52px;
+    min-width: 76px;
+    padding: 8px 10px;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    flex-direction: column;
+    color: var(--mantine-color-gray-6);
+    border: 1px solid var(--mantine-color-gray-3);
+    border-radius: 10px;
+    background: var(--mantine-color-white);
+    transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease;
+  }
+
+  .settings-mobile-nav-item.is-active {
+    color: var(--mantine-color-blue-7);
+    border-color: var(--mantine-color-blue-3);
+    background: var(--mantine-color-blue-0);
+  }
 }
 
 :where([class*='mantine-']) {
