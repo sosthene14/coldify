@@ -6,6 +6,7 @@ import { EmailSenderService } from "#/services/email.service"
 import { Alert, Anchor, Paper, Stack, TextInput } from "@mantine/core"
 import { IconAlertCircle } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router"
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 import { EmailActions } from "./EmailActions";
@@ -73,6 +74,13 @@ export function ComposeEmailPage() {
   
   const { validateForm } = useEmailValidation()
   const {templates} = useTemplateStore()
+  const [isScheduling, setIsScheduling] = useState(Boolean(formData.scheduledAt))
+
+  useEffect(() => {
+    if (uiState.editingScheduledId && formData.scheduledAt) {
+      setIsScheduling(true)
+    }
+  }, [uiState.editingScheduledId, formData.scheduledAt])
   const {
     attachments,
     addAttachments,
@@ -86,6 +94,11 @@ export function ComposeEmailPage() {
   })
 
   const handleSend = async () => {
+    if (isScheduling && !formData.scheduledAt) {
+      toast.error(t('select_schedule_time'))
+      return
+    }
+
     const validationPayload = {
       mailboxId: formData.mailboxId,
       to: formData.to,
@@ -232,14 +245,19 @@ export function ComposeEmailPage() {
 
             <ScheduleSection
               scheduledAt={formData.scheduledAt as Date}
+              visible={isScheduling}
               onChange={(value) => updateField('scheduledAt', value)}
             />
 
             <EmailActions
               sending={uiState.sending}
               disabled={connectedMailboxes.length === 0}
-              scheduledAt={formData.scheduledAt as Date}
+              isScheduling={isScheduling}
               onSend={handleSend}
+              onModeChange={(nextIsScheduling) => {
+                setIsScheduling(nextIsScheduling)
+                if (!nextIsScheduling) updateField('scheduledAt', null)
+              }}
               onClear={resetForm}
             />
           </Stack>

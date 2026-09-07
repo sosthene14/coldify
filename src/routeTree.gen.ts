@@ -18,6 +18,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as AuthErrorRouteImport } from './routes/auth.error'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardMailsIndexRouteImport } from './routes/dashboard/mails/index'
 import { Route as DashboardMailsNewRouteImport } from './routes/dashboard/mails/new'
@@ -71,6 +72,11 @@ const TermsRoute = TermsRouteImport.update({
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
   path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthErrorRoute = AuthErrorRouteImport.update({
+  id: '/auth/error',
+  path: '/auth/error',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/auth/error': typeof AuthErrorRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/mails/new': typeof DashboardMailsNewRoute
   '/dashboard/templates/new': typeof DashboardTemplatesNewRoute
@@ -151,6 +158,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/auth/error': typeof AuthErrorRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/mails/new': typeof DashboardMailsNewRoute
   '/dashboard/templates/new': typeof DashboardTemplatesNewRoute
@@ -172,6 +180,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/auth/error': typeof AuthErrorRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/mails/new': typeof DashboardMailsNewRoute
   '/dashboard/templates/new': typeof DashboardTemplatesNewRoute
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/terms'
     | '/verify-email'
+    | '/auth/error'
     | '/dashboard/'
     | '/dashboard/mails/new'
     | '/dashboard/templates/new'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/terms'
     | '/verify-email'
+    | '/auth/error'
     | '/dashboard'
     | '/dashboard/mails/new'
     | '/dashboard/templates/new'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/terms'
     | '/verify-email'
+    | '/auth/error'
     | '/dashboard/'
     | '/dashboard/mails/new'
     | '/dashboard/templates/new'
@@ -254,6 +266,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  AuthErrorRoute: typeof AuthErrorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -319,6 +332,13 @@ declare module '@tanstack/react-router' {
       path: '/verify-email'
       fullPath: '/verify-email'
       preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/error': {
+      id: '/auth/error'
+      path: '/auth/error'
+      fullPath: '/auth/error'
+      preLoaderRoute: typeof AuthErrorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/': {
@@ -427,6 +447,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  AuthErrorRoute: AuthErrorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -6,10 +6,11 @@ import { useTranslation } from 'react-i18next'
 
 interface ScheduleSectionProps {
   scheduledAt: Date | null
+  visible: boolean
   onChange: (value: Date | null) => void
 }
 
-export function ScheduleSection({ scheduledAt, onChange }: ScheduleSectionProps) {
+export function ScheduleSection({ scheduledAt, visible, onChange }: ScheduleSectionProps) {
   const { t } = useTranslation()
   
   // Get user's timezone
@@ -20,10 +21,10 @@ export function ScheduleSection({ scheduledAt, onChange }: ScheduleSectionProps)
   }
 
   return (
-    <>
+    visible && <>
       <DateTimePicker
         label={t('schedule_later_optional')}
-        placeholder={t('send_immediately')}
+        placeholder={t('schedule_later_optional')}
         value={scheduledAt}
         onChange={handleChange}
         minDate={new Date()}

@@ -43,6 +43,7 @@ import { useSession } from '#/lib/auth-client';
 import DOMPurify from 'dompurify'
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast'
+import { modals } from '@mantine/modals'
 
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://172.18.191.18:3001'
@@ -294,31 +295,33 @@ const handleCancelScheduled = async (email: EmailHistoryItem) => {
   }
 
   const handleDeleteEmail = async (email: EmailHistoryItem) => {
-    const confirmed = window.confirm(
-      t('are_you_sure_delete', { subject: email.subject })
-    )
+    modals.openConfirmModal({
+      title: t('delete_email_title'),
+      children: <Text size="sm">{t('are_you_sure_delete', { subject: email.subject })}</Text>,
+      labels: { confirm: t('delete_confirm'), cancel: t('cancel_confirm') },
+      confirmProps: { color: 'red' },
+      onConfirm: async () => {
+        try {
+          if (email.type === 'sent') {
+            await axios.delete(`${API_URL}/email-history/${email.id}`, {
+              withCredentials: true,
+            })
+          } else {
+            await axios.delete(`${API_URL}/scheduled-emails/${email.id}`, {
+              withCredentials: true,
+            })
+          }
 
-    if (!confirmed) return
+          await refetchEmails()
+          setModalOpened(false)
 
-    try {
-      if (email.type === 'sent') {
-        await axios.delete(`${API_URL}/email-history/${email.id}`, {
-          withCredentials: true,
-        })
-      } else {
-        await axios.delete(`${API_URL}/scheduled-emails/${email.id}`, {
-          withCredentials: true,
-        })
-      }
-
-      await refetchEmails()
-      setModalOpened(false)
-
-      toast.success(t('deleted_title'))
-    } catch (error: any) {
-      console.error('Failed to delete email:', error)
-      toast.error(t('error_occurred'))
-    }
+          toast.success(t('deleted_title'))
+        } catch (error: any) {
+          console.error('Failed to delete email:', error)
+          toast.error(t('error_occurred'))
+        }
+      },
+    })
   }
 
   const handleEditScheduled = (email: EmailHistoryItem) => {

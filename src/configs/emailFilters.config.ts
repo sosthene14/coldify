@@ -24,6 +24,7 @@ export const emailFilters: CampaignFilterItem[] = [
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 export const EMAIL_CONSTANTS = {
+  MAX_CONTENT_SIZE: 5 * 1024 * 1024, // 5 MiB for HTML + plain text
   MAX_ATTACHMENT_SIZE: 25 * 1024 * 1024, // 25MB
   DANGEROUS_EXTENSIONS: [
     '.exe', '.bat', '.cmd', '.com', '.pif', '.scr',

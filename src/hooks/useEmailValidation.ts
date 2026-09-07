@@ -37,6 +37,11 @@ export const useEmailValidation = () => {
     if (!formData.subject.trim()) return t('enter_subject_required')
     if (!formData.htmlContent.trim()) return t('enter_email_content_required')
 
+    const contentSize = new TextEncoder().encode(formData.htmlContent).byteLength
+    if (contentSize > EMAIL_CONSTANTS.MAX_CONTENT_SIZE) {
+      return 'Le contenu de l\'email dépasse la limite de 5 Mo.'
+    }
+
     if (formData.scheduledAt) {
       const scheduledDate = formData.scheduledAt instanceof Date 
         ? formData.scheduledAt 
