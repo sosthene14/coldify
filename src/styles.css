@@ -60,6 +60,12 @@
     border-color: var(--mantine-color-blue-3);
     background: var(--mantine-color-blue-0);
   }
+
+  .profile-language-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 :where([class*='mantine-']) {

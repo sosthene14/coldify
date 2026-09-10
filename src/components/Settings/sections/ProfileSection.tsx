@@ -42,15 +42,20 @@ export function ProfileSection() {
     if (data?.user) {
       // Auto-détection de la timezone du navigateur si pas déjà définie
       const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      const userLanguage = data.user.language === 'fr' ? 'fr' : 'en'
       
       setProfileData({
         firstName: data.user.firstName || data.user.name?.split(' ')[0] || '',
         lastName: data.user.lastName || data.user.name?.split(' ')[1] || '',
         timezone: data.user.timezone || detectedTimezone || 'UTC',
-        language: data.user.language || i18n.language || 'en'
+        language: userLanguage
       })
+
+      if (i18n.language !== userLanguage) {
+        i18n.changeLanguage(userLanguage)
+      }
     }
-  }, [data?.user, i18n.language])
+  }, [data?.user])
 
   // Générer la liste des timezones avec des infos utiles (Memoized pour performance)
 const timezoneOptions = useMemo(() => {
@@ -244,7 +249,7 @@ const timezoneOptions = useMemo(() => {
               styles={{
                 input: {
                   backgroundColor: '#f8f9fa',
-                  color: '#868e96',
+                  color: '#070707',
                   cursor: 'not-allowed'
                 }
               }}
@@ -263,6 +268,7 @@ const timezoneOptions = useMemo(() => {
                />
               <Select 
                 label={t('interface_language')} 
+                classNames={{ label: 'profile-language-label' }}
                 value={profileData.language}
                 onChange={(value) => {
                   const newLang = value || 'en'

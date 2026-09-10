@@ -74,6 +74,20 @@ export function MailboxesSection() {
   useEffect(() => {
     fetchMailboxes()
     fetchQuotaStats()
+
+    const searchParams = new URLSearchParams(window.location.search)
+    if (searchParams.get('mailbox') === 'error') {
+      const reason = searchParams.get('reason')
+      const message = reason === 'gmail_reauthorization_required'
+        ? t('gmail_reauthorization_required')
+        : t('gmail_connection_failed')
+
+      toast.error(message)
+      searchParams.delete('mailbox')
+      searchParams.delete('reason')
+      const cleanQuery = searchParams.toString()
+      window.history.replaceState({}, document.title, `${window.location.pathname}${cleanQuery ? `?${cleanQuery}` : ''}`)
+    }
   }, [])
 
   const handleConnect = async (provider: ProviderKey) => {
